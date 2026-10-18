@@ -60,8 +60,10 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean)
 
   const record = () => {
     if ([...stopVisits.values()].some((n) => n === 0)) return;
-    // A crossing driven on only one axis is just a costlier straight: skip such duplicates.
-    if ([...crossAxes.values()].some((mask) => mask !== 3)) return;
+    // A crossing driven on only one axis acts as a straight. If enough straights are left
+    // to swap them in, the same route with straights is counted on its own: skip this copy.
+    const singleAxis = [...crossAxes.values()].filter((mask) => mask !== 3).length;
+    if (singleAxis > 0 && left.straight >= singleAxis) return;
     result.count += 1;
     if (result.minRails === null || path.length < result.minRails) result.minRails = path.length;
     const copy = path.map((p) => ({ ...p, rail: { ...p.rail } }));

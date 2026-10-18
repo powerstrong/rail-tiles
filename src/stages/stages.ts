@@ -159,7 +159,7 @@ export const STAGE_DEFS: StageDef[] = [
       '. . . . . .',
       '. R . . . .',
       '. . P M . .',
-      'T . . . . .',
+      'T . . R . .',
       '. W . . . G',
     ],
     solution: [
@@ -210,7 +210,7 @@ export const STAGE_DEFS: StageDef[] = [
       'S . . . ┐ . .',
       'W W W W ║ W W',
       '. . T . . . .',
-      '. M . . . . .',
+      '. M . R . . .',
       'T G . . . . T',
     ],
     solution: [
@@ -393,7 +393,7 @@ export const STAGE_DEFS: StageDef[] = [
       '. M . R . R .',
       'S . 2 . 1 . T',
       '. M . . . . T',
-      'T . . P . . T',
+      'T . . P R . T',
       'T . . . . . T',
     ],
     solution: [
@@ -401,8 +401,8 @@ export const STAGE_DEFS: StageDef[] = [
       '. . . . │ . .',
       '. . . . │ . .',
       '. ─ . ─ . ┐ .',
-      '. . │ . . │ .',
-      '. . └ ─ ─ ┘ .',
+      '. . │ ┌ ─ ┘ .',
+      '. . └ ┘ . . .',
       '. . . . . . .',
     ],
   },
@@ -443,7 +443,7 @@ export const STAGE_DEFS: StageDef[] = [
     map: [
       'T . . . . P T', //
       '. . . . . . .',
-      '. . R . R . .',
+      '. R R . R . .',
       'S . . . . . .',
       '. . R . R . .',
       'P . . . . . T',

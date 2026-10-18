@@ -239,6 +239,16 @@ describe('crossings', () => {
     expect(trace.failure).toMatchObject({ reason: 'misaligned', cell: { x: 1, y: 2 } });
   });
 
+  it('counts a crossing used as a straight only when no straight could take its place', () => {
+    // LINE needs three straights; with two straights and one crossing, the crossing must fill in.
+    const short = stage(LINE, 'E', 'W', { straight: 2, curve: 0, cross: 1 } as never);
+    const res = solve(short, 1000, true);
+    expect(res.count).toBe(3); // the crossing can stand in any of the three cells
+    expect(res.minRails).toBe(3);
+    // With enough straights, crossings-as-straights are duplicates and are not counted.
+    expect(solve(stage(LINE, 'E', 'W', { straight: 3, curve: 0, cross: 1 } as never)).count).toBe(1);
+  });
+
   it('is required by the solver exactly when the map demands it', () => {
     const without = parseStage({ id: 'c', title: '', tip: '', map, start: 'E', goal: 'N', inventory: { straight: 9, curve: 9 }, solution: blankSolution(map) }, 1);
     expect(solve(without).count).toBe(0);
