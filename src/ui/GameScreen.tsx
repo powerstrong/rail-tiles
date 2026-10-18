@@ -1,5 +1,5 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createEditor, eraseRail, placeBlock, placeRail, remaining, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
+import { createEditor, eraseRail, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
 import { type Pose, traceToPath } from '../engine/geometry';
 import { RAIL_KINDS, type RailKind } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
@@ -123,14 +123,21 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
       else if (cell?.type === 'fixed') deny(x, y, '고정 레일은 지울 수 없어요.');
       return;
     }
+    const noneLeft = () => {
+      deny(x, y, `${KIND_LABEL[tool]} 레일이 더 없어요.`);
+      setBump({ tool, n: ++counter.current });
+    };
     if (placedHere) {
-      if (applyEdit(rotateRail(editor, x, y))) play('rotate');
+      // Same kind: rotate. Other kind: swap it out (the old piece is refunded).
+      if (placedHere.kind === tool) {
+        if (applyEdit(rotateRail(editor, x, y))) play('rotate');
+      } else if (left[tool] <= 0) noneLeft();
+      else if (applyEdit(replaceRail(stage, editor, x, y, tool))) play('place');
       return;
     }
     const block = placeBlock(stage, editor.placed, x, y, tool);
     if (block === 'none_left') {
-      deny(x, y, `${KIND_LABEL[tool]} 레일이 더 없어요.`);
-      setBump({ tool, n: ++counter.current });
+      noneLeft();
       return;
     }
     if (block === 'not_empty') {

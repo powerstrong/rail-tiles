@@ -1,6 +1,6 @@
 import { type RefObject, memo, useMemo, useState } from 'react';
 import { ALL_DIRS, type Dir, DX, DY } from '../engine/dir';
-import { type Placements, autoOrient, placeBlock } from '../engine/editor';
+import { type Placements, autoOrient, placeBlock, remaining } from '../engine/editor';
 import type { Pose } from '../engine/geometry';
 import type { Failure } from '../engine/simulate';
 import { type Stage, cellAt, cellKey } from '../engine/stage';
@@ -108,13 +108,14 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
   );
 });
 
-function PlacedRails({ placed, eraseHover }: { placed: Placements; eraseHover: string | null }) {
+function PlacedRails({ placed, eraseHover, swapHover }: { placed: Placements; eraseHover: string | null; swapHover: string | null }) {
   return (
     <g>
       {Object.entries(placed).map(([key, rail]) => {
         const [x, y] = key.split(',').map(Number);
+        // Keyed by kind too, so a swapped piece remounts and plays its pop-in.
         return (
-          <g key={key} transform={`translate(${centre(x)} ${centre(y)})`}>
+          <g key={`${key}:${rail.kind}`} transform={`translate(${centre(x)} ${centre(y)})`} opacity={swapHover === key ? 0.25 : 1}>
             <g className="rail-spin" style={{ transform: `rotate(${rail.spin * 90}deg)` }}>
               <g className="rail-pop">
                 <RailPieceArt kind={rail.kind} />
@@ -157,8 +158,17 @@ export function Board(props: BoardProps) {
 
   const preview = useMemo(() => {
     if (!editable || !hover || tool === 'eraser') return null;
+    const key = cellKey(hover.x, hover.y);
+    const existing = placed[key];
+    // Hovering a rail of the other kind previews the swap; the same kind just rotates on click.
+    if (existing) {
+      if (existing.kind === tool || remaining(stage, placed)[tool] <= 0) return null;
+      const without = { ...placed };
+      delete without[key];
+      return { ...hover, rot: autoOrient(stage, without, hover.x, hover.y, tool), kind: tool, swap: true };
+    }
     if (placeBlock(stage, placed, hover.x, hover.y, tool)) return null;
-    return { ...hover, rot: autoOrient(stage, placed, hover.x, hover.y, tool), kind: tool };
+    return { ...hover, rot: autoOrient(stage, placed, hover.x, hover.y, tool), kind: tool, swap: false };
   }, [editable, hover, tool, stage, placed]);
 
   const ghosts = showGhost ? stage.solution.filter((p) => !placed[cellKey(p.x, p.y)]) : [];
@@ -181,10 +191,14 @@ export function Board(props: BoardProps) {
         </g>
       ))}
 
-      <PlacedRails placed={placed} eraseHover={editable && tool === 'eraser' && hoverKey && placed[hoverKey] ? hoverKey : null} />
+      <PlacedRails
+        placed={placed}
+        eraseHover={editable && tool === 'eraser' && hoverKey && placed[hoverKey] ? hoverKey : null}
+        swapHover={preview?.swap ? cellKey(preview.x, preview.y) : null}
+      />
 
       {preview && (
-        <g transform={`translate(${centre(preview.x)} ${centre(preview.y)}) rotate(${preview.rot * 90})`} opacity={0.5} pointerEvents="none">
+        <g transform={`translate(${centre(preview.x)} ${centre(preview.y)}) rotate(${preview.rot * 90})`} opacity={preview.swap ? 0.75 : 0.5} pointerEvents="none">
           <RailPieceArt kind={preview.kind} />
         </g>
       )}

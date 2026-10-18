@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { E, N, S, W } from './dir';
-import { createEditor, eraseRail, placeBlock, placeRail, remaining, resetBoard, rotateRail, undo } from './editor';
+import { createEditor, eraseRail, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo } from './editor';
 import { RAIL_GLYPHS, type Rail, railExit, railPorts } from './rail';
 import { type RailMap, simulate } from './simulate';
 import { solve } from './solver';
@@ -200,6 +200,27 @@ describe('editor', () => {
     expect(new Set(rots).size).toBe(4);
     expect(remaining(s, ed.placed)).toEqual(before);
     expect(rotateRail(ed, 3, 3)).toBe(ed);
+  });
+
+  it('replacing a rail refunds the old kind and spends the new one', () => {
+    let ed = placeRail(s, createEditor(), 1, 2, 'straight');
+    ed = replaceRail(s, ed, 1, 2, 'curve');
+    expect(ed.placed[cellKey(1, 2)].kind).toBe('curve');
+    expect(remaining(s, ed.placed)).toEqual({ straight: 2, curve: 0 });
+    // The new curve is auto-oriented toward a neighbour that points at it:
+    // the start station (west) or the fixed straight (east).
+    const ports = railPorts(ed.placed[cellKey(1, 2)]);
+    expect(ports.includes(W) || ports.includes(E)).toBe(true);
+    ed = replaceRail(s, ed, 1, 2, 'straight');
+    expect(remaining(s, ed.placed)).toEqual({ straight: 1, curve: 1 });
+    expect(undo(ed).placed[cellKey(1, 2)].kind).toBe('curve');
+  });
+
+  it('replacing is a no-op for the same kind, empty cells, or an empty inventory', () => {
+    const ed = placeRail(s, placeRail(s, createEditor(), 1, 2, 'straight'), 1, 0, 'curve');
+    expect(replaceRail(s, ed, 1, 2, 'straight')).toBe(ed);
+    expect(replaceRail(s, ed, 3, 3, 'curve')).toBe(ed);
+    expect(replaceRail(s, ed, 1, 2, 'curve')).toBe(ed); // the only curve is already on the board
   });
 
   it('undo steps back through place, rotate, erase and reset', () => {

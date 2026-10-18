@@ -53,6 +53,22 @@ export function placeRail(stage: Stage, state: EditorState, x: number, y: number
   return commit(state, { ...state.placed, [cellKey(x, y)]: { kind, rot, spin: rot } });
 }
 
+/**
+ * Swaps a placed rail for the other kind in one step: the old piece goes back to the
+ * inventory and the new one is auto-oriented. No-op if the cell holds the same kind,
+ * holds nothing, or none of the new kind are left.
+ */
+export function replaceRail(stage: Stage, state: EditorState, x: number, y: number, kind: RailKind): EditorState {
+  const key = cellKey(x, y);
+  const current = state.placed[key];
+  if (!current || current.kind === kind) return state;
+  if (remaining(stage, state.placed)[kind] <= 0) return state;
+  const without = { ...state.placed };
+  delete without[key];
+  const rot = autoOrient(stage, without, x, y, kind);
+  return commit(state, { ...without, [key]: { kind, rot, spin: rot } });
+}
+
 export function rotateRail(state: EditorState, x: number, y: number): EditorState {
   const key = cellKey(x, y);
   const rail = state.placed[key];
