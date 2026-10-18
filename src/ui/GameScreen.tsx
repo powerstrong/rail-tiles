@@ -1,0 +1,327 @@
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createEditor, eraseRail, placeBlock, placeRail, remaining, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
+import { type Pose, traceToPath } from '../engine/geometry';
+import { RAIL_KINDS, type RailKind } from '../engine/rail';
+import { type FailReason, type Trace, simulate } from '../engine/simulate';
+import { type Stage, cellAt, cellKey } from '../engine/stage';
+import { CELL, RailPieceArt } from './art/TrackArt';
+import { CHIMNEY } from './art/TrainArt';
+import { Board, type Flash, type Tool } from './Board';
+import { poseTransform, runTrain } from './trainRunner';
+
+const KIND_LABEL: Record<RailKind, string> = { straight: '직선', curve: '곡선' };
+
+const FAIL_TEXT: Record<FailReason, string> = {
+  out_of_bounds: '선로가 게임판 밖으로 이어져 있어요.',
+  no_track: '선로가 중간에 끊겨 있어요.',
+  blocked: '장애물에 가로막혔어요.',
+  misaligned: '레일 방향이 맞지 않아요.',
+  goal_wrong_side: '도착역 입구와 방향이 맞지 않아요.',
+  start_reentry: '기차가 출발역으로 되돌아왔어요.',
+  missed_waypoint: '아직 태우지 못한 승객이 있어요.',
+  step_limit: '기차가 같은 길을 맴돌고 있어요.',
+};
+
+const TRAIN_SPEED = 2.6;
+
+type Mode = 'edit' | 'running' | 'result';
+
+interface Props {
+  stage: Stage;
+  hasNext: boolean;
+  onBack: () => void;
+  onNext: () => void;
+  onCleared: (stageId: string) => void;
+}
+
+function startPose(stage: Stage): Pose {
+  return { x: stage.start.x + 0.5, y: stage.start.y + 0.5, angle: (stage.start.dir - 1) * 90 };
+}
+
+function ToolIcon({ tool }: { tool: Tool }) {
+  if (tool === 'eraser') {
+    return (
+      <svg viewBox="-50 -50 100 100" className="tool-icon" aria-hidden>
+        <g transform="rotate(-35)">
+          <rect x={-34} y={-20} width={68} height={40} rx={10} fill="#F7A6A0" />
+          <rect x={-34} y={-20} width={26} height={40} rx={10} fill="#7A8FC2" />
+          <rect x={-14} y={-20} width={6} height={40} fill="#7A8FC2" />
+        </g>
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="-50 -50 100 100" className="tool-icon" aria-hidden>
+      <g transform="rotate(90)">
+        <RailPieceArt kind={tool} />
+      </g>
+    </svg>
+  );
+}
+
+export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props) {
+  const [editor, setEditor] = useState(createEditor);
+  const [tool, setTool] = useState<Tool>(() => RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
+  const [mode, setMode] = useState<Mode>('edit');
+  const [result, setResult] = useState<Trace | null>(null);
+  const [restPose, setRestPose] = useState(() => startPose(stage));
+  const [flash, setFlash] = useState<Flash | null>(null);
+  const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
+  const [bump, setBump] = useState<{ tool: Tool; n: number } | null>(null);
+  const trainRef = useRef<SVGGElement>(null);
+  const smokeRef = useRef<SVGGElement>(null);
+  const cancelRun = useRef<(() => void) | null>(null);
+  const counter = useRef(0);
+
+  const left = remaining(stage, editor.placed);
+  const tools = useMemo<Tool[]>(() => [...RAIL_KINDS.filter((k) => stage.inventory[k] > 0), 'eraser'], [stage]);
+  const running = mode === 'running';
+
+  useEffect(() => () => cancelRun.current?.(), []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const say = (text: string) => setToast({ text, n: ++counter.current });
+  const deny = (x: number, y: number, text?: string) => {
+    setFlash({ x, y, n: ++counter.current });
+    if (text) say(text);
+  };
+
+  /** Any edit after a run puts the train back in the station and clears the result. */
+  const applyEdit = useCallback(
+    (next: typeof editor) => {
+      if (next === editor) return false;
+      setEditor(next);
+      if (mode === 'result') {
+        setMode('edit');
+        setResult(null);
+        setRestPose(startPose(stage));
+      }
+      return true;
+    },
+    [editor, mode, stage],
+  );
+
+  const onCellClick = (x: number, y: number) => {
+    if (running) return;
+    const placedHere = editor.placed[cellKey(x, y)];
+    const cell = cellAt(stage, x, y);
+    if (tool === 'eraser') {
+      if (placedHere) applyEdit(eraseRail(editor, x, y));
+      else if (cell?.type === 'fixed') deny(x, y, '고정 레일은 지울 수 없어요.');
+      return;
+    }
+    if (placedHere) {
+      applyEdit(rotateRail(editor, x, y));
+      return;
+    }
+    const block = placeBlock(stage, editor.placed, x, y, tool);
+    if (block === 'none_left') {
+      deny(x, y, `${KIND_LABEL[tool]} 레일이 더 없어요.`);
+      setBump({ tool, n: ++counter.current });
+      return;
+    }
+    if (block === 'not_empty') {
+      deny(x, y, cell?.type === 'fixed' ? '고정 레일은 움직일 수 없어요.' : undefined);
+      return;
+    }
+    applyEdit(placeRail(stage, editor, x, y, tool));
+  };
+
+  const spawnPuff = (pose: Pose) => {
+    const layer = smokeRef.current;
+    if (!layer) return;
+    const a = (pose.angle * Math.PI) / 180;
+    const puff = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    puff.setAttribute('cx', (pose.x * CELL + Math.cos(a) * CHIMNEY.x).toFixed(1));
+    puff.setAttribute('cy', (pose.y * CELL + Math.sin(a) * CHIMNEY.x).toFixed(1));
+    puff.setAttribute('r', '7');
+    puff.setAttribute('class', 'puff');
+    puff.addEventListener('animationend', () => puff.remove());
+    layer.appendChild(puff);
+  };
+
+  const start = () => {
+    if (running) return;
+    cancelRun.current?.();
+    const trace = simulate(stage, editor.placed);
+    const path = traceToPath(trace.steps);
+    setResult(null);
+    setRestPose(startPose(stage));
+    setMode('running');
+    cancelRun.current = runTrain(path, {
+      speed: TRAIN_SPEED,
+      brake: trace.success,
+      onPose: (pose) => trainRef.current?.setAttribute('transform', poseTransform(pose, CELL)),
+      onPuff: spawnPuff,
+      onDone: (pose) => {
+        cancelRun.current = null;
+        setRestPose(pose);
+        setResult(trace);
+        setMode('result');
+        if (trace.success) onCleared(stage.id);
+      },
+    });
+  };
+
+  const doUndo = () => !running && applyEdit(undo(editor));
+  const doReset = () => !running && applyEdit(resetBoard(editor));
+
+  const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandler.current = (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      doUndo();
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const idx = ['1', '2', '3'].indexOf(e.key);
+    if (idx >= 0 && tools[idx]) setTool(tools[idx]);
+    else if (e.key.toLowerCase() === 'e') setTool('eraser');
+    else if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) start();
+  };
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => keyHandler.current(e);
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, []);
+
+  const failure = result && !result.success ? result.failure : null;
+  const success = result?.success ?? false;
+
+  return (
+    <div className="game">
+      <header className="game-head">
+        <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M15 5 L8 12 L15 19" />
+          </svg>
+        </button>
+        <div className="game-title">
+          <span className="stage-no">STAGE {stage.number}</span>
+          <h1>{stage.title}</h1>
+        </div>
+        <div className="head-actions">
+          <button className="icon-btn" onClick={doUndo} disabled={running || editor.history.length === 0} aria-label="되돌리기">
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <path d="M9 7 L4 12 L9 17 M4 12 H14 A6 6 0 0 1 14 24" transform="translate(1 -3)" />
+            </svg>
+          </button>
+          <button className="icon-btn" onClick={doReset} disabled={running || usedCount(editor.placed) === 0} aria-label="모두 지우기">
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <path d="M19 12 A7 7 0 1 1 16.5 6.6 M17 2.5 V7 H12.5" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <p className="tip">{stage.tip}</p>
+
+      <div className="board-wrap">
+        <Board
+          stage={stage}
+          placed={editor.placed}
+          editable={!running}
+          tool={tool}
+          showGhost={stage.ghostHint && mode === 'edit'}
+          failure={failure}
+          arrived={success}
+          flash={flash}
+          restPose={restPose}
+          trainRef={trainRef}
+          smokeRef={smokeRef}
+          onCellClick={onCellClick}
+        />
+        {toast && (
+          <div key={toast.n} className="toast" role="status">
+            {toast.text}
+          </div>
+        )}
+      </div>
+
+      <div className={`status ${failure ? 'is-fail' : ''}`} aria-live="polite">
+        {failure ? (
+          <>
+            <strong>앗!</strong> {FAIL_TEXT[failure.reason]} 레일을 고친 뒤 다시 출발해 보세요.
+          </>
+        ) : running ? (
+          '칙칙폭폭…'
+        ) : (
+          <>
+            레일 {usedCount(editor.placed)}개 놓음
+            {failure === null && mode === 'edit' && usedCount(editor.placed) > 0 && ' · 준비되면 출발!'}
+          </>
+        )}
+      </div>
+
+      <div className="dock">
+        <div className="tools" role="radiogroup" aria-label="도구">
+          {tools.map((t, i) => {
+            const count = t === 'eraser' ? null : left[t];
+            return (
+              <button
+                key={t + (bump?.tool === t ? bump.n : '')}
+                role="radio"
+                aria-checked={tool === t}
+                className={`tool ${tool === t ? 'selected' : ''} ${count === 0 ? 'empty' : ''} ${bump?.tool === t ? 'bump' : ''}`}
+                onClick={() => setTool(t)}
+                disabled={running}
+                title={`${t === 'eraser' ? '지우개' : `${KIND_LABEL[t]} 레일`} (${i + 1})`}
+              >
+                <ToolIcon tool={t} />
+                <span className="tool-label">{t === 'eraser' ? '지우개' : KIND_LABEL[t]}</span>
+                {count !== null && <span className="count">{count}</span>}
+              </button>
+            );
+          })}
+        </div>
+        <button className="go-btn" onClick={start} disabled={running}>
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M8 5 L19 12 L8 19 Z" />
+          </svg>
+          출발
+        </button>
+      </div>
+
+      {success && (
+        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+          <div className="result-card">
+            <div className="confetti" aria-hidden>
+              {Array.from({ length: 18 }, (_, i) => (
+                <i key={i} style={{ '--i': i } as CSSProperties} />
+              ))}
+            </div>
+            <p className="result-kicker">STAGE {stage.number}</p>
+            <h2>도착 완료!</h2>
+            <p className="result-sub">레일 {usedCount(editor.placed)}개로 기차가 무사히 도착했어요.</p>
+            <div className="result-actions">
+              {hasNext ? (
+                <button className="primary" onClick={onNext} autoFocus>
+                  다음 스테이지
+                </button>
+              ) : (
+                <button className="primary" onClick={onBack} autoFocus>
+                  스테이지 목록
+                </button>
+              )}
+              <button
+                className="secondary"
+                onClick={() => {
+                  setResult(null);
+                  setMode('edit');
+                  setRestPose(startPose(stage));
+                }}
+              >
+                다시 배치하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
