@@ -86,6 +86,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const smokeRef = useRef<SVGGElement>(null);
   const cancelRun = useRef<(() => void) | null>(null);
   const counter = useRef(0);
+  const celebrationTimers = useRef<number[]>([]);
 
   const left = remaining(stage, editor.placed);
   const tools = useMemo<Tool[]>(() => [...RAIL_KINDS.filter((k) => stage.inventory[k] > 0), 'eraser'], [stage]);
@@ -106,7 +107,13 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   };
   const hint = hintKey ? (solutionOrder.find((p) => cellKey(p.x, p.y) === hintKey && !matches(p)) ?? null) : null;
 
-  useEffect(() => () => cancelRun.current?.(), []);
+  useEffect(
+    () => () => {
+      cancelRun.current?.();
+      celebrationTimers.current.forEach(clearTimeout);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!toast) return;
@@ -189,6 +196,8 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const start = () => {
     if (running) return;
     cancelRun.current?.();
+    celebrationTimers.current.forEach(clearTimeout);
+    celebrationTimers.current = [];
     const trace = simulate(stage, editor.placed);
     const path = traceToPath(trace.steps);
     // Passengers are picked up as the train passes the middle of their tile.
@@ -245,6 +254,11 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           const stars = starsFor(usedCount(editor.placed), stage.par, hinted);
           setEarned(stars);
           onCleared(stage.id, stars);
+          // Ceremony first, then one ping per star as the result card shows them (see styles.css delays).
+          celebrationTimers.current.push(window.setTimeout(() => play('pop'), 120));
+          (['star1', 'star2', 'star3'] as const).slice(0, stars).forEach((sfx, i) => {
+            celebrationTimers.current.push(window.setTimeout(() => play(sfx), 1850 + i * 250));
+          });
         }
       },
     });

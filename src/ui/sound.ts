@@ -2,7 +2,7 @@
  * Tiny synthesized sound effects (Web Audio, no asset files). The AudioContext is
  * created lazily on the first sound, which always follows a user gesture.
  */
-export type Sfx = 'place' | 'rotate' | 'erase' | 'deny' | 'depart' | 'chuff' | 'pickup' | 'arrive' | 'crash';
+export type Sfx = 'place' | 'rotate' | 'erase' | 'deny' | 'depart' | 'chuff' | 'pickup' | 'arrive' | 'crash' | 'pop' | 'star1' | 'star2' | 'star3';
 
 const MUTE_KEY = 'rail-tiles:muted';
 
@@ -108,6 +108,20 @@ export function play(sfx: Sfx): void {
     case 'arrive':
       [523, 659, 784, 1046].forEach((f, i) => tone(ac, f, t + i * 0.1, 0.28, { type: 'triangle', gain: 0.15 }));
       break;
+    case 'pop':
+      // Confetti popper: a bright burst with a quick upward chirp.
+      noise(ac, t, 0.09, { freq: 5000, gain: 0.12 });
+      tone(ac, 660, t + 0.02, 0.18, { type: 'triangle', gain: 0.1, slideTo: 1320 });
+      break;
+    case 'star1':
+    case 'star2':
+    case 'star3': {
+      // One ping per star, climbing a major triad.
+      const f = { star1: 1046, star2: 1318, star3: 1568 }[sfx];
+      tone(ac, f, t, 0.35, { type: 'sine', gain: 0.13 });
+      tone(ac, f * 2, t, 0.18, { type: 'sine', gain: 0.04 });
+      break;
+    }
     case 'crash':
       noise(ac, t, 0.3, { freq: 400, gain: 0.3 });
       tone(ac, 140, t, 0.25, { type: 'sine', gain: 0.2, slideTo: 60 });

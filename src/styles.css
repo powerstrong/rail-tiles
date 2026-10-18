@@ -498,15 +498,15 @@ p {
 }
 
 .result-stars svg:nth-child(1) {
-  animation-delay: 0.6s;
+  animation-delay: 1.75s;
 }
 
 .result-stars svg:nth-child(2) {
-  animation-delay: 0.75s;
+  animation-delay: 2s;
 }
 
 .result-stars svg:nth-child(3) {
-  animation-delay: 0.9s;
+  animation-delay: 2.25s;
 }
 
 @keyframes star-pop {
@@ -683,7 +683,7 @@ p {
   place-items: center;
   padding: 16px;
   background: rgba(58, 45, 30, 0.32);
-  animation: fade-in 0.3s ease 0.35s both;
+  animation: fade-in 0.3s ease 1.3s both;
   z-index: 10;
 }
 
@@ -695,7 +695,7 @@ p {
   padding: 30px 22px 22px;
   text-align: center;
   box-shadow: 0 6px 0 var(--line), 0 24px 48px rgba(70, 45, 20, 0.25);
-  animation: card-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 0.4s both;
+  animation: card-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 1.35s both;
 }
 
 .result-kicker {
@@ -739,7 +739,7 @@ p {
   height: 14px;
   border-radius: 3px;
   background: hsl(calc(var(--i) * 47deg) 80% 62%);
-  animation: confetti 1.1s cubic-bezier(0.15, 0.7, 0.4, 1) calc(0.45s + var(--i) * 0.012s) both;
+  animation: confetti 1.1s cubic-bezier(0.15, 0.7, 0.4, 1) calc(1.5s + var(--i) * 0.012s) both;
 }
 
 .confetti i:nth-child(odd) {
@@ -786,6 +786,151 @@ p {
   transform-box: fill-box;
   transform-origin: center;
   animation: celebrate 0.9s ease-out 2 forwards;
+}
+
+.board {
+  overflow: visible;
+}
+
+/* ---------- arrival ceremony ---------- */
+
+.confetti-piece {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: confetti-burst 1.5s cubic-bezier(0.2, 0.7, 0.35, 1) both;
+}
+
+.sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sparkle 0.7s ease-out both;
+}
+
+.heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: heart-float 1.4s ease-out both;
+}
+
+.hop-out {
+  animation: hop-out 0.55s cubic-bezier(0.3, 0.9, 0.4, 1) both;
+}
+
+.wave-arm {
+  transform-box: view-box;
+  transform-origin: 8px 2px;
+  animation: wave 0.35s ease-in-out 4 alternate both;
+}
+
+.arrive-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bubble-pop 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) 0.15s both;
+}
+
+.train-cheer {
+  animation: cheer 0.9s ease-out both;
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.3);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(var(--mx), var(--my)) rotate(calc(var(--rot) * 0.4)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--ex), var(--ey)) rotate(var(--rot)) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes heart-float {
+  0% {
+    transform: translate(0, 0) scale(0.2);
+    opacity: 0;
+  }
+  25% {
+    transform: translate(0, -18px) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--sway), -80px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes hop-out {
+  0% {
+    transform: translate(0, 0) scale(0.3);
+    opacity: 0;
+  }
+  55% {
+    transform: translate(calc(var(--tx) * 0.6), calc(var(--ty) * 0.5 - 34px)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes wave {
+  from {
+    transform: rotate(-25deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes bubble-pop {
+  from {
+    transform: scale(0.2) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes cheer {
+  0% {
+    transform: scale(1, 1);
+  }
+  15% {
+    transform: scale(1.18, 0.82);
+  }
+  35% {
+    transform: scale(0.88, 1.14) rotate(-6deg);
+  }
+  55% {
+    transform: scale(1.06, 0.95) rotate(5deg);
+  }
+  75% {
+    transform: scale(0.98, 1.02) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1, 1) rotate(0deg);
+  }
 }
 
 .switch-idle {

@@ -8,6 +8,7 @@ import type { SwitchStates } from '../engine/step';
 import { C } from './art/palette';
 import { BridgeArt, DecorationArt, GroundDetail, TunnelArt, TunnelBadge, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
 import { CELL, RailPieceArt, SwitchArt } from './art/TrackArt';
+import { Ceremony } from './art/Ceremony';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
 
@@ -246,22 +247,10 @@ export function Board(props: BoardProps) {
         );
       })}
 
-      {arrived && (
-        <circle
-          className="celebrate-ring"
-          cx={centre(stage.goal.x)}
-          cy={centre(stage.goal.y)}
-          r={40}
-          fill="none"
-          stroke={C.gold}
-          strokeWidth={6}
-          pointerEvents="none"
-        />
-      )}
 
       <g ref={smokeRef} pointerEvents="none" />
       <g ref={trainRef} transform={poseTransform(restPose, CELL)} opacity={restPose.alpha} pointerEvents="none">
-        <g className={failure && !arrived ? 'train-crash' : undefined}>
+        <g className={arrived ? 'train-cheer' : failure ? 'train-crash' : undefined}>
           <TrainArt />
         </g>
       </g>
@@ -274,6 +263,16 @@ export function Board(props: BoardProps) {
       ))}
 
       {failure && <FailMarker failure={failure} />}
+
+      {arrived && (
+        <Ceremony
+          cx={centre(stage.goal.x)}
+          cy={centre(stage.goal.y)}
+          bubbleBelow={stage.goal.y < stage.height / 2}
+          passengers={picked.size}
+          seed={stage.number}
+        />
+      )}
 
       {flash && (
         <rect
