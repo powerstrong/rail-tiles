@@ -4,7 +4,7 @@ import { type Pose, traceToPath } from '../engine/geometry';
 import { RAIL_KINDS, type RailKind, normalizeRot } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
-import { type Stars, starsFor } from '../engine/stars';
+import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { type SwitchStates, initialSwitches } from '../engine/step';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
@@ -388,7 +388,10 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           ) : (
             <span>
               {stage.waypoints.length > 0 && <span className="riders">손님 {stage.waypoints.length}명 · </span>}
-              레일 <b>{usedCount(editor.placed)}</b>개 · <span className="par">★★★ {stage.par}개 이하</span>
+              레일 <b>{usedCount(editor.placed)}</b>개 ·{' '}
+              <span className="par">
+                ★★★ {stage.par} · ★★ {stage.par + TWO_STAR_SLACK}개 이하
+              </span>
               {hinted && <span className="hinted"> · 힌트 사용(최대 ★★)</span>}
             </span>
           )}
@@ -443,7 +446,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
               <>
                 <h2>도착 완료!</h2>
                 <p className="result-sub">
-                  레일 {usedCount(editor.placed)}개 사용 · ★★★ 목표 {stage.par}개
+                  레일 {usedCount(editor.placed)}개 사용 · ★★★ {stage.par}개 · ★★ {stage.par + TWO_STAR_SLACK}개
                   {earned < 3 && !hinted && (
                     <>
                       <br />

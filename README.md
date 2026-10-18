@@ -43,7 +43,8 @@ npm run stages     # 스테이지별 정답 경로 수, 최소 레일 수, 정�
 ### 별과 힌트
 
 - 스테이지마다 **par**(이길 수 있는 최소 레일 수)가 있습니다. par 이하로 클리어하면 ★★★, par+2 이하면 ★★, 그 외는 ★입니다.
-- 클리어에는 여유 레일이 주어지므로, 클리어 자체보다 ★★★가 진짜 도전입니다.
+- 레일은 넉넉히 주어집니다. 돌아가는 길로도 클리어할 수 있지만 그러면 ★★나 ★가 되고, ★★★는 최단 경로를 찾아야 합니다.
+- 튜토리얼(1, 11)을 제외한 모든 스테이지에서 ★★★가 아닌 클리어가 가능한지 테스트로 보장합니다.
 - **힌트** 버튼은 정답 레일 한 칸을 보여 줍니다. 힌트를 쓰면 이번 클리어는 최대 ★★입니다.
 - 가장 좋은 기록이 저장됩니다(진행 데이터 v2. 예전 v1 기록은 클리어당 ★1로 자동 이전).
 
@@ -104,6 +105,8 @@ scripts/
   stage-report.ts    npm run stages: 현재 스테이지 점검
   stage-design.ts    npm run stage-design -- drafts.ts: 초안 맵의 인벤토리별 경로 수 표
   inventory-table.ts vite-node scripts/inventory-table.ts <id>: 현재 스테이지 수량 주변 경로 수
+  star-spread.ts     vite-node scripts/star-spread.ts: 스테이지별 ★★★/★★/★ 경로 분포
+  tune-stars.ts      vite-node scripts/tune-stars.ts 4: 별 분포가 생기는 여유 레일 수 탐색
 ```
 
 ### 핵심 설계

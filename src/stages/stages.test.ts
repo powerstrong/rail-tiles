@@ -6,31 +6,34 @@ import { cellKey } from '../engine/stage';
 import { STAGES } from './stages';
 
 /**
- * Pinned number of winning routes per stage. A change here means a stage got
- * easier or harder — update deliberately, never just to make the test pass.
+ * Pinned [routes that earn ★★★ (use exactly par rails), all winning routes] per stage.
+ * A change means a stage got easier or harder — update deliberately, never just to
+ * make the test pass. Apart from the two tutorials, every stage must also allow
+ * sloppier clears, so the star rating means something.
  */
-const EXPECTED_ROUTES: Record<string, number> = {
-  'first-line': 1,
-  'first-turn': 1,
-  'around-the-hill': 1,
-  'river-crossing': 2,
-  'make-it-last': 2,
-  'first-passenger': 2,
-  'forest-stop': 1,
-  'two-passengers': 3,
-  'the-way-back': 1,
-  'last-run': 1,
-  'tunnel-intro': 1,
-  'around-the-back': 3,
-  'two-tunnels': 1,
-  'under-the-river': 2,
-  'first-crossing': 1,
-  'first-switch': 3,
-  'wrong-way-switch': 1,
-  'figure-eight': 2,
-  'crossing-return': 1,
-  'grand-tour': 1,
+const EXPECTED: Record<string, [optimal: number, total: number]> = {
+  'first-line': [1, 1],
+  'first-turn': [1, 4],
+  'around-the-hill': [1, 3],
+  'river-crossing': [2, 4],
+  'make-it-last': [2, 4],
+  'first-passenger': [2, 4],
+  'forest-stop': [6, 11],
+  'two-passengers': [1, 13],
+  'the-way-back': [5, 23],
+  'last-run': [2, 5],
+  'tunnel-intro': [1, 1],
+  'around-the-back': [1, 7],
+  'two-tunnels': [1, 7],
+  'under-the-river': [2, 4],
+  'first-crossing': [1, 11],
+  'first-switch': [5, 25],
+  'wrong-way-switch': [1, 5],
+  'figure-eight': [7, 12],
+  'crossing-return': [1, 39],
+  'grand-tour': [1, 6],
 };
+const TUTORIALS = new Set(['first-line', 'tunnel-intro']);
 
 describe('stages', () => {
   it('have unique ids', () => {
@@ -51,10 +54,12 @@ describe('stages', () => {
         expect(simulate(stage, placed).success).toBe(true);
       });
 
-      it('has the expected number of routes, and its listed solution is a shortest one (par)', () => {
-        const res = solve(stage);
-        expect(res.count).toBe(EXPECTED_ROUTES[stage.id]);
+      it('has the pinned routes; its listed solution is a shortest one (par); sloppier clears exist', () => {
+        const res = solve(stage, 2000, true);
         expect(res.minRails).toBe(stage.par);
+        const optimal = (res.routes ?? []).filter((r) => r.length === stage.par).length;
+        expect([optimal, res.count]).toEqual(EXPECTED[stage.id]);
+        if (!TUTORIALS.has(stage.id)) expect(res.count).toBeGreaterThan(optimal);
       });
     });
   }
