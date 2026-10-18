@@ -71,7 +71,7 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
       } else if (cell.type === 'fixed') {
         scenery.push(
           <g key={cellKey(x, y)} transform={`${t} rotate(${cell.rail.rot * 90})`}>
-            <RailPieceArt kind={cell.rail.kind} tint="#E2D3B3" />
+            <RailPieceArt kind={cell.rail.kind} tint={C.ballastFixed} />
           </g>,
         );
       }
@@ -79,11 +79,13 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
   }
   return (
     <g>
-      <rect x={-BOARD_PAD + 4} y={-BOARD_PAD + 10} width={w + BOARD_PAD * 2} height={h + BOARD_PAD * 2} rx={30} fill={C.shadow} />
+      <rect x={-BOARD_PAD + 3} y={-BOARD_PAD + 9} width={w + BOARD_PAD * 2} height={h + BOARD_PAD * 2} rx={30} fill={C.shadow} />
       <rect x={-BOARD_PAD} y={-BOARD_PAD + 6} width={w + BOARD_PAD * 2} height={h + BOARD_PAD * 2} rx={30} fill={C.boardWoodDark} />
-      <rect x={-BOARD_PAD} y={-BOARD_PAD} width={w + BOARD_PAD * 2} height={h + BOARD_PAD * 2} rx={30} fill={C.boardWood} />
-      <rect x={-BOARD_PAD + 6} y={-BOARD_PAD + 5} width={w + BOARD_PAD * 2 - 12} height={10} rx={5} fill={C.boardWoodHi} opacity={0.6} />
-      <rect x={-6} y={-6} width={w + 12} height={h + 12} rx={18} fill={C.boardWoodDark} opacity={0.55} />
+      <rect x={-BOARD_PAD} y={-BOARD_PAD} width={w + BOARD_PAD * 2} height={h + BOARD_PAD * 2} rx={30} fill={C.boardWoodHi} />
+      <rect x={-BOARD_PAD + 3} y={-BOARD_PAD + 4} width={w + BOARD_PAD * 2 - 6} height={h + BOARD_PAD * 2 - 5} rx={27} fill={C.boardWood} />
+      <rect x={-BOARD_PAD + 9} y={-BOARD_PAD + 6} width={w + BOARD_PAD * 2 - 18} height={4} rx={2} fill={C.boardWoodHi} opacity={0.7} />
+      <rect x={-8} y={-8} width={w + 16} height={h + 16} rx={19} fill={C.boardWoodDark} />
+      <rect x={-6} y={-4} width={w + 12} height={h + 10} rx={17} fill={C.boardInset} />
       {tiles}
       {scenery}
       {(['start', 'goal'] as const).map((kind) => {

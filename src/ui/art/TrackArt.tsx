@@ -7,11 +7,11 @@ import { C } from './palette';
 /** Cell size in SVG units. All art is drawn around a tile centre at (0, 0). */
 export const CELL = 100;
 
-const BALLAST = 50;
-const BALLAST_EDGE = 56;
+const BALLAST = 46;
+const BALLAST_EDGE = 50;
 const GAUGE = 0.14; // rail offset from centreline, in cells
-const TIE_LEN = 44;
-const TIE_W = 8;
+const TIE_LEN = 39;
+const TIE_W = 6;
 
 function Ties({ seg, count }: { seg: Segment; count: number }) {
   const ties = [];
@@ -22,8 +22,8 @@ function Ties({ seg, count }: { seg: Segment; count: number }) {
     const angle = (Math.atan2(tg.y, tg.x) * 180) / Math.PI;
     ties.push(
       <g key={i} transform={`translate(${p.x * CELL} ${p.y * CELL}) rotate(${angle})`}>
-        <rect x={-TIE_W / 2} y={-TIE_LEN / 2 + 1.5} width={TIE_W} height={TIE_LEN} rx={2} fill={C.tieDark} />
-        <rect x={-TIE_W / 2} y={-TIE_LEN / 2} width={TIE_W} height={TIE_LEN} rx={2} fill={C.tie} />
+        <rect x={-TIE_W / 2} y={-TIE_LEN / 2 + 1} width={TIE_W} height={TIE_LEN} rx={1.5} fill={C.tieDark} />
+        <rect x={-TIE_W / 2} y={-TIE_LEN / 2} width={TIE_W} height={TIE_LEN} rx={1.5} fill={C.tie} />
       </g>,
     );
   }
@@ -43,8 +43,8 @@ export function SegmentArt({ seg, tint }: { seg: Segment; tint?: string }) {
       <Ties seg={seg} count={ties} />
       {[left, right].map((d) => (
         <g key={d}>
-          <path d={d} stroke={C.steel} strokeWidth={6} fill="none" />
-          <path d={d} stroke={C.steelHi} strokeWidth={2} fill="none" transform="translate(-0.6 -0.8)" />
+          <path d={d} stroke={C.steel} strokeWidth={5} fill="none" />
+          <path d={d} stroke={C.steelHi} strokeWidth={1.7} fill="none" />
         </g>
       ))}
     </g>
