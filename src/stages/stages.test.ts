@@ -35,7 +35,7 @@ describe('stages', () => {
     describe(`${stage.number}. ${stage.id}`, () => {
       it('listed solution wins within the inventory', () => {
         const placed: Record<string, Rail> = {};
-        const used = { straight: 0, curve: 0 };
+        const used = { straight: 0, curve: 0, cross: 0 };
         for (const p of stage.solution) {
           placed[cellKey(p.x, p.y)] = p.rail;
           used[p.rail.kind] += 1;

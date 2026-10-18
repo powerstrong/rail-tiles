@@ -1,6 +1,7 @@
 import { type Dir, DX, DY, opposite, rotateCW } from './dir';
-import { type Rail, type RailKind, railExit, railPorts, rotationCount } from './rail';
+import { type Rail, type RailKind, railPorts, rotationCount } from './rail';
 import { type Placement, type Stage, cellAt, cellKey } from './stage';
+import { type SwitchStates, enter, initialSwitches, motionKey } from './step';
 
 export interface SolveResult {
   /** Number of distinct winning routes (capped at `limit`). */
@@ -25,9 +26,13 @@ function pieceFor(inEdge: Dir, outEdge: Dir): Rail {
 }
 
 /**
- * Enumerates every route from start to goal that fits the inventory. A route is a
- * simple path (two-port pieces can never be crossed twice), so a DFS over
- * "go straight / turn left / turn right" with visited-cell pruning is exhaustive.
+ * Enumerates every winning way to lay track (distinct sets of player rails).
+ *
+ * The train is driven by the same `enter` rules as `simulate`. Whenever it reaches an
+ * empty cell with no rail yet, the search branches over the pieces that could go there;
+ * when it comes back to a cell it already built, it simply follows that piece. Crossings
+ * and switches make such revisits possible; a repeated (cell, heading, switches) state
+ * means an endless loop and ends that branch.
  */
 export function solve(stage: Stage, limit = 1000, collectRoutes = false): SolveResult {
   const all = search(stage, limit, Infinity, collectRoutes);
@@ -43,69 +48,83 @@ export function solve(stage: Stage, limit = 1000, collectRoutes = false): SolveR
 
 function search(stage: Stage, limit: number, maxRails: number, collect: boolean): Omit<SolveResult, 'truncated'> {
   const left = { ...stage.inventory };
-  const visited = new Set<string>();
+  const built = new Map<string, Rail>();
   const path: Placement[] = [];
+  /** Axes (bit 0: N–S, bit 1: E–W) each placed crossing has been driven on. */
+  const crossAxes = new Map<string, number>();
+  const switches: SwitchStates = initialSwitches(stage);
+  const seen = new Set<string>();
+  const stopVisits = new Map<string, number>(stage.waypoints.map((p) => [cellKey(p.x, p.y), 0]));
   const result: Omit<SolveResult, 'truncated'> = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
-  const copy = () => path.map((p) => ({ ...p, rail: { ...p.rail } }));
+  const lookup = (x: number, y: number) => built.get(cellKey(x, y)) ?? null;
+
+  const record = () => {
+    if ([...stopVisits.values()].some((n) => n === 0)) return;
+    // A crossing driven on only one axis is just a costlier straight: skip such duplicates.
+    if ([...crossAxes.values()].some((mask) => mask !== 3)) return;
+    result.count += 1;
+    if (result.minRails === null || path.length < result.minRails) result.minRails = path.length;
+    const copy = path.map((p) => ({ ...p, rail: { ...p.rail } }));
+    if (!result.first) result.first = copy;
+    result.routes?.push(copy);
+  };
+
+  /** Moves into (x, y) facing `heading` (already validated), recursing from there. */
+  const arrive = (x: number, y: number, heading: Dir, toggle?: { key: string; to: 0 | 1 }) => {
+    const key = cellKey(x, y);
+    const prevSwitch = toggle ? switches[toggle.key] : undefined;
+    if (toggle) switches[toggle.key] = toggle.to;
+    const motion = motionKey(stage, x, y, heading, switches);
+    if (!seen.has(motion)) {
+      seen.add(motion);
+      const stop = stopVisits.get(key);
+      if (stop !== undefined) stopVisits.set(key, stop + 1);
+      const cross = crossAxes.get(key);
+      if (cross !== undefined) crossAxes.set(key, cross | (heading % 2 === 0 ? 1 : 2));
+      visit(x, y, heading);
+      if (cross !== undefined) crossAxes.set(key, cross);
+      if (stop !== undefined) stopVisits.set(key, stop);
+      seen.delete(motion);
+    }
+    if (toggle) switches[toggle.key] = prevSwitch!;
+  };
 
   const visit = (x: number, y: number, heading: Dir): void => {
     if (result.count >= limit) return;
+    const entry = enter(stage, lookup, switches, x, y, heading);
+    if (entry.kind === 'fail') return;
+    if (entry.kind === 'goal') return record();
+    if (entry.kind === 'move') {
+      const toggle = entry.step.kind === 'rail' ? entry.step.toggle : undefined;
+      return arrive(entry.x, entry.y, entry.heading, toggle);
+    }
+
+    // Unbuilt empty cell: try every piece that could carry the train onward.
+    if (path.length >= maxRails) return;
     const nx = x + DX[heading];
     const ny = y + DY[heading];
-    const inEdge = opposite(heading);
-    const cell = cellAt(stage, nx, ny);
     const key = cellKey(nx, ny);
-    if (!cell || visited.has(key)) return;
-
-    if (cell.type === 'goal') {
-      if (stage.goal.dir !== inEdge) return;
-      if (!stage.waypoints.every((p) => visited.has(cellKey(p.x, p.y)))) return;
-      result.count += 1;
-      if (result.minRails === null || path.length < result.minRails) result.minRails = path.length;
-      if (!result.first) result.first = copy();
-      result.routes?.push(copy());
-      return;
-    }
-
-    if (cell.type === 'tunnel') {
-      // Each mouth has a single opening, so a tunnel can be ridden at most once.
-      if (cell.dir !== inEdge) return;
-      const exitKey = cellKey(cell.pair.x, cell.pair.y);
-      const exit = cellAt(stage, cell.pair.x, cell.pair.y);
-      if (visited.has(exitKey) || exit?.type !== 'tunnel') return;
-      visited.add(key);
-      visited.add(exitKey);
-      visit(cell.pair.x, cell.pair.y, exit.dir);
-      visited.delete(exitKey);
-      visited.delete(key);
-      return;
-    }
-
-    if (cell.type === 'fixed') {
-      const out = railExit(cell.rail, inEdge);
-      if (out === null) return;
-      visited.add(key);
-      visit(nx, ny, out);
-      visited.delete(key);
-      return;
-    }
-
-    if (cell.type !== 'empty' || path.length >= maxRails) return;
-
-    visited.add(key);
-    for (const out of [heading, rotateCW(heading, 1), rotateCW(heading, 3)]) {
-      const rail = pieceFor(inEdge, out);
+    const options: { rail: Rail; out: Dir }[] = [heading, rotateCW(heading, 1), rotateCW(heading, 3)].map((out) => ({
+      rail: pieceFor(entry.inEdge, out),
+      out,
+    }));
+    if (left.cross > 0) options.push({ rail: { kind: 'cross', rot: 0 }, out: opposite(entry.inEdge) });
+    for (const { rail, out } of options) {
       if (left[rail.kind] <= 0) continue;
       left[rail.kind] -= 1;
+      built.set(key, rail);
       path.push({ x: nx, y: ny, rail });
-      visit(nx, ny, out);
+      if (rail.kind === 'cross') crossAxes.set(key, 0);
+      arrive(nx, ny, out);
+      crossAxes.delete(key);
       path.pop();
+      built.delete(key);
       left[rail.kind] += 1;
     }
-    visited.delete(key);
   };
 
-  visited.add(cellKey(stage.start.x, stage.start.y));
-  visit(stage.start.x, stage.start.y, stage.start.dir);
+  const start = stage.start;
+  seen.add(motionKey(stage, start.x, start.y, start.dir, switches));
+  if (cellAt(stage, start.x, start.y)) visit(start.x, start.y, start.dir);
   return result;
 }

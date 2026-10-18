@@ -1,7 +1,7 @@
 import { ALL_DIRS, type Dir, DX, DY, opposite } from './dir';
 import { type Rail, type RailKind, hasPort, normalizeRot, railPorts, rotationCount } from './rail';
 import { railAt } from './simulate';
-import { type Inventory, type Stage, cellAt, cellKey } from './stage';
+import { type Cell, type Inventory, type Stage, cellAt, cellKey } from './stage';
 
 /** A player-placed rail. `spin` counts quarter turns ever applied, so the UI can animate 3 → 0 forwards. */
 export interface PlacedRail extends Rail {
@@ -95,6 +95,10 @@ export function undo(state: EditorState): EditorState {
   return { placed: state.history[state.history.length - 1], history: state.history.slice(0, -1) };
 }
 
+function switchPorts(cell: Extract<Cell, { type: 'switch' }>): Dir[] {
+  return [cell.trunk, opposite(cell.trunk), cell.turn];
+}
+
 /** Does the neighbour on side `d` of (x, y) offer a connection into this cell? */
 function neighbourWants(stage: Stage, placed: Placements, x: number, y: number, d: Dir): boolean {
   const nx = x + DX[d];
@@ -104,6 +108,7 @@ function neighbourWants(stage: Stage, placed: Placements, x: number, y: number, 
   if (stage.goal.x === nx && stage.goal.y === ny) return stage.goal.dir === back;
   const cell = cellAt(stage, nx, ny);
   if (cell?.type === 'tunnel') return cell.dir === back;
+  if (cell?.type === 'switch') return switchPorts(cell).includes(back);
   const rail = railAt(stage, placed, nx, ny);
   return rail !== null && hasPort(rail, back);
 }
@@ -115,7 +120,9 @@ function sideIsOpen(stage: Stage, placed: Placements, x: number, y: number, d: D
   const cell = cellAt(stage, nx, ny);
   if (!cell) return false;
   if (cell.type === 'obstacle') return false;
-  if (cell.type === 'start' || cell.type === 'goal' || cell.type === 'tunnel') return neighbourWants(stage, placed, x, y, d);
+  if (cell.type === 'start' || cell.type === 'goal' || cell.type === 'tunnel' || cell.type === 'switch') {
+    return neighbourWants(stage, placed, x, y, d);
+  }
   const rail = railAt(stage, placed, nx, ny);
   return rail === null || hasPort(rail, opposite(d));
 }

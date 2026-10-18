@@ -4,6 +4,7 @@ import { createEditor, eraseRail, placeBlock, placeRail, remaining, replaceRail,
 import { RAIL_GLYPHS, type Rail, railExit, railPorts } from './rail';
 import { type RailMap, simulate } from './simulate';
 import { solve } from './solver';
+import { switchExit } from './step';
 import { type StageDef, StageError, cellKey, parseStage } from './stage';
 
 const blankSolution = (map: string[]) => map.map((row) => row.replace(/[^\s]/g, '.'));
@@ -63,10 +64,10 @@ describe('rail ports', () => {
   });
 
   it('map glyphs match their drawn shape', () => {
-    expect(railPorts(RAIL_GLYPHS['└']).sort()).toEqual([N, E].sort());
-    expect(railPorts(RAIL_GLYPHS['┌']).sort()).toEqual([E, S].sort());
-    expect(railPorts(RAIL_GLYPHS['┐']).sort()).toEqual([S, W].sort());
-    expect(railPorts(RAIL_GLYPHS['┘']).sort()).toEqual([W, N].sort());
+    expect([...railPorts(RAIL_GLYPHS['└'])].sort()).toEqual([N, E].sort());
+    expect([...railPorts(RAIL_GLYPHS['┌'])].sort()).toEqual([E, S].sort());
+    expect([...railPorts(RAIL_GLYPHS['┐'])].sort()).toEqual([S, W].sort());
+    expect([...railPorts(RAIL_GLYPHS['┘'])].sort()).toEqual([W, N].sort());
   });
 });
 
@@ -215,14 +216,94 @@ describe('tunnels', () => {
   });
 });
 
+describe('crossings', () => {
+  // The passenger at (3,2) must be picked up first, and rocks leave (1,2) as the only way
+  // down to the goal, so the route has to come back over its own start line at (1,2).
+  const map = ['. . . . .', '. . . . .', 'S . . P .', 'R . R . .', '. G . . .'];
+  const loopRoute = ['. . . . .', '. ┌ ─ ┐ .', '. ┼ ─ ┘ .', '. │ . . .'];
+
+  it('lets the train pass the same tile twice, once on each axis', () => {
+    const s = stage(map, 'E', 'N', { straight: 9, curve: 9, cross: 1 } as never);
+    const trace = simulate(s, rails(loopRoute));
+    expect(trace.success).toBe(true);
+    const visits = trace.steps.filter((st) => st.x === 1 && st.y === 2);
+    expect(visits.map((v) => (v.kind === 'rail' ? [v.inEdge, v.outEdge] : null))).toEqual([
+      [W, E],
+      [N, S],
+    ]);
+  });
+
+  it('a straight in its place blocks the second pass', () => {
+    const s = stage(map, 'E', 'N');
+    const trace = simulate(s, rails(['. . . . .', '. ┌ ─ ┐ .', '. ─ ─ ┘ .', '. │ . . .']));
+    expect(trace.failure).toMatchObject({ reason: 'misaligned', cell: { x: 1, y: 2 } });
+  });
+
+  it('is required by the solver exactly when the map demands it', () => {
+    const without = parseStage({ id: 'c', title: '', tip: '', map, start: 'E', goal: 'N', inventory: { straight: 9, curve: 9 }, solution: blankSolution(map) }, 1);
+    expect(solve(without).count).toBe(0);
+    const withCross = parseStage(
+      { id: 'c', title: '', tip: '', map, start: 'E', goal: 'N', inventory: { straight: 9, curve: 9, cross: 1 }, solution: blankSolution(map) },
+      1,
+    );
+    const res = solve(withCross, 1000, true);
+    expect(res.count).toBeGreaterThan(0);
+    expect(res.minRails).toBe(7);
+    // Every route found actually wins and really uses its crossing twice.
+    for (const route of res.routes ?? []) {
+      const placed: Record<string, Rail> = {};
+      for (const p of route) placed[cellKey(p.x, p.y)] = p.rail;
+      expect(simulate(withCross, placed).success).toBe(true);
+      expect(route.some((p) => p.rail.kind === 'cross')).toBe(true);
+    }
+  });
+});
+
+describe('switches', () => {
+  // Switch 1 at (2,2): trunk west, straight branch east, turn branch north.
+  const map = ['. . . . .', '. . . . .', 'S . 1 . G', '. . . . .', '. . . . .'];
+  const make = (switches: StageDef['switches']) =>
+    parseStage({ id: 'sw', title: '', tip: '', map, start: 'E', goal: 'W', inventory: { straight: 9, curve: 9 }, solution: blankSolution(map), switches }, 1);
+  const line = rails(['. . . . .', '. . . . .', '. ─ . ─ .']);
+
+  it('sends a train from the trunk along the set branch, then flips', () => {
+    const st = make({ '1': { trunk: 'W', turn: 'N' } });
+    const sw = st.cells[2 * 5 + 2];
+    if (sw.type !== 'switch') throw new Error('expected a switch');
+    expect(switchExit(sw, 0, W)).toEqual({ out: E, flips: true });
+    expect(switchExit(sw, 1, W)).toEqual({ out: N, flips: true });
+    expect(switchExit(sw, 0, E)).toEqual({ out: W, flips: false });
+    expect(switchExit(sw, 1, N)).toEqual({ out: W, flips: false });
+    expect(switchExit(sw, 0, S)).toBeNull();
+  });
+
+  it('records the flip in the trace and honours the initial setting', () => {
+    const straightRun = simulate(make({ '1': { trunk: 'W', turn: 'N' } }), line);
+    expect(straightRun.success).toBe(true);
+    expect(straightRun.steps.find((st) => st.x === 2 && st.y === 2)).toMatchObject({
+      kind: 'rail',
+      inEdge: W,
+      outEdge: E,
+      toggle: { key: '2,2', to: 1 },
+    });
+    const turnRun = simulate(make({ '1': { trunk: 'W', turn: 'N', initial: 'turn' } }), line);
+    expect(turnRun.failure).toMatchObject({ reason: 'no_track', cell: { x: 2, y: 1 } });
+  });
+
+  it('rejects malformed switches', () => {
+    expect(() => make({})).toThrow(/no entry in switches/);
+    expect(() => make({ '1': { trunk: 'W', turn: 'E' } })).toThrow(/sideways/);
+  });
+});
+
 describe('editor', () => {
   const s = stage(['. . . . .', '. . R . .', 'S . ─ . G', '. . . . .', '. . . . .'], 'E', 'W', { straight: 2, curve: 1 });
 
   it('placing spends inventory and erasing refunds it', () => {
     let ed = placeRail(s, createEditor(), 1, 2, 'straight');
-    expect(remaining(s, ed.placed)).toEqual({ straight: 1, curve: 1 });
+    expect(remaining(s, ed.placed)).toEqual({ straight: 1, curve: 1, cross: 0 });
     ed = eraseRail(ed, 1, 2);
-    expect(remaining(s, ed.placed)).toEqual({ straight: 2, curve: 1 });
+    expect(remaining(s, ed.placed)).toEqual({ straight: 2, curve: 1, cross: 0 });
   });
 
   it('cannot place when the piece is used up', () => {
@@ -256,13 +337,13 @@ describe('editor', () => {
     let ed = placeRail(s, createEditor(), 1, 2, 'straight');
     ed = replaceRail(s, ed, 1, 2, 'curve');
     expect(ed.placed[cellKey(1, 2)].kind).toBe('curve');
-    expect(remaining(s, ed.placed)).toEqual({ straight: 2, curve: 0 });
+    expect(remaining(s, ed.placed)).toEqual({ straight: 2, curve: 0, cross: 0 });
     // The new curve is auto-oriented toward a neighbour that points at it:
     // the start station (west) or the fixed straight (east).
     const ports = railPorts(ed.placed[cellKey(1, 2)]);
     expect(ports.includes(W) || ports.includes(E)).toBe(true);
     ed = replaceRail(s, ed, 1, 2, 'straight');
-    expect(remaining(s, ed.placed)).toEqual({ straight: 1, curve: 1 });
+    expect(remaining(s, ed.placed)).toEqual({ straight: 1, curve: 1, cross: 0 });
     expect(undo(ed).placed[cellKey(1, 2)].kind).toBe('curve');
   });
 
@@ -288,9 +369,9 @@ describe('editor', () => {
 
   it('auto-orients new pieces toward stations and neighbouring rails', () => {
     let ed = placeRail(s, createEditor(), 1, 2, 'straight');
-    expect(railPorts(ed.placed[cellKey(1, 2)]).sort()).toEqual([E, W].sort());
+    expect([...railPorts(ed.placed[cellKey(1, 2)])].sort()).toEqual([E, W].sort());
     ed = placeRail(s, ed, 3, 2, 'straight');
-    expect(railPorts(ed.placed[cellKey(3, 2)]).sort()).toEqual([E, W].sort());
+    expect([...railPorts(ed.placed[cellKey(3, 2)])].sort()).toEqual([E, W].sort());
     expect(simulate(s, ed.placed).success).toBe(true);
 
     // A curve next to the start, with the way ahead blocked, should bend toward open ground.

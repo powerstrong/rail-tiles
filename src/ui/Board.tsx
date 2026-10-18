@@ -10,7 +10,7 @@ import { CELL, RailPieceArt } from './art/TrackArt';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
 
-export type Tool = 'straight' | 'curve' | 'eraser';
+export type Tool = 'straight' | 'curve' | 'cross' | 'eraser';
 
 export const BOARD_PAD = 26;
 

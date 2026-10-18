@@ -12,7 +12,7 @@ import { StarRow } from './StageSelect';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
 
-const KIND_LABEL: Record<RailKind, string> = { straight: '직선', curve: '곡선' };
+const KIND_LABEL: Record<RailKind, string> = { straight: '직선', curve: '곡선', cross: '교차' };
 
 const FAIL_TEXT: Record<FailReason, string> = {
   out_of_bounds: '선로가 게임판 밖으로 이어져 있어요.',
@@ -23,7 +23,7 @@ const FAIL_TEXT: Record<FailReason, string> = {
   tunnel_wrong_side: '터널 입구가 아닌 쪽으로 들어갔어요.',
   start_reentry: '기차가 출발역으로 되돌아왔어요.',
   missed_waypoint: '아직 태우지 못한 승객이 있어요.',
-  step_limit: '기차가 같은 길을 맴돌고 있어요.',
+  loop: '기차가 같은 길을 끝없이 맴돌아요.',
 };
 
 const TRAIN_SPEED = 2.6;

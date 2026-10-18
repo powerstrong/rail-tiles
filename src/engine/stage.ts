@@ -11,7 +11,16 @@ export type Cell =
   | { type: 'start' }
   | { type: 'goal' }
   /** Tunnel mouth: track meets it through `dir`; the train re-emerges from `pair`. */
-  | { type: 'tunnel'; dir: Dir; pair: Pos; label: string };
+  | { type: 'tunnel'; dir: Dir; pair: Pos; label: string }
+  /**
+   * Fixed switch: a trunk edge and two branches (straight across, or `turn`).
+   * Entering from the trunk follows the current branch and then flips it;
+   * entering from either branch always leaves through the trunk.
+   */
+  | { type: 'switch'; trunk: Dir; turn: Dir; initial: SwitchState; label: string };
+
+/** 0: trunk ↔ straight branch, 1: trunk ↔ turn branch. */
+export type SwitchState = 0 | 1;
 
 export interface Pos {
   x: number;
@@ -24,6 +33,14 @@ export interface Station extends Pos {
 }
 
 export type Inventory = Record<RailKind, number>;
+
+export interface SwitchDef {
+  trunk: DirName;
+  /** The side the curved branch leaves through (perpendicular to the trunk). */
+  turn: DirName;
+  /** Which branch is set at the start. Default: straight. */
+  initial?: 'straight' | 'turn';
+}
 
 export interface Placement extends Pos {
   rail: Rail;
@@ -41,6 +58,8 @@ export interface Stage {
   goal: Station;
   inventory: Inventory;
   waypoints: Pos[];
+  /** Cell keys of every switch, in reading order (fixes the order of switch state signatures). */
+  switches: string[];
   /** A shortest solution (tests check it uses exactly `par` rails). Drives hints and the stage-1 ghost. */
   solution: Placement[];
   /** Fewest player rails that can win: the ★★★ target. */
@@ -54,6 +73,8 @@ export interface Stage {
  *   S  start     G  goal
  *   T  tree      R  rock      M  mountain   W  water   H  house
  *   │ ─ └ ┌ ┐ ┘  fixed rail       ║ ═  fixed bridge over water
+ *   ┼            fixed crossing
+ *   1 2 3 …      switches, configured in `switches[digit]`
  *   a b c …      tunnel mouths: each lowercase letter appears exactly twice;
  *                `tunnels[letter]` gives the opening side of the first and second
  *                occurrence in reading order (row by row, left to right)
@@ -67,9 +88,11 @@ export interface StageDef {
   map: string[];
   start: DirName;
   goal: DirName;
-  inventory: Inventory;
+  /** `cross` defaults to 0. */
+  inventory: { straight: number; curve: number; cross?: number };
   solution: string[];
   tunnels?: Record<string, [DirName, DirName]>;
+  switches?: Record<string, SwitchDef>;
   ghostHint?: boolean;
 }
 
@@ -110,6 +133,7 @@ export function parseStage(def: StageDef, number: number): Stage {
   const cells: Cell[] = [];
   const waypoints: Pos[] = [];
   const mouths: Record<string, { index: number; pos: Pos }[]> = {};
+  const switches: string[] = [];
   let start: Pos | null = null;
   let goal: Pos | null = null;
 
@@ -131,7 +155,15 @@ export function parseStage(def: StageDef, number: number): Stage {
       } else if (DECORATIONS[glyph]) cells.push({ type: 'obstacle', deco: DECORATIONS[glyph] });
       else if (RAIL_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...RAIL_GLYPHS[glyph] }, bridge: false });
       else if (BRIDGE_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...BRIDGE_GLYPHS[glyph] }, bridge: true });
-      else if (/^[a-z]$/.test(glyph)) {
+      else if (/^[1-9]$/.test(glyph)) {
+        const sw = def.switches?.[glyph];
+        if (!sw) fail(`switch "${glyph}" at ${x},${y} has no entry in switches`);
+        const trunk = dirFromName(sw!.trunk);
+        const turn = dirFromName(sw!.turn);
+        if (turn === trunk || (turn + 2) % 4 === trunk) fail(`switch "${glyph}" must turn sideways from its trunk`);
+        switches.push(cellKey(x, y));
+        cells.push({ type: 'switch', trunk, turn, initial: sw!.initial === 'turn' ? 1 : 0, label: glyph });
+      } else if (/^[a-z]$/.test(glyph)) {
         (mouths[glyph] ??= []).push({ index: cells.length, pos: { x, y } });
         cells.push({ type: 'empty', waypoint: false }); // replaced once both mouths are known
       }
@@ -167,8 +199,9 @@ export function parseStage(def: StageDef, number: number): Stage {
     if (nx < 0 || ny < 0 || nx >= width || ny >= height) fail(`${name} station faces off the board`);
   }
 
-  for (const kind of ['straight', 'curve'] as const) {
-    const n = def.inventory[kind];
+  const inventory: Inventory = { straight: def.inventory.straight, curve: def.inventory.curve, cross: def.inventory.cross ?? 0 };
+  for (const kind of ['straight', 'curve', 'cross'] as const) {
+    const n = inventory[kind];
     if (!Number.isInteger(n) || n < 0) fail(`inventory.${kind} must be a non-negative integer`);
   }
 
@@ -197,8 +230,9 @@ export function parseStage(def: StageDef, number: number): Stage {
     cells,
     start: startStation,
     goal: goalStation,
-    inventory: { ...def.inventory },
+    inventory,
     waypoints,
+    switches,
     solution,
     par: solution.length,
     ghostHint: def.ghostHint ?? false,
