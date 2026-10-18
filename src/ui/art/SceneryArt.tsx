@@ -154,13 +154,16 @@ export function TunnelArt({ dir, label }: { dir: Dir; label: string }) {
   return (
     <g transform={`rotate(${(dir - 1) * 90})`}>
       <SegmentArt seg={stub} />
-      <path d="M12 -46 C-10 -50 -48 -40 -48 0 C-48 40 -10 50 12 46 C20 30 20 -30 12 -46Z" fill={C.shadow} transform="translate(3 4)" />
-      <path d="M12 -46 C-10 -50 -48 -40 -48 0 C-48 40 -10 50 12 46 C20 30 20 -30 12 -46Z" fill={C.foothill} />
-      <path d="M2 -40 C-14 -42 -40 -32 -40 -6 C-30 -26 -12 -32 2 -30Z" fill={C.grassHi} opacity={0.5} />
-      {/* Stone arch around the portal, colour-coded per tunnel pair. */}
-      <path d="M16 -24 C4 -24 -2 -12 -2 0 C-2 12 4 24 16 24" stroke={ring} strokeWidth={9} fill="none" strokeLinecap="round" />
-      <path d="M15 -18 C7 -18 3 -9 3 0 C3 9 7 18 15 18 Z" fill={C.portal} />
-      <path d="M16 -24 C4 -24 -2 -12 -2 0" stroke={C.cream} strokeWidth={2} opacity={0.45} fill="none" />
+      <path d="M12 -44 C-12 -49 -46 -35 -46 0 C-46 35 -12 49 12 44 C21 29 21 -29 12 -44Z" fill={C.shadow} transform="translate(3 4)" />
+      <path d="M12 -44 C-12 -49 -46 -35 -46 0 C-46 35 -12 49 12 44 C21 29 21 -29 12 -44Z" fill={C.grassSide} stroke={C.foothill} strokeWidth={3} />
+      <path d="M3 -38 C-15 -41 -36 -27 -39 -8 C-29 -25 -11 -29 5 -28Z" fill={C.grassHi} opacity={0.65} />
+      <path d="M-37 13 Q-29 33 -7 37" stroke={C.foothill} strokeWidth={4} strokeLinecap="round" fill="none" />
+      {/* A deep, broad opening and a chunky arch stay distinct at phone size. */}
+      <path d="M23 -27 C3 -27 -8 -15 -8 0 C-8 15 3 27 23 27Z" fill={C.portal} />
+      <path d="M22 -27 C2 -27 -8 -15 -8 0 C-8 15 2 27 22 27" stroke={C.inkSoft} strokeWidth={15} fill="none" strokeLinecap="round" />
+      <path d="M22 -27 C2 -27 -8 -15 -8 0 C-8 15 2 27 22 27" stroke={ring} strokeWidth={11} fill="none" strokeLinecap="round" />
+      <path d="M21 -30 C1 -30 -11 -16 -11 0" stroke={C.cream} strokeWidth={2.5} opacity={0.65} fill="none" strokeLinecap="round" />
+      <path d="M10 -32 L11 -22 M-9 -17 L-1 -12 M-13 4 L-3 4 M-1 23 L5 16 M14 32 L15 22" stroke={C.cream} strokeWidth={2} opacity={0.55} />
     </g>
   );
 }
@@ -168,13 +171,14 @@ export function TunnelArt({ dir, label }: { dir: Dir; label: string }) {
 /** Pair letter for a tunnel, kept upright and placed on the hill behind the portal. */
 export function TunnelBadge({ dir, label }: { dir: Dir; label: string }) {
   const a = ((dir - 1) * Math.PI) / 2;
-  // (-28, -26) in tunnel space: on the hill, clear of the track.
-  const bx = -28 * Math.cos(a) + 26 * Math.sin(a);
-  const by = -28 * Math.sin(a) - 26 * Math.cos(a);
+  // (-29, -27) in tunnel space: on the hill, clear of the portal and track.
+  const bx = -29 * Math.cos(a) + 27 * Math.sin(a);
+  const by = -29 * Math.sin(a) - 27 * Math.cos(a);
   return (
     <g transform={`translate(${bx} ${by})`} pointerEvents="none">
-      <circle r={11} fill={tunnelColor(label)} stroke={C.cream} strokeWidth={2.5} />
-      <text y={4.5} textAnchor="middle" fontSize={13} fontWeight={900} fill="#fff">
+      <circle cy={2} r={15.5} fill={C.shadow} />
+      <circle r={14} fill={tunnelColor(label)} stroke={C.cream} strokeWidth={3.5} />
+      <text y={6} textAnchor="middle" fontSize={17} fontWeight={900} fill={C.cream}>
         {label.toUpperCase()}
       </text>
     </g>

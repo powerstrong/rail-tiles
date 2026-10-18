@@ -22,6 +22,7 @@ export const C = {
   steel: '#5D6271',
   steelHi: '#E1E4EA',
   steelPlate: '#B9BEC9',
+  switchBed: '#D8EDE3',
 
   stone: '#E3DACB',
   stoneSide: '#C2B5A0',
@@ -67,6 +68,7 @@ export const C = {
   trainRed: '#E5584F',
   trainRedDark: '#BF423B',
   trainRedHi: '#F58270',
+  skin: '#F7D2B4',
   trainWindow: '#A9DFDF',
   trainWindowHi: '#E4F6EC',
   coal: '#252D39',

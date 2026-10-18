@@ -785,7 +785,7 @@ p {
 .celebrate-ring {
   transform-box: fill-box;
   transform-origin: center;
-  animation: celebrate 0.9s ease-out 2 forwards;
+  animation: celebrate 0.6s ease-out both;
 }
 
 .board {
@@ -797,47 +797,50 @@ p {
 .confetti-piece {
   transform-box: fill-box;
   transform-origin: center;
-  animation: confetti-burst 1.5s cubic-bezier(0.2, 0.7, 0.35, 1) both;
+  animation: confetti-burst 1.15s cubic-bezier(0.2, 0.7, 0.35, 1) both;
 }
 
 .sparkle {
   transform-box: fill-box;
   transform-origin: center;
-  animation: sparkle 0.7s ease-out both;
+  animation: sparkle 0.52s ease-out both;
 }
 
 .heart {
   transform-box: fill-box;
   transform-origin: center;
-  animation: heart-float 1.4s ease-out both;
+  animation: heart-float 1s ease-out both;
 }
 
 .hop-out {
-  animation: hop-out 0.55s cubic-bezier(0.3, 0.9, 0.4, 1) both;
+  animation: hop-out 0.46s cubic-bezier(0.3, 0.9, 0.4, 1) both;
 }
 
 .wave-arm {
   transform-box: view-box;
   transform-origin: 8px 2px;
-  animation: wave 0.35s ease-in-out 4 alternate both;
+  animation: wave 0.2s ease-in-out 3 alternate both;
 }
 
 .arrive-bubble {
   transform-box: fill-box;
   transform-origin: center;
-  animation: bubble-pop 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) 0.15s both;
+  animation: bubble-pop 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) 0.12s both;
 }
 
 .train-cheer {
-  animation: cheer 0.9s ease-out both;
+  animation: cheer 0.72s ease-out both;
 }
 
 @keyframes confetti-burst {
   0% {
     transform: translate(0, 0) rotate(0deg) scale(0.3);
+    opacity: 0;
+  }
+  12% {
     opacity: 1;
   }
-  35% {
+  38% {
     transform: translate(var(--mx), var(--my)) rotate(calc(var(--rot) * 0.4)) scale(1);
     opacity: 1;
   }
@@ -934,7 +937,7 @@ p {
 }
 
 .switch-idle {
-  opacity: 0.35;
+  opacity: 0.72;
 }
 
 .passenger-halo {
@@ -1137,5 +1140,9 @@ p {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .arrival-ceremony * {
+    animation-delay: 0s !important;
   }
 }
