@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { STAGES, TOTAL_PLANNED_STAGES } from './stages/stages';
 import { loadProgress, markCleared, saveProgress } from './storage';
 import { GameScreen } from './ui/GameScreen';
@@ -12,13 +12,13 @@ export function App() {
   const [progress, setProgress] = useState(loadProgress);
   const cleared = useMemo(() => new Set(progress.cleared), [progress]);
 
-  const onCleared = (id: string) => {
-    setProgress((p) => {
-      const next = markCleared(p, id);
-      if (next !== p) saveProgress(next);
-      return next;
-    });
-  };
+  // Persist outside the state updater (StrictMode may call updaters twice); skip the initial load.
+  const loaded = useRef(progress);
+  useEffect(() => {
+    if (progress !== loaded.current) saveProgress(progress);
+  }, [progress]);
+
+  const onCleared = (id: string) => setProgress((p) => markCleared(p, id));
 
   if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'select' })} />;
 

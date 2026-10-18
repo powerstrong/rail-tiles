@@ -5,7 +5,9 @@ import { type Placement, type Stage, cellAt, cellKey } from './stage';
 export interface SolveResult {
   /** Number of distinct winning routes (capped at `limit`). */
   count: number;
-  /** Fewest player rails any winning route needs, or null when unsolvable. */
+  /** True when the route count hit `limit`, i.e. `count` is a lower bound. */
+  truncated: boolean;
+  /** Fewest player rails any winning route needs, or null when unsolvable. Exact even when truncated. */
   minRails: number | null;
   first: Placement[] | null;
 }
@@ -26,10 +28,22 @@ function pieceFor(inEdge: Dir, outEdge: Dir): Rail {
  * "go straight / turn left / turn right" with visited-cell pruning is exhaustive.
  */
 export function solve(stage: Stage, limit = 1000): SolveResult {
+  const all = search(stage, limit, Infinity);
+  const truncated = all.count >= limit;
+  if (!truncated || all.minRails === null) return { ...all, truncated };
+  // The capped enumeration may have stopped before reaching the shortest route:
+  // find the true minimum by iterative deepening on the number of player rails.
+  for (let depth = 0; depth < all.minRails; depth++) {
+    if (search(stage, 1, depth).count > 0) return { ...all, truncated, minRails: depth };
+  }
+  return { ...all, truncated };
+}
+
+function search(stage: Stage, limit: number, maxRails: number): Omit<SolveResult, 'truncated'> {
   const left = { ...stage.inventory };
   const visited = new Set<string>();
   const path: Placement[] = [];
-  const result: SolveResult = { count: 0, minRails: null, first: null };
+  const result: Omit<SolveResult, 'truncated'> = { count: 0, minRails: null, first: null };
 
   const visit = (x: number, y: number, heading: Dir): void => {
     if (result.count >= limit) return;
@@ -58,7 +72,7 @@ export function solve(stage: Stage, limit = 1000): SolveResult {
       return;
     }
 
-    if (cell.type !== 'empty') return;
+    if (cell.type !== 'empty' || path.length >= maxRails) return;
 
     visited.add(key);
     for (const out of [heading, rotateCW(heading, 1), rotateCW(heading, 3)]) {

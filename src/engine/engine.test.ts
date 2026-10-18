@@ -238,6 +238,21 @@ describe('solver', () => {
     expect(roomy.minRails).toBe(3);
   });
 
+  it('reports the true minimum even when the route count is capped', () => {
+    // Open board with a huge number of routes; the shortest needs only 3 rails.
+    const open = stage(['. . . . . .', 'S . . . . .', '. . . . . .', '. . G . . .', '. . . . . .', '. . . . . .'], 'E', 'N', {
+      straight: 20,
+      curve: 20,
+    });
+    for (const limit of [1, 1000]) {
+      const res = solve(open, limit);
+      expect(res.truncated).toBe(true);
+      expect(res.count).toBe(limit);
+      expect(res.minRails).toBe(3);
+    }
+    expect(solve(stage(LINE, 'E', 'W', { straight: 3, curve: 0 })).truncated).toBe(false);
+  });
+
   it('every route it finds actually wins', () => {
     const s = stage(['. . P . .', '. . . . .', 'S . . . G', '. R . . .', '. . . . .'], 'E', 'W', { straight: 6, curve: 6 });
     const res = solve(s);
