@@ -3,7 +3,8 @@
 격자 위에 레일을 놓아 작은 기차를 출발역에서 도착역까지 데려다주는 싱글플레이 퍼즐 웹게임입니다.
 백엔드 없이 브라우저만으로 실행됩니다.
 
-현재 상태: **v0.1. 스테이지 10개 모두 플레이 가능**
+현재 상태: **v0.1. 스테이지 10개 모두 플레이 가능**  
+플레이: https://powerstrong.github.io/rail-tiles/
 
 ## 실행
 
@@ -15,9 +16,13 @@ npm run build      # 타입 검사 + 프로덕션 빌드 (dist/)
 npm run stages     # 스테이지별 정답 경로 수, 최소 레일 수, 정답 그림 출력
 ```
 
-### 배포 (Cloudflare Pages)
+### 배포
 
-정적 사이트라 백엔드 설정이 필요 없습니다. 빌드 명령 `npm run build`, 출력 디렉터리 `dist`.
+**GitHub Pages:** https://powerstrong.github.io/rail-tiles/
+
+`main`에 푸시하면 `.github/workflows/deploy.yml`이 테스트, 빌드, 배포를 자동으로 실행합니다.
+빌드는 상대 경로(`base: './'`)를 쓰므로 다른 정적 호스팅(Cloudflare Pages 등)에도
+빌드 명령 `npm run build`, 출력 디렉터리 `dist`로 그대로 올릴 수 있습니다.
 
 ## 조작
 
