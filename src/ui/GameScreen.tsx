@@ -66,6 +66,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
   const [result, setResult] = useState<Trace | null>(null);
   const [restPose, setRestPose] = useState(() => startPose(stage));
   const [flash, setFlash] = useState<Flash | null>(null);
+  const [picked, setPicked] = useState<ReadonlySet<string>>(() => new Set());
   const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
   const [bump, setBump] = useState<{ tool: Tool; n: number } | null>(null);
   const trainRef = useRef<SVGGElement>(null);
@@ -99,6 +100,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
       if (mode === 'result') {
         setMode('edit');
         setResult(null);
+        setPicked(new Set());
         setRestPose(startPose(stage));
       }
       return true;
@@ -150,7 +152,16 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
     cancelRun.current?.();
     const trace = simulate(stage, editor.placed);
     const path = traceToPath(trace.steps);
+    // Passengers are picked up as the train passes the middle of their tile.
+    const stops = new Set(stage.waypoints.map((p) => cellKey(p.x, p.y)));
+    const pickups = trace.steps.flatMap((step, i) =>
+      step.kind === 'rail' && stops.has(cellKey(step.x, step.y))
+        ? [{ key: cellKey(step.x, step.y), at: path.starts[i] + path.segments[i].length / 2 }]
+        : [],
+    );
+    let nextPickup = 0;
     setResult(null);
+    setPicked(new Set());
     setRestPose(startPose(stage));
     setMode('running');
     cancelRun.current = runTrain(path, {
@@ -158,6 +169,12 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
       brake: trace.success,
       onPose: (pose) => trainRef.current?.setAttribute('transform', poseTransform(pose, CELL)),
       onPuff: spawnPuff,
+      onAdvance: (dist) => {
+        while (nextPickup < pickups.length && pickups[nextPickup].at <= dist) {
+          const { key } = pickups[nextPickup++];
+          setPicked((prev) => new Set(prev).add(key));
+        }
+      },
       onDone: (pose) => {
         cancelRun.current = null;
         setRestPose(pose);
@@ -231,6 +248,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
           failure={failure}
           arrived={success}
           flash={flash}
+          picked={picked}
           restPose={restPose}
           trainRef={trainRef}
           smokeRef={smokeRef}
@@ -313,6 +331,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
                 onClick={() => {
                   setResult(null);
                   setMode('edit');
+                  setPicked(new Set());
                   setRestPose(startPose(stage));
                 }}
               >

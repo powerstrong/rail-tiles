@@ -13,6 +13,13 @@ const EXPECTED_ROUTES: Record<string, number> = {
   'first-line': 1,
   'first-turn': 1,
   'around-the-hill': 1,
+  'river-crossing': 2,
+  'make-it-last': 2,
+  'first-passenger': 2,
+  'forest-stop': 1,
+  'two-passengers': 1,
+  'the-way-back': 1,
+  'last-run': 1,
 };
 
 describe('stages', () => {

@@ -654,6 +654,10 @@ p {
   animation: celebrate 0.9s ease-out 2 forwards;
 }
 
+.passenger-bob {
+  animation: bob 1.4s ease-in-out infinite;
+}
+
 .puff {
   fill: #fff;
   transform-box: fill-box;
@@ -748,6 +752,16 @@ p {
   to {
     transform: scale(2.4) translate(-3px, -6px);
     opacity: 0;
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
   }
 }
 

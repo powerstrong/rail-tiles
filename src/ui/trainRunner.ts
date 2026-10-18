@@ -7,6 +7,8 @@ export interface RunOptions {
   brake: boolean;
   onPose: (pose: Pose) => void;
   onPuff?: (pose: Pose) => void;
+  /** Distance travelled so far (cells), every frame. */
+  onAdvance?: (distance: number) => void;
   onDone: (pose: Pose) => void;
 }
 
@@ -36,6 +38,7 @@ export function runTrain(path: TrackPath, opts: RunOptions): () => void {
 
     const pose = poseAt(path, dist);
     opts.onPose(pose);
+    opts.onAdvance?.(dist);
     if (opts.onPuff && dist >= nextPuff) {
       nextPuff = dist + PUFF_EVERY;
       opts.onPuff(pose);

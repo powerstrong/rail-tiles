@@ -5,7 +5,7 @@ import type { Pose } from '../engine/geometry';
 import type { Failure } from '../engine/simulate';
 import { type Stage, cellAt, cellKey } from '../engine/stage';
 import { C } from './art/palette';
-import { DecorationArt, GroundDetail, PassengerArt, StationArt, StationLabel, TileBase, cellHash } from './art/SceneryArt';
+import { BridgeArt, DecorationArt, GroundDetail, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
@@ -29,6 +29,8 @@ interface BoardProps {
   failure: Failure | null;
   arrived: boolean;
   flash: Flash | null;
+  /** Passenger stops the train has already passed through on this run. */
+  picked: ReadonlySet<string>;
   restPose: Pose;
   trainRef: RefObject<SVGGElement>;
   smokeRef: RefObject<SVGGElement>;
@@ -47,25 +49,31 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
     for (let x = 0; x < stage.width; x++) {
       const cell = cellAt(stage, x, y)!;
       const seed = cellHash(x, y, stage.number);
-      const variant = cell.type === 'fixed' ? 'stone' : cell.type === 'start' || cell.type === 'goal' ? 'paved' : 'grass';
+      const variant = cell.type === 'fixed' && !cell.bridge ? 'stone' : cell.type === 'start' || cell.type === 'goal' ? 'paved' : 'grass';
       const t = `translate(${centre(x)} ${centre(y)})`;
       tiles.push(
         <g key={cellKey(x, y)} transform={t}>
           <TileBase variant={variant} alt={(x + y) % 2 === 1} />
-          {cell.type === 'empty' && <GroundDetail seed={seed} />}
+          {cell.type === 'empty' && (cell.waypoint ? <StopPad /> : <GroundDetail seed={seed} />)}
         </g>,
       );
+      // Water joins neighbouring water and bridges, so rivers read as one body.
+      const waterJoins = (): Dir[] =>
+        ALL_DIRS.filter((d) => {
+          const n = cellAt(stage, x + DX[d], y + DY[d]);
+          return (n?.type === 'obstacle' && n.deco === 'water') || (n?.type === 'fixed' && n.bridge);
+        });
       if (cell.type === 'obstacle') {
-        const joins: Dir[] =
-          cell.deco === 'water'
-            ? ALL_DIRS.filter((d) => {
-                const n = cellAt(stage, x + DX[d], y + DY[d]);
-                return n?.type === 'obstacle' && n.deco === 'water';
-              })
-            : [];
+        const joins = cell.deco === 'water' ? waterJoins() : [];
         scenery.push(
           <g key={cellKey(x, y)} transform={t}>
             <DecorationArt deco={cell.deco} seed={seed} joins={joins} />
+          </g>,
+        );
+      } else if (cell.type === 'fixed' && cell.bridge) {
+        scenery.push(
+          <g key={cellKey(x, y)} transform={t}>
+            <BridgeArt rot={cell.rail.rot % 2} joins={waterJoins()} />
           </g>,
         );
       } else if (cell.type === 'fixed') {
@@ -141,7 +149,7 @@ function FailMarker({ failure }: { failure: Failure }) {
 }
 
 export function Board(props: BoardProps) {
-  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, restPose, trainRef, smokeRef, onCellClick } = props;
+  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, restPose, trainRef, smokeRef, onCellClick } = props;
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const w = stage.width * CELL;
   const h = stage.height * CELL;
@@ -165,12 +173,6 @@ export function Board(props: BoardProps) {
     >
       <StaticLayer stage={stage} />
 
-      {stage.waypoints.map((p) => (
-        <g key={cellKey(p.x, p.y)} transform={`translate(${centre(p.x)} ${centre(p.y)})`}>
-          <PassengerArt visited={false} />
-        </g>
-      ))}
-
       {ghosts.map((p, i) => (
         <g key={cellKey(p.x, p.y)} transform={`translate(${centre(p.x)} ${centre(p.y)}) rotate(${p.rail.rot * 90})`} pointerEvents="none">
           <g className="ghost" style={{ animationDelay: `${i * 0.18}s` }}>
@@ -187,12 +189,27 @@ export function Board(props: BoardProps) {
         </g>
       )}
 
-      {(['start', 'goal'] as const).map((kind) => (
-        <g key={kind} transform={`translate(${centre(stage[kind].x)} ${centre(stage[kind].y)})`}>
-          <StationLabel dir={stage[kind].dir} kind={kind} />
-          {kind === 'goal' && arrived && <circle className="celebrate-ring" r={40} fill="none" stroke={C.gold} strokeWidth={6} />}
-        </g>
-      ))}
+      {stage.waypoints.map((p) => {
+        const key = cellKey(p.x, p.y);
+        return (
+          <g key={key} transform={`translate(${centre(p.x)} ${centre(p.y)})`} pointerEvents="none">
+            <PassengerArt picked={picked.has(key)} seed={cellHash(p.x, p.y, 11)} />
+          </g>
+        );
+      })}
+
+      {arrived && (
+        <circle
+          className="celebrate-ring"
+          cx={centre(stage.goal.x)}
+          cy={centre(stage.goal.y)}
+          r={40}
+          fill="none"
+          stroke={C.gold}
+          strokeWidth={6}
+          pointerEvents="none"
+        />
+      )}
 
       <g ref={smokeRef} pointerEvents="none" />
       <g ref={trainRef} transform={poseTransform(restPose, CELL)} pointerEvents="none">
@@ -200,6 +217,13 @@ export function Board(props: BoardProps) {
           <TrainArt />
         </g>
       </g>
+
+      {/* Station signs sit above the train so they stay readable while it waits in the station. */}
+      {(['start', 'goal'] as const).map((kind) => (
+        <g key={kind} transform={`translate(${centre(stage[kind].x)} ${centre(stage[kind].y)})`}>
+          <StationLabel dir={stage[kind].dir} kind={kind} />
+        </g>
+      ))}
 
       {failure && <FailMarker failure={failure} />}
 

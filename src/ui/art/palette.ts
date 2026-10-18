@@ -45,6 +45,10 @@ export const C = {
   foothill: '#9FAF79',
   snow: '#FFFCF5',
 
+  deck: '#D7AC7A',
+  deckDark: '#A87B4E',
+  deckHi: '#E9C899',
+
   water: '#86CDEB',
   waterDeep: '#68B7DD',
   waterHi: '#C4EAF7',

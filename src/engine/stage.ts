@@ -6,7 +6,8 @@ export type Decoration = 'tree' | 'rock' | 'mountain' | 'water' | 'house';
 export type Cell =
   | { type: 'empty'; waypoint: boolean }
   | { type: 'obstacle'; deco: Decoration }
-  | { type: 'fixed'; rail: Rail }
+  /** `bridge` is purely visual: a fixed straight drawn as a bridge over water. */
+  | { type: 'fixed'; rail: Rail; bridge: boolean }
   | { type: 'start' }
   | { type: 'goal' };
 
@@ -48,7 +49,7 @@ export interface Stage {
  *   .  empty     P  passenger stop (empty, must be visited)
  *   S  start     G  goal
  *   T  tree      R  rock      M  mountain   W  water   H  house
- *   │ ─ └ ┌ ┐ ┘  fixed rail
+ *   │ ─ └ ┌ ┐ ┘  fixed rail       ║ ═  fixed bridge over water
  * `solution` uses the same grid, with rail glyphs on the cells the player fills.
  */
 export interface StageDef {
@@ -65,6 +66,11 @@ export interface StageDef {
 
 export const MIN_SIZE = 5;
 export const MAX_SIZE = 7;
+
+const BRIDGE_GLYPHS: Record<string, Rail> = {
+  '║': { kind: 'straight', rot: 0 },
+  '═': { kind: 'straight', rot: 1 },
+};
 
 const DECORATIONS: Record<string, Decoration> = {
   T: 'tree',
@@ -113,7 +119,8 @@ export function parseStage(def: StageDef, number: number): Stage {
         goal = { x, y };
         cells.push({ type: 'goal' });
       } else if (DECORATIONS[glyph]) cells.push({ type: 'obstacle', deco: DECORATIONS[glyph] });
-      else if (RAIL_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...RAIL_GLYPHS[glyph] } });
+      else if (RAIL_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...RAIL_GLYPHS[glyph] }, bridge: false });
+      else if (BRIDGE_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...BRIDGE_GLYPHS[glyph] }, bridge: true });
       else fail(`unknown glyph "${glyph}" at ${x},${y}`);
     });
   });

@@ -3,7 +3,7 @@ import { type Dir, DX, DY } from '../../engine/dir';
 import type { Segment } from '../../engine/geometry';
 import type { Decoration } from '../../engine/stage';
 import { C } from './palette';
-import { SegmentArt } from './TrackArt';
+import { RailPieceArt, SegmentArt } from './TrackArt';
 
 /** Small deterministic hash so decorations vary per cell but never flicker between renders. */
 export function cellHash(x: number, y: number, salt = 0): number {
@@ -121,10 +121,11 @@ function Water({ joins }: { joins: Dir[] }) {
       {joins.map((d) => (
         <rect
           key={d}
-          x={DX[d] === 0 ? -40 + inset : DX[d] > 0 ? 0 : -50}
-          y={DY[d] === 0 ? -40 + inset : DY[d] > 0 ? 0 : -50}
-          width={DX[d] === 0 ? 80 - inset * 2 : 50}
-          height={DY[d] === 0 ? 80 - inset * 2 : 50}
+          // Overlap the neighbour by 1 unit so anti-aliasing leaves no seam at the tile border.
+          x={DX[d] === 0 ? -40 + inset : DX[d] > 0 ? 0 : -51}
+          y={DY[d] === 0 ? -40 + inset : DY[d] > 0 ? 0 : -51}
+          width={DX[d] === 0 ? 80 - inset * 2 : 51}
+          height={DY[d] === 0 ? 80 - inset * 2 : 51}
         />
       ))}
     </g>
@@ -136,6 +137,27 @@ function Water({ joins }: { joins: Dir[] }) {
       {body(C.water, 5)}
       <path d="M-27 -17 Q-23 -25 -14 -25" stroke={C.waterHi} strokeWidth={2.5} strokeLinecap="round" fill="none" opacity={0.7} />
       <path d="M-15 -3 q5 -3 10 0 M7 17 q5 -3 10 0" stroke={C.waterHi} strokeWidth={2.5} strokeLinecap="round" fill="none" />
+    </g>
+  );
+}
+
+/** A wooden bridge carrying a fixed straight rail over water. `rot` 0 runs N–S, 1 runs E–W. */
+export function BridgeArt({ rot, joins }: { rot: number; joins: Dir[] }) {
+  return (
+    <g>
+      <Water joins={joins} />
+      <g transform={`rotate(${rot * 90})`}>
+        <rect x={-31} y={-51} width={62} height={102} fill={C.shadow} transform="translate(3 0)" />
+        <rect x={-31} y={-51} width={62} height={102} fill={C.deck} />
+        {[-38, -19, 0, 19, 38].map((y) => (
+          <path key={y} d={`M-31 ${y} H31`} stroke={C.deckDark} strokeWidth={1.5} opacity={0.5} />
+        ))}
+        <rect x={-34} y={-51} width={6} height={102} rx={2} fill={C.deckDark} />
+        <rect x={28} y={-51} width={6} height={102} rx={2} fill={C.deckDark} />
+        <rect x={-33} y={-51} width={3} height={102} fill={C.deckHi} opacity={0.6} />
+        <rect x={29} y={-51} width={3} height={102} fill={C.deckHi} opacity={0.6} />
+        <RailPieceArt kind="straight" tint={C.deck} />
+      </g>
     </g>
   );
 }
@@ -192,10 +214,11 @@ export function StationArt({ dir, kind }: { dir: Dir; kind: 'start' | 'goal' }) 
       <path d="M-41 -46 L-31 -40 L-41 -33Z M28 -46 V-33 L18 -40Z" fill={roofDark} />
       <path d="M-31 -40 H18" stroke={C.cream} strokeWidth={1.5} opacity={0.5} />
       {kind === 'goal' ? (
-        <g>
-          <path d="M35 -25 V-46" stroke={C.amberDark} strokeWidth={2.5} strokeLinecap="round" />
-          <path d="M36 -46 H46 L43 -41 L46 -36 H36Z" fill={C.amber} />
-          <path d="M37 -44 L41 -41 L37 -38" stroke={C.cream} strokeWidth={1.8} fill="none" />
+        // Counter-rotate around the pole base so the pennant always flies upright and to the right.
+        <g transform={`translate(35 -25) rotate(${-(dir - 1) * 90})`}>
+          <path d="M0 0 V-21" stroke={C.amberDark} strokeWidth={2.5} strokeLinecap="round" />
+          <path d="M1 -21 H11 L8 -16 L11 -11 H1Z" fill={C.amber} />
+          <path d="M2 -19 L6 -16 L2 -13" stroke={C.cream} strokeWidth={1.8} fill="none" />
         </g>
       ) : (
         <g>
@@ -214,31 +237,65 @@ export function StationArt({ dir, kind }: { dir: Dir; kind: 'start' | 'goal' }) 
 /** Station name label, kept upright regardless of station rotation. */
 export function StationLabel({ dir, kind }: { dir: Dir; kind: 'start' | 'goal' }) {
   const a = ((dir - 1) * Math.PI) / 2;
-  // Opposite platform: keep the building visible and the sign within its tile.
-  // Vertical tracks need less horizontal offset because the sign stays upright.
-  const lx = -27 * Math.sin(a);
+  // On the side opposite the building. Vertical tracks leave only a narrow strip beside
+  // the rails, so the sign is slimmer there and pushed out to clear the train.
+  const vertical = dir % 2 === 0;
+  const half = vertical ? 17 : 21;
+  const lx = (vertical ? -32 : -27) * Math.sin(a);
   const ly = 35 * Math.cos(a);
   const text = kind === 'start' ? '출발' : '도착';
+  const accent = kind === 'start' ? C.teal : C.amberDark;
   return (
     <g transform={`translate(${lx} ${ly})`} pointerEvents="none">
-      <rect x={-21} y={-10} width={42} height={22} rx={5} fill={C.shadow} />
-      <rect x={-21} y={-11} width={42} height={21} rx={5} fill={C.cream} stroke={kind === 'start' ? C.teal : C.amberDark} strokeWidth={2} />
-      <circle cx={-17} cy={0} r={1.2} fill={kind === 'start' ? C.teal : C.amberDark} />
-      <circle cx={17} cy={0} r={1.2} fill={kind === 'start' ? C.teal : C.amberDark} />
-      <text y={5} textAnchor="middle" fontSize={13.5} fontWeight={800} fill={C.ink}>
+      <rect x={-half} y={-10} width={half * 2} height={22} rx={5} fill={C.shadow} />
+      <rect x={-half} y={-11} width={half * 2} height={21} rx={5} fill={C.cream} stroke={accent} strokeWidth={2} />
+      {!vertical && <circle cx={-17} cy={0} r={1.2} fill={accent} />}
+      {!vertical && <circle cx={17} cy={0} r={1.2} fill={accent} />}
+      <text y={vertical ? 4.5 : 5} textAnchor="middle" fontSize={vertical ? 12 : 13.5} fontWeight={800} fill={C.ink}>
         {text}
       </text>
     </g>
   );
 }
 
-/** Passenger stop marker for waypoint cells (future stages). */
-export function PassengerArt({ visited }: { visited: boolean }) {
+/** Small paved stop pad in the corner of a passenger tile (static layer, under the rails). */
+export function StopPad() {
   return (
-    <g transform="translate(-30 -30)" opacity={visited ? 0.45 : 1}>
-      <circle r={15} fill={C.cream} stroke={C.amber} strokeWidth={3} />
-      <circle cy={-4} r={4.5} fill={C.ink} />
-      <path d="M-7 8 Q0 -2 7 8 Z" fill={C.ink} />
+    <g transform="translate(-30 -30)">
+      <rect x={-17} y={-15} width={34} height={33} rx={9} fill={C.platformEdge} />
+      <rect x={-17} y={-17} width={34} height={33} rx={9} fill={C.platform} />
+      <rect x={-14} y={-14} width={28} height={27} rx={7} fill="none" stroke={C.brass} strokeWidth={1.5} strokeDasharray="3 3" />
+    </g>
+  );
+}
+
+const SHIRTS = [C.amber, C.trainRed, C.teal] as const;
+
+/** A passenger waiting on the stop pad, or a check badge once the train has picked them up. */
+export function PassengerArt({ picked, seed }: { picked: boolean; seed: number }) {
+  if (picked) {
+    return (
+      <g transform="translate(-30 -30)">
+        <g className="pop-in">
+          <circle r={13} fill={C.teal} stroke={C.cream} strokeWidth={3} />
+          <path d="M-5.5 0.5 L-1.5 4.5 L6 -4" stroke={C.cream} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </g>
+      </g>
+    );
+  }
+  const shirt = SHIRTS[Math.floor(seed * SHIRTS.length) % SHIRTS.length];
+  return (
+    <g transform="translate(-30 -30)">
+      <ellipse cy={13} rx={10} ry={3.5} fill={C.shadow} />
+      <g className="passenger-bob">
+        <path d="M-9 12 Q-9 -1 0 -1 Q9 -1 9 12 Z" fill={shirt} />
+        <path d="M-3 -1 L0 4 L3 -1" fill={C.cream} />
+        <circle cy={-8} r={7.5} fill="#F7D2B4" />
+        <path d="M-7.5 -9 Q-7 -16.5 0 -16.5 Q7 -16.5 7.5 -9 Q3 -13 -7.5 -9Z" fill={C.ink} />
+        <circle cx={-2.6} cy={-7} r={1.1} fill={C.ink} />
+        <circle cx={2.6} cy={-7} r={1.1} fill={C.ink} />
+        <path d="M10 -2 L14 -12" stroke="#F7D2B4" strokeWidth={3.2} strokeLinecap="round" />
+      </g>
     </g>
   );
 }

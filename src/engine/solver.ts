@@ -10,6 +10,8 @@ export interface SolveResult {
   /** Fewest player rails any winning route needs, or null when unsolvable. Exact even when truncated. */
   minRails: number | null;
   first: Placement[] | null;
+  /** Every route found (up to `limit`), only when `collectRoutes` is set. */
+  routes?: Placement[][];
 }
 
 function pieceFor(inEdge: Dir, outEdge: Dir): Rail {
@@ -27,23 +29,24 @@ function pieceFor(inEdge: Dir, outEdge: Dir): Rail {
  * simple path (two-port pieces can never be crossed twice), so a DFS over
  * "go straight / turn left / turn right" with visited-cell pruning is exhaustive.
  */
-export function solve(stage: Stage, limit = 1000): SolveResult {
-  const all = search(stage, limit, Infinity);
+export function solve(stage: Stage, limit = 1000, collectRoutes = false): SolveResult {
+  const all = search(stage, limit, Infinity, collectRoutes);
   const truncated = all.count >= limit;
   if (!truncated || all.minRails === null) return { ...all, truncated };
   // The capped enumeration may have stopped before reaching the shortest route:
   // find the true minimum by iterative deepening on the number of player rails.
   for (let depth = 0; depth < all.minRails; depth++) {
-    if (search(stage, 1, depth).count > 0) return { ...all, truncated, minRails: depth };
+    if (search(stage, 1, depth, false).count > 0) return { ...all, truncated, minRails: depth };
   }
   return { ...all, truncated };
 }
 
-function search(stage: Stage, limit: number, maxRails: number): Omit<SolveResult, 'truncated'> {
+function search(stage: Stage, limit: number, maxRails: number, collect: boolean): Omit<SolveResult, 'truncated'> {
   const left = { ...stage.inventory };
   const visited = new Set<string>();
   const path: Placement[] = [];
-  const result: Omit<SolveResult, 'truncated'> = { count: 0, minRails: null, first: null };
+  const result: Omit<SolveResult, 'truncated'> = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
+  const copy = () => path.map((p) => ({ ...p, rail: { ...p.rail } }));
 
   const visit = (x: number, y: number, heading: Dir): void => {
     if (result.count >= limit) return;
@@ -59,7 +62,8 @@ function search(stage: Stage, limit: number, maxRails: number): Omit<SolveResult
       if (!stage.waypoints.every((p) => visited.has(cellKey(p.x, p.y)))) return;
       result.count += 1;
       if (result.minRails === null || path.length < result.minRails) result.minRails = path.length;
-      if (!result.first) result.first = path.map((p) => ({ ...p, rail: { ...p.rail } }));
+      if (!result.first) result.first = copy();
+      result.routes?.push(copy());
       return;
     }
 
