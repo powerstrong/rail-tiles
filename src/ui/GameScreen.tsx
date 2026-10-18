@@ -435,6 +435,11 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                 <i key={i} style={{ '--i': i } as CSSProperties} />
               ))}
             </div>
+            <button className="icon-btn result-close" onClick={onBack} aria-label="스테이지 목록으로">
+              <svg viewBox="0 0 24 24" aria-hidden>
+                <path d="M6 6 L18 18 M18 6 L6 18" />
+              </svg>
+            </button>
             <p className="result-kicker">STAGE {stage.number}</p>
             <StarRow count={earned} className="result-stars" />
             {!hasNext && allCleared ? (
