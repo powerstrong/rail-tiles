@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { emptyProgress, loadProgress, markCleared, saveProgress } from './storage';
+import { starsFor } from './engine/stars';
+import { emptyProgress, loadProgress, recordClear, saveProgress } from './storage';
 
 function memory(initial?: string) {
   const data = new Map<string, string>();
@@ -11,16 +12,22 @@ function memory(initial?: string) {
 }
 
 describe('progress storage', () => {
-  it('round-trips cleared stages', () => {
+  it('round-trips star ratings', () => {
     const store = memory();
-    saveProgress(markCleared(emptyProgress(), 'first-line'), store);
-    expect(loadProgress(store).cleared).toEqual(['first-line']);
+    saveProgress(recordClear(emptyProgress(), 'first-line', 3), store);
+    expect(loadProgress(store).stars).toEqual({ 'first-line': 3 });
   });
 
-  it('falls back to a fresh start on bad data', () => {
-    for (const raw of ['not json', '{"schemaVersion":99,"cleared":[]}', '{"schemaVersion":1}', 'null', '[]']) {
+  it('migrates v1 "cleared" lists to one star each', () => {
+    const v1 = JSON.stringify({ schemaVersion: 1, cleared: ['first-line', 'first-turn', 42] });
+    expect(loadProgress(memory(v1)).stars).toEqual({ 'first-line': 1, 'first-turn': 1 });
+  });
+
+  it('falls back to a fresh start on bad data and drops invalid ratings', () => {
+    for (const raw of ['not json', '{"schemaVersion":99,"stars":{}}', '{"schemaVersion":2}', 'null', '[]']) {
       expect(loadProgress(memory(raw))).toEqual(emptyProgress());
     }
+    expect(loadProgress(memory('{"schemaVersion":2,"stars":{"a":3,"b":7,"c":"3"}}')).stars).toEqual({ a: 3 });
     expect(loadProgress(null)).toEqual(emptyProgress());
   });
 
@@ -37,8 +44,24 @@ describe('progress storage', () => {
     expect(() => saveProgress(emptyProgress(), broken)).not.toThrow();
   });
 
-  it('markCleared is idempotent', () => {
-    const p = markCleared(emptyProgress(), 'a');
-    expect(markCleared(p, 'a')).toBe(p);
+  it('keeps the best rating and is a no-op otherwise', () => {
+    const p = recordClear(emptyProgress(), 'a', 2);
+    expect(recordClear(p, 'a', 1)).toBe(p);
+    expect(recordClear(p, 'a', 2)).toBe(p);
+    expect(recordClear(p, 'a', 3).stars.a).toBe(3);
+  });
+});
+
+describe('stars', () => {
+  it('rates by rails used against par', () => {
+    expect(starsFor(8, 9, false)).toBe(3);
+    expect(starsFor(9, 9, false)).toBe(3);
+    expect(starsFor(11, 9, false)).toBe(2);
+    expect(starsFor(12, 9, false)).toBe(1);
+  });
+
+  it('caps hinted clears at two stars', () => {
+    expect(starsFor(9, 9, true)).toBe(2);
+    expect(starsFor(12, 9, true)).toBe(1);
   });
 });

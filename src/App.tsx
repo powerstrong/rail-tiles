@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { STAGES, TOTAL_PLANNED_STAGES } from './stages/stages';
-import { loadProgress, markCleared, saveProgress } from './storage';
+import type { Stars } from './engine/stars';
+import { STAGES } from './stages/stages';
+import { loadProgress, recordClear, saveProgress } from './storage';
 import { GameScreen } from './ui/GameScreen';
 import { StageSelect } from './ui/StageSelect';
 import { TitleScreen } from './ui/TitleScreen';
@@ -10,7 +11,7 @@ type Screen = { name: 'title' } | { name: 'select' } | { name: 'game'; index: nu
 export function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
   const [progress, setProgress] = useState(loadProgress);
-  const cleared = useMemo(() => new Set(progress.cleared), [progress]);
+  const cleared = useMemo(() => new Set(Object.keys(progress.stars)), [progress]);
   const allCleared = STAGES.every((s) => cleared.has(s.id));
 
   // Persist outside the state updater (StrictMode may call updaters twice); skip the initial load.
@@ -19,7 +20,7 @@ export function App() {
     if (progress !== loaded.current) saveProgress(progress);
   }, [progress]);
 
-  const onCleared = (id: string) => setProgress((p) => markCleared(p, id));
+  const onCleared = (id: string, stars: Stars) => setProgress((p) => recordClear(p, id, stars));
 
   if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'select' })} />;
 
@@ -27,7 +28,7 @@ export function App() {
     return (
       <StageSelect
         stages={STAGES}
-        totalPlanned={TOTAL_PLANNED_STAGES}
+        stars={progress.stars}
         cleared={cleared}
         allCleared={allCleared}
         onPick={(index) => setScreen({ name: 'game', index })}
@@ -44,6 +45,7 @@ export function App() {
       stage={stage}
       hasNext={nextIndex < STAGES.length}
       allCleared={allCleared}
+      bestStars={progress.stars[stage.id] ?? 0}
       onBack={() => setScreen({ name: 'select' })}
       // "Next" is only offered after a clear, which unlocks the following stage.
       onNext={() => setScreen(nextIndex < STAGES.length ? { name: 'game', index: nextIndex } : { name: 'select' })}

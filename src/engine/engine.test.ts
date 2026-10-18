@@ -8,8 +8,14 @@ import { type StageDef, StageError, cellKey, parseStage } from './stage';
 
 const blankSolution = (map: string[]) => map.map((row) => row.replace(/[^\s]/g, '.'));
 
-function stage(map: string[], start: StageDef['start'], goal: StageDef['goal'], inventory = { straight: 9, curve: 9 }) {
-  return parseStage({ id: 't', title: 't', tip: '', map, start, goal, inventory, solution: blankSolution(map) }, 1);
+function stage(
+  map: string[],
+  start: StageDef['start'],
+  goal: StageDef['goal'],
+  inventory = { straight: 9, curve: 9 },
+  tunnels?: StageDef['tunnels'],
+) {
+  return parseStage({ id: 't', title: 't', tip: '', map, start, goal, inventory, tunnels, solution: blankSolution(map) }, 1);
 }
 
 /** Builds a RailMap from a glyph grid laid over the stage (`.` = nothing). */
@@ -162,6 +168,50 @@ describe('simulate', () => {
         expect(trace.steps.at(-1)?.kind).toBe('goal');
       }
     }
+  });
+});
+
+describe('tunnels', () => {
+  // Mouth "a" at (2,0) opens east; its pair at (2,2) opens west, right in front of the start.
+  const map = ['. . a . .', '. . . . .', 'S . a . G', '. . . . .', '. . . . .'];
+  const s = stage(map, 'E', 'W', { straight: 9, curve: 9 }, { a: ['E', 'W'] });
+  // Start → (1,2) → into the lower mouth → out of the upper mouth heading east → down to the goal.
+  const route = ['. . . ┐ .', '. . . │ .', '. ─ . └ .'];
+
+  it('parses paired mouths with their openings', () => {
+    expect(s.cells[0 * 5 + 2]).toMatchObject({ type: 'tunnel', dir: E, pair: { x: 2, y: 2 } });
+    expect(s.cells[2 * 5 + 2]).toMatchObject({ type: 'tunnel', dir: W, pair: { x: 2, y: 0 } });
+  });
+
+  it('rejects unpaired or undeclared tunnels', () => {
+    expect(() => stage(['. . a . .', '. . . . .', 'S . . . G', '. . . . .', '. . . . .'], 'E', 'W', undefined, { a: ['E', 'W'] })).toThrow(
+      /exactly two mouths/,
+    );
+    expect(() => stage(map, 'E', 'W')).toThrow(/no entry in tunnels/);
+  });
+
+  it('carries the train from one mouth out of the other', () => {
+    const trace = simulate(s, rails(route));
+    expect(trace.success).toBe(true);
+    expect(trace.steps.map((st) => st.kind)).toEqual(['start', 'rail', 'tunnel', 'rail', 'rail', 'rail', 'goal']);
+    expect(trace.steps[2]).toMatchObject({ x: 2, y: 2, inEdge: W, toX: 2, toY: 0, outEdge: E });
+  });
+
+  it('refuses a mouth approached from the wrong side', () => {
+    const sideways = stage(map, 'E', 'W', undefined, { a: ['E', 'N'] });
+    expect(simulate(sideways, rails(route)).failure).toMatchObject({ reason: 'tunnel_wrong_side', cell: { x: 2, y: 2 } });
+  });
+
+  it('is understood by the solver and by auto-orient', () => {
+    const tight = stage(map, 'E', 'W', { straight: 2, curve: 2 }, { a: ['E', 'W'] });
+    const res = solve(tight);
+    expect(res.minRails).toBe(4);
+    const placed: Record<string, Rail> = {};
+    for (const p of res.first ?? []) placed[cellKey(p.x, p.y)] = p.rail;
+    expect(simulate(tight, placed).success).toBe(true);
+    // A curve beside the upper mouth turns to meet its opening on the west.
+    const ed = placeRail(s, createEditor(), 3, 0, 'curve');
+    expect(railPorts(ed.placed[cellKey(3, 0)])).toContain(W);
   });
 });
 

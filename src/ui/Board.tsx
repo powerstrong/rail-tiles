@@ -3,9 +3,9 @@ import { ALL_DIRS, type Dir, DX, DY } from '../engine/dir';
 import { type Placements, autoOrient, placeBlock, remaining } from '../engine/editor';
 import type { Pose } from '../engine/geometry';
 import type { Failure } from '../engine/simulate';
-import { type Stage, cellAt, cellKey } from '../engine/stage';
+import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
 import { C } from './art/palette';
-import { BridgeArt, DecorationArt, GroundDetail, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
+import { BridgeArt, DecorationArt, GroundDetail, TunnelArt, TunnelBadge, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
@@ -31,6 +31,8 @@ interface BoardProps {
   flash: Flash | null;
   /** Passenger stops the train has already passed through on this run. */
   picked: ReadonlySet<string>;
+  /** Hint: one solution tile to show as a pulsing ghost. */
+  hint: Placement | null;
   restPose: Pose;
   trainRef: RefObject<SVGGElement>;
   smokeRef: RefObject<SVGGElement>;
@@ -68,6 +70,13 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
         scenery.push(
           <g key={cellKey(x, y)} transform={t}>
             <DecorationArt deco={cell.deco} seed={seed} joins={joins} />
+          </g>,
+        );
+      } else if (cell.type === 'tunnel') {
+        scenery.push(
+          <g key={cellKey(x, y)} transform={t}>
+            <TunnelArt dir={cell.dir} label={cell.label} />
+            <TunnelBadge dir={cell.dir} label={cell.label} />
           </g>,
         );
       } else if (cell.type === 'fixed' && cell.bridge) {
@@ -150,7 +159,7 @@ function FailMarker({ failure }: { failure: Failure }) {
 }
 
 export function Board(props: BoardProps) {
-  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, restPose, trainRef, smokeRef, onCellClick } = props;
+  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, hint, restPose, trainRef, smokeRef, onCellClick } = props;
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const w = stage.width * CELL;
   const h = stage.height * CELL;
@@ -197,6 +206,17 @@ export function Board(props: BoardProps) {
         swapHover={preview?.swap ? cellKey(preview.x, preview.y) : null}
       />
 
+      {hint && (
+        <g transform={`translate(${centre(hint.x)} ${centre(hint.y)})`} pointerEvents="none">
+          <rect className="hint-ring" x={-47} y={-47} width={94} height={94} rx={13} fill="none" stroke={C.gold} strokeWidth={5} />
+          <g transform={`rotate(${hint.rail.rot * 90})`}>
+            <g className="ghost hint-ghost">
+              <RailPieceArt kind={hint.rail.kind} />
+            </g>
+          </g>
+        </g>
+      )}
+
       {preview && (
         <g transform={`translate(${centre(preview.x)} ${centre(preview.y)}) rotate(${preview.rot * 90})`} opacity={preview.swap ? 0.75 : 0.5} pointerEvents="none">
           <RailPieceArt kind={preview.kind} />
@@ -226,7 +246,7 @@ export function Board(props: BoardProps) {
       )}
 
       <g ref={smokeRef} pointerEvents="none" />
-      <g ref={trainRef} transform={poseTransform(restPose, CELL)} pointerEvents="none">
+      <g ref={trainRef} transform={poseTransform(restPose, CELL)} opacity={restPose.alpha} pointerEvents="none">
         <g className={failure && !arrived ? 'train-crash' : undefined}>
           <TrainArt />
         </g>

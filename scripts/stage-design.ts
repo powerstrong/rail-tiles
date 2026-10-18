@@ -32,8 +32,14 @@ for (const def of drafts) {
   }
   const chosen = solve(parseStage(def, 0), 999, true);
   console.log(`  chosen inventory s${def.inventory.straight} c${def.inventory.curve}: ${chosen.count} route(s), min ${chosen.minRails}`);
-  const shown = chosen.count > 0 && chosen.count <= 4 ? chosen.routes! : [chosen.first ?? free.first];
+  const shown = chosen.count > 0 && chosen.count <= 3 ? chosen.routes! : chosen.count > 0 ? [] : [free.first];
   shown.forEach((route, i) => console.log(`  route ${i + 1}:
 ${draw(parseStage(def, 0), route)}`));
-  if (chosen.first) console.log('  solution: ' + JSON.stringify(solutionGrid(parseStage(def, 0), chosen.first), null, 0));
+  // The listed solution must be a shortest route (it defines par).
+  const shortest = chosen.routes?.reduce((a, b) => (b.length < a.length ? b : a));
+  if (shortest) {
+    console.log(`  shortest (${shortest.length} rails):
+${draw(parseStage(def, 0), shortest)}`);
+    console.log('  solution: ' + JSON.stringify(solutionGrid(parseStage(def, 0), shortest), null, 0));
+  }
 }

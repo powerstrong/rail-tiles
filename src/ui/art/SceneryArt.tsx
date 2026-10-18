@@ -141,6 +141,46 @@ function Water({ joins }: { joins: Dir[] }) {
   );
 }
 
+const TUNNEL_COLORS: Record<string, string> = { a: C.tunnelA, b: C.tunnelB, c: C.tunnelC };
+export const tunnelColor = (label: string) => TUNNEL_COLORS[label] ?? C.tunnelA;
+
+/**
+ * Tunnel mouth, drawn opening east then rotated so the opening faces `dir`:
+ * a grassy hill on the back half with a dark portal the track runs into.
+ */
+export function TunnelArt({ dir, label }: { dir: Dir; label: string }) {
+  const ring = tunnelColor(label);
+  const stub: Segment = { type: 'line', a: { x: -0.05, y: 0 }, b: { x: 0.5, y: 0 }, length: 0.55 };
+  return (
+    <g transform={`rotate(${(dir - 1) * 90})`}>
+      <SegmentArt seg={stub} />
+      <path d="M12 -46 C-10 -50 -48 -40 -48 0 C-48 40 -10 50 12 46 C20 30 20 -30 12 -46Z" fill={C.shadow} transform="translate(3 4)" />
+      <path d="M12 -46 C-10 -50 -48 -40 -48 0 C-48 40 -10 50 12 46 C20 30 20 -30 12 -46Z" fill={C.foothill} />
+      <path d="M2 -40 C-14 -42 -40 -32 -40 -6 C-30 -26 -12 -32 2 -30Z" fill={C.grassHi} opacity={0.5} />
+      {/* Stone arch around the portal, colour-coded per tunnel pair. */}
+      <path d="M16 -24 C4 -24 -2 -12 -2 0 C-2 12 4 24 16 24" stroke={ring} strokeWidth={9} fill="none" strokeLinecap="round" />
+      <path d="M15 -18 C7 -18 3 -9 3 0 C3 9 7 18 15 18 Z" fill={C.portal} />
+      <path d="M16 -24 C4 -24 -2 -12 -2 0" stroke={C.cream} strokeWidth={2} opacity={0.45} fill="none" />
+    </g>
+  );
+}
+
+/** Pair letter for a tunnel, kept upright and placed on the hill behind the portal. */
+export function TunnelBadge({ dir, label }: { dir: Dir; label: string }) {
+  const a = ((dir - 1) * Math.PI) / 2;
+  // (-28, -26) in tunnel space: on the hill, clear of the track.
+  const bx = -28 * Math.cos(a) + 26 * Math.sin(a);
+  const by = -28 * Math.sin(a) - 26 * Math.cos(a);
+  return (
+    <g transform={`translate(${bx} ${by})`} pointerEvents="none">
+      <circle r={11} fill={tunnelColor(label)} stroke={C.cream} strokeWidth={2.5} />
+      <text y={4.5} textAnchor="middle" fontSize={13} fontWeight={900} fill="#fff">
+        {label.toUpperCase()}
+      </text>
+    </g>
+  );
+}
+
 /** A wooden bridge carrying a fixed straight rail over water. `rot` 0 runs N–S, 1 runs E–W. */
 export function BridgeArt({ rot, joins }: { rot: number; joins: Dir[] }) {
   return (

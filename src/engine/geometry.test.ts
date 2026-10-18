@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_DIRS, type Dir, opposite } from './dir';
-import { pointAt, poseAt, segmentPath, tangentAt, tileSegment, traceToPath } from './geometry';
+import { TUNNEL_DWELL, pointAt, poseAt, segmentPath, tangentAt, tileSegment, traceToPath } from './geometry';
 import type { TraceStep } from './simulate';
 
 const close = (a: number, b: number) => expect(a).toBeCloseTo(b, 6);
@@ -82,10 +82,32 @@ describe('train path', () => {
   it('starts at the station centre and ends at the goal centre, facing the right way', () => {
     const a = poseAt(path, 0);
     const b = poseAt(path, path.length);
-    expect([a.x, a.y, a.angle]).toEqual([0.5, 0.5, 0]);
+    expect([a.x, a.y, a.angle, a.alpha]).toEqual([0.5, 0.5, 0, 1]);
     close(b.x, 2.5);
     close(b.y, 2.5);
     close(b.angle, 90);
     close(path.length, 0.5 + 1 + Math.PI / 4 + 1 + 0.5);
+  });
+});
+
+describe('tunnel path', () => {
+  const steps: TraceStep[] = [
+    { kind: 'start', x: 0, y: 2, outEdge: 1 },
+    { kind: 'tunnel', x: 1, y: 2, inEdge: 3, toX: 1, toY: 0, outEdge: 1 },
+    { kind: 'goal', x: 2, y: 0, inEdge: 3 },
+  ];
+  const path = traceToPath(steps);
+
+  it('splits the tunnel into a fade-out and a fade-in segment', () => {
+    expect(path.segments.map((s) => s.fade)).toEqual([undefined, 'out', 'hidden', 'in', undefined]);
+    expect(path.stepMid).toHaveLength(steps.length);
+  });
+
+  it('hides the train at the mouth and shows it again after', () => {
+    expect(poseAt(path, 0.25).alpha).toBe(1);
+    expect(poseAt(path, 1.0).alpha).toBeLessThan(0.05); // at the lower mouth's centre
+    expect(poseAt(path, 1.0 + TUNNEL_DWELL / 2).alpha).toBe(0); // underground
+    expect(poseAt(path, 1.0 + TUNNEL_DWELL + 1e-6).alpha).toBeLessThan(0.05); // just out of the upper mouth
+    expect(poseAt(path, 1.5 + TUNNEL_DWELL).alpha).toBeGreaterThan(0.95);
   });
 });

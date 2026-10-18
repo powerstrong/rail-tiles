@@ -1,8 +1,9 @@
 import type { Stage } from '../engine/stage';
+import type { Stars } from '../engine/stars';
 
 interface Props {
   stages: Stage[];
-  totalPlanned: number;
+  stars: Readonly<Record<string, Stars>>;
   cleared: ReadonlySet<string>;
   allCleared: boolean;
   onPick: (index: number) => void;
@@ -13,7 +14,21 @@ export function isUnlocked(stages: Stage[], cleared: ReadonlySet<string>, index:
   return index === 0 || cleared.has(stages[index - 1]?.id);
 }
 
-export function StageSelect({ stages, totalPlanned, cleared, allCleared, onPick, onBack }: Props) {
+/** Three small stars, filled up to `count`. */
+export function StarRow({ count, className }: { count: number; className?: string }) {
+  return (
+    <span className={`star-row ${className ?? ''}`} aria-label={`별 ${count}개`}>
+      {[1, 2, 3].map((n) => (
+        <svg key={n} viewBox="0 0 24 24" className={n <= count ? 'on' : 'off'} aria-hidden>
+          <path d="M12 2.8 L14.7 8.6 L21 9.3 L16.3 13.6 L17.6 19.9 L12 16.7 L6.4 19.9 L7.7 13.6 L3 9.3 L9.3 8.6 Z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+export function StageSelect({ stages, stars, cleared, allCleared, onPick, onBack }: Props) {
+  const totalStars = stages.reduce((sum, s) => sum + (stars[s.id] ?? 0), 0);
   return (
     <main className="select">
       <header className="select-head">
@@ -23,8 +38,8 @@ export function StageSelect({ stages, totalPlanned, cleared, allCleared, onPick,
           </svg>
         </button>
         <h1>스테이지 선택</h1>
-        <span className="select-progress">
-          {stages.filter((s) => cleared.has(s.id)).length} / {totalPlanned}
+        <span className="select-progress" aria-label={`별 ${totalStars}개 / ${stages.length * 3}개`}>
+          ★ {totalStars} / {stages.length * 3}
         </span>
       </header>
       {allCleared && (
@@ -33,18 +48,7 @@ export function StageSelect({ stages, totalPlanned, cleared, allCleared, onPick,
         </p>
       )}
       <ol className="stage-grid">
-        {Array.from({ length: totalPlanned }, (_, i) => {
-          const stage = stages[i];
-          if (!stage) {
-            return (
-              <li key={i}>
-                <div className="stage-card soon" aria-disabled>
-                  <span className="stage-num">{i + 1}</span>
-                  <span className="stage-name">준비 중</span>
-                </div>
-              </li>
-            );
-          }
+        {stages.map((stage, i) => {
           const unlocked = isUnlocked(stages, cleared, i);
           const done = cleared.has(stage.id);
           return (
@@ -53,17 +57,11 @@ export function StageSelect({ stages, totalPlanned, cleared, allCleared, onPick,
                 className={`stage-card ${done ? 'done' : ''} ${unlocked ? '' : 'locked'}`}
                 disabled={!unlocked}
                 onClick={() => onPick(i)}
-                aria-label={`스테이지 ${i + 1} ${stage.title}${done ? ', 클리어' : unlocked ? '' : ', 잠김'}`}
+                aria-label={`스테이지 ${i + 1} ${stage.title}${done ? `, 별 ${stars[stage.id]}개` : unlocked ? '' : ', 잠김'}`}
               >
                 <span className="stage-num">{i + 1}</span>
                 <span className="stage-name">{stage.title}</span>
-                {done && (
-                  <span className="badge" aria-hidden>
-                    <svg viewBox="0 0 24 24">
-                      <path d="M5 12.5 L10 17 L19 7" />
-                    </svg>
-                  </span>
-                )}
+                {unlocked && <StarRow count={stars[stage.id] ?? 0} className="card-stars" />}
                 {!unlocked && (
                   <span className="lock" aria-hidden>
                     <svg viewBox="0 0 24 24">

@@ -11,6 +11,7 @@ export type FailReason =
   | 'blocked'
   | 'misaligned'
   | 'goal_wrong_side'
+  | 'tunnel_wrong_side'
   | 'start_reentry'
   | 'missed_waypoint'
   | 'step_limit';
@@ -24,6 +25,8 @@ export type FailReason =
 export type TraceStep =
   | { kind: 'start'; x: number; y: number; outEdge: Dir }
   | { kind: 'rail'; x: number; y: number; inEdge: Dir; outEdge: Dir }
+  /** Into the mouth at (x, y) through `inEdge`, out of the paired mouth (toX, toY) through `outEdge`. */
+  | { kind: 'tunnel'; x: number; y: number; inEdge: Dir; toX: number; toY: number; outEdge: Dir }
   | { kind: 'goal'; x: number; y: number; inEdge: Dir };
 
 export interface Failure {
@@ -99,6 +102,16 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
       }
       case 'start':
         return fail('start_reentry', next);
+      case 'tunnel': {
+        if (cell.dir !== inEdge) return fail('tunnel_wrong_side', next);
+        const out = cellAt(stage, cell.pair.x, cell.pair.y);
+        const outEdge = out?.type === 'tunnel' ? out.dir : heading;
+        steps.push({ kind: 'tunnel', x: nx, y: ny, inEdge, toX: cell.pair.x, toY: cell.pair.y, outEdge });
+        x = cell.pair.x;
+        y = cell.pair.y;
+        heading = outEdge;
+        break;
+      }
       case 'obstacle':
         return fail('blocked', next);
       case 'fixed':

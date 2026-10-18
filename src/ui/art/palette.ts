@@ -49,6 +49,11 @@ export const C = {
   deckDark: '#A87B4E',
   deckHi: '#E9C899',
 
+  tunnelA: '#8E6BD1',
+  tunnelB: '#3A9AD9',
+  tunnelC: '#E0679A',
+  portal: '#2B2A36',
+
   water: '#86CDEB',
   waterDeep: '#68B7DD',
   waterHi: '#C4EAF7',

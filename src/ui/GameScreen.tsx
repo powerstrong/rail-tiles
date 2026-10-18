@@ -1,12 +1,14 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createEditor, eraseRail, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
 import { type Pose, traceToPath } from '../engine/geometry';
-import { RAIL_KINDS, type RailKind } from '../engine/rail';
+import { RAIL_KINDS, type RailKind, normalizeRot } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
-import { type Stage, cellAt, cellKey } from '../engine/stage';
+import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
+import { type Stars, starsFor } from '../engine/stars';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
+import { StarRow } from './StageSelect';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
 
@@ -18,6 +20,7 @@ const FAIL_TEXT: Record<FailReason, string> = {
   blocked: '장애물에 가로막혔어요.',
   misaligned: '레일 방향이 맞지 않아요.',
   goal_wrong_side: '도착역 입구와 방향이 맞지 않아요.',
+  tunnel_wrong_side: '터널 입구가 아닌 쪽으로 들어갔어요.',
   start_reentry: '기차가 출발역으로 되돌아왔어요.',
   missed_waypoint: '아직 태우지 못한 승객이 있어요.',
   step_limit: '기차가 같은 길을 맴돌고 있어요.',
@@ -31,13 +34,15 @@ interface Props {
   stage: Stage;
   hasNext: boolean;
   allCleared: boolean;
+  /** Best rating so far for this stage (0 if never cleared). */
+  bestStars: number;
   onBack: () => void;
   onNext: () => void;
-  onCleared: (stageId: string) => void;
+  onCleared: (stageId: string, stars: Stars) => void;
 }
 
 function startPose(stage: Stage): Pose {
-  return { x: stage.start.x + 0.5, y: stage.start.y + 0.5, angle: (stage.start.dir - 1) * 90 };
+  return { x: stage.start.x + 0.5, y: stage.start.y + 0.5, angle: (stage.start.dir - 1) * 90, alpha: 1 };
 }
 
 function ToolIcon({ tool }: { tool: Tool }) {
@@ -61,7 +66,7 @@ function ToolIcon({ tool }: { tool: Tool }) {
   );
 }
 
-export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onCleared }: Props) {
+export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared }: Props) {
   const [editor, setEditor] = useState(createEditor);
   const [tool, setTool] = useState<Tool>(() => RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
   const [mode, setMode] = useState<Mode>('edit');
@@ -72,6 +77,9 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
   const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
   const [bump, setBump] = useState<{ tool: Tool; n: number } | null>(null);
   const [muted, setMutedState] = useState(isMuted);
+  const [hinted, setHinted] = useState(false);
+  const [hintKey, setHintKey] = useState<string | null>(null);
+  const [earned, setEarned] = useState<Stars>(1);
   const trainRef = useRef<SVGGElement>(null);
   const smokeRef = useRef<SVGGElement>(null);
   const cancelRun = useRef<(() => void) | null>(null);
@@ -80,6 +88,21 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
   const left = remaining(stage, editor.placed);
   const tools = useMemo<Tool[]>(() => [...RAIL_KINDS.filter((k) => stage.inventory[k] > 0), 'eraser'], [stage]);
   const running = mode === 'running';
+
+  // The listed solution in driving order: a hint reveals its first tile the player hasn't matched yet.
+  const solutionOrder = useMemo<Placement[]>(() => {
+    const byKey = new Map(stage.solution.map((p) => [cellKey(p.x, p.y), p]));
+    const trace = simulate(stage, Object.fromEntries([...byKey].map(([k, p]) => [k, p.rail])));
+    return trace.steps.flatMap((st) => {
+      const p = st.kind === 'rail' ? byKey.get(cellKey(st.x, st.y)) : undefined;
+      return p ? [p] : [];
+    });
+  }, [stage]);
+  const matches = (p: Placement) => {
+    const r = editor.placed[cellKey(p.x, p.y)];
+    return !!r && r.kind === p.rail.kind && normalizeRot(r.kind, r.rot) === normalizeRot(p.rail.kind, p.rail.rot);
+  };
+  const hint = hintKey ? (solutionOrder.find((p) => cellKey(p.x, p.y) === hintKey && !matches(p)) ?? null) : null;
 
   useEffect(() => () => cancelRun.current?.(), []);
 
@@ -169,7 +192,7 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
     const stops = new Set(stage.waypoints.map((p) => cellKey(p.x, p.y)));
     const pickups = trace.steps.flatMap((step, i) =>
       step.kind === 'rail' && stops.has(cellKey(step.x, step.y))
-        ? [{ key: cellKey(step.x, step.y), at: path.starts[i] + path.segments[i].length / 2 }]
+        ? [{ key: cellKey(step.x, step.y), at: path.stepMid[i] }]
         : [],
     );
     let nextPickup = 0;
@@ -182,8 +205,12 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
     cancelRun.current = runTrain(path, {
       speed: TRAIN_SPEED,
       brake: trace.success,
-      onPose: (pose) => trainRef.current?.setAttribute('transform', poseTransform(pose, CELL)),
+      onPose: (pose) => {
+        trainRef.current?.setAttribute('transform', poseTransform(pose, CELL));
+        trainRef.current?.setAttribute('opacity', pose.alpha.toFixed(3));
+      },
       onPuff: (pose) => {
+        if (pose.alpha < 0.6) return; // no smoke from inside a tunnel
         spawnPuff(pose);
         if (puffs++ % 2 === 1) play('chuff');
       },
@@ -200,13 +227,28 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
         setResult(trace);
         setMode('result');
         play(trace.success ? 'arrive' : 'crash');
-        if (trace.success) onCleared(stage.id);
+        if (trace.success) {
+          const stars = starsFor(usedCount(editor.placed), stage.par, hinted);
+          setEarned(stars);
+          onCleared(stage.id, stars);
+        }
       },
     });
   };
 
   const doUndo = () => !running && applyEdit(undo(editor)) && play('rotate');
   const doReset = () => !running && applyEdit(resetBoard(editor)) && play('erase');
+  const showHint = () => {
+    if (running) return;
+    const next = solutionOrder.find((p) => !matches(p));
+    if (!next) {
+      say('정답 레일은 모두 놓였어요. 출발해 보세요!');
+      return;
+    }
+    setHinted(true);
+    setHintKey(cellKey(next.x, next.y));
+    play('pickup');
+  };
   const toggleMute = () => {
     setMuted(!muted);
     setMutedState(!muted);
@@ -279,6 +321,7 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
           arrived={success}
           flash={flash}
           picked={picked}
+          hint={mode === 'edit' ? hint : null}
           restPose={restPose}
           trainRef={trainRef}
           smokeRef={smokeRef}
@@ -291,19 +334,27 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
         )}
       </div>
 
-      <div className={`status ${failure ? 'is-fail' : ''}`} aria-live="polite">
-        {failure ? (
-          <>
-            <strong>앗!</strong> {FAIL_TEXT[failure.reason]} 레일을 고친 뒤 다시 출발해 보세요.
-          </>
-        ) : running ? (
-          '칙칙폭폭…'
-        ) : (
-          <>
-            레일 {usedCount(editor.placed)}개 놓음
-            {failure === null && mode === 'edit' && usedCount(editor.placed) > 0 && ' · 준비되면 출발!'}
-          </>
-        )}
+      <div className="status-row">
+        <button className="hint-btn" onClick={showHint} disabled={running} aria-label="힌트 보기">
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
+          </svg>
+          힌트
+        </button>
+        <div className={`status ${failure ? 'is-fail' : ''}`} aria-live="polite">
+          {failure ? (
+            <>
+              <strong>앗!</strong> {FAIL_TEXT[failure.reason]}
+            </>
+          ) : running ? (
+            '칙칙폭폭…'
+          ) : (
+            <span>
+              레일 <b>{usedCount(editor.placed)}</b>개 · <span className="par">★★★ {stage.par}개 이하</span>
+              {hinted && <span className="hinted"> · 힌트 사용(최대 ★★)</span>}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="dock">
@@ -344,6 +395,7 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
               ))}
             </div>
             <p className="result-kicker">STAGE {stage.number}</p>
+            <StarRow count={earned} className="result-stars" />
             {!hasNext && allCleared ? (
               <>
                 <h2>모든 노선 완성!</h2>
@@ -352,7 +404,21 @@ export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onClear
             ) : (
               <>
                 <h2>도착 완료!</h2>
-                <p className="result-sub">레일 {usedCount(editor.placed)}개로 기차가 무사히 도착했어요.</p>
+                <p className="result-sub">
+                  레일 {usedCount(editor.placed)}개 사용 · ★★★ 목표 {stage.par}개
+                  {earned < 3 && !hinted && (
+                    <>
+                      <br />
+                      레일 {stage.par}개로 다시 도전해 보세요!
+                    </>
+                  )}
+                  {bestStars > earned && (
+                    <>
+                      <br />
+                      최고 기록: 별 {bestStars}개
+                    </>
+                  )}
+                </p>
               </>
             )}
             <div className="result-actions">

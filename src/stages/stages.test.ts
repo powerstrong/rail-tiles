@@ -17,9 +17,13 @@ const EXPECTED_ROUTES: Record<string, number> = {
   'make-it-last': 2,
   'first-passenger': 2,
   'forest-stop': 1,
-  'two-passengers': 1,
+  'two-passengers': 3,
   'the-way-back': 1,
   'last-run': 1,
+  'tunnel-intro': 1,
+  'around-the-back': 3,
+  'two-tunnels': 1,
+  'under-the-river': 2,
 };
 
 describe('stages', () => {
@@ -41,9 +45,10 @@ describe('stages', () => {
         expect(simulate(stage, placed).success).toBe(true);
       });
 
-      it('has the expected number of routes', () => {
+      it('has the expected number of routes, and its listed solution is a shortest one (par)', () => {
         const res = solve(stage);
         expect(res.count).toBe(EXPECTED_ROUTES[stage.id]);
+        expect(res.minRails).toBe(stage.par);
       });
     });
   }

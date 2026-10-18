@@ -20,6 +20,7 @@ export function draw(stage: Stage, solution: Placement[] | null): string {
       else if (cell.type === 'goal') row.push('G');
       else if (cell.type === 'obstacle') row.push(MAP_GLYPH[cell.deco]);
       else if (cell.type === 'fixed') row.push(cell.bridge ? (cell.rail.rot % 2 ? '═' : '║') : (GLYPH_OF.get(`${cell.rail.kind}:${cell.rail.rot}`) ?? '?'));
+      else if (cell.type === 'tunnel') row.push(cell.label);
       else row.push(cell.waypoint ? 'P' : '·');
     }
     rows.push('    ' + row.join(' '));

@@ -11,16 +11,27 @@ export interface Vec {
   y: number;
 }
 
+/**
+ * `fade` makes the train vanish into (`out`) or emerge from (`in`) a tunnel along the
+ * segment; `hidden` keeps it invisible (time spent underground).
+ */
+type SegmentFade = { fade?: 'in' | 'out' | 'hidden' };
+
+/** Path length the train spends out of sight inside a tunnel. */
+export const TUNNEL_DWELL = 0.8;
+
 export type Segment =
-  | { type: 'line'; a: Vec; b: Vec; length: number }
+  | ({ type: 'line'; a: Vec; b: Vec; length: number } & SegmentFade)
   /** Quarter arc around corner `c`: point(θ) = c + r·(cos θ·u + sin θ·v), θ ∈ [0, π/2]. */
-  | { type: 'arc'; c: Vec; u: Vec; v: Vec; r: number; length: number };
+  | ({ type: 'arc'; c: Vec; u: Vec; v: Vec; r: number; length: number } & SegmentFade);
 
 export interface Pose {
   x: number;
   y: number;
   /** Heading in degrees, 0 = east, clockwise positive (screen coordinates). */
   angle: number;
+  /** Visibility, 0..1 (below 1 only while entering or leaving a tunnel). */
+  alpha: number;
 }
 
 const unit = (d: Dir): Vec => ({ x: DX[d], y: DY[d] });
@@ -66,7 +77,12 @@ export function pointAt(seg: Segment, t: number): Vec {
 
 /** Unit tangent in the direction of travel. */
 export function tangentAt(seg: Segment, t: number): Vec {
-  if (seg.type === 'line') return { x: (seg.b.x - seg.a.x) / seg.length, y: (seg.b.y - seg.a.y) / seg.length };
+  if (seg.type === 'line') {
+    const dx = seg.b.x - seg.a.x;
+    const dy = seg.b.y - seg.a.y;
+    const len = Math.hypot(dx, dy);
+    return len === 0 ? { x: 1, y: 0 } : { x: dx / len, y: dy / len };
+  }
   const th = (t * Math.PI) / 2;
   const c = Math.cos(th);
   const s = Math.sin(th);
@@ -106,17 +122,47 @@ export function buildPath(segments: Segment[]): TrackPath {
   return { segments, starts, length };
 }
 
+export interface TracePath extends TrackPath {
+  /** For each trace step: the distance at which the train is in the middle of that step's tile. */
+  stepMid: number[];
+}
+
 /** Converts a simulation trace into a drivable path through tile centres. */
-export function traceToPath(steps: readonly TraceStep[]): TrackPath {
-  return buildPath(
-    steps.map((step) => {
-      const cx = step.x + 0.5;
-      const cy = step.y + 0.5;
-      if (step.kind === 'start') return halfOut(cx, cy, step.outEdge);
-      if (step.kind === 'goal') return halfIn(cx, cy, step.inEdge);
-      return tileSegment(cx, cy, step.inEdge, step.outEdge);
-    }),
-  );
+export function traceToPath(steps: readonly TraceStep[]): TracePath {
+  const segments: Segment[] = [];
+  const stepMid: number[] = [];
+  let length = 0;
+  const add = (seg: Segment) => {
+    segments.push(seg);
+    length += seg.length;
+  };
+  for (const step of steps) {
+    const cx = step.x + 0.5;
+    const cy = step.y + 0.5;
+    const before = length;
+    if (step.kind === 'start') add(halfOut(cx, cy, step.outEdge));
+    else if (step.kind === 'goal') add(halfIn(cx, cy, step.inEdge));
+    else if (step.kind === 'tunnel') {
+      add({ ...halfIn(cx, cy, step.inEdge), fade: 'out' });
+      // Out of sight for a moment, parked at the entry mouth, before emerging from the pair.
+      add({ type: 'line', a: { x: cx, y: cy }, b: { x: cx, y: cy }, length: TUNNEL_DWELL, fade: 'hidden' });
+      add({ ...halfOut(step.toX + 0.5, step.toY + 0.5, step.outEdge), fade: 'in' });
+    } else add(tileSegment(cx, cy, step.inEdge, step.outEdge));
+    stepMid.push((before + length) / 2);
+  }
+  return { ...buildPath(segments), stepMid };
+}
+
+/** Train visibility on a fading segment at fraction t: gone by the tunnel mouth, back soon after. */
+function alphaAt(seg: Segment, t: number): number {
+  const smooth = (v: number) => {
+    const c = Math.min(1, Math.max(0, v));
+    return c * c * (3 - 2 * c);
+  };
+  if (seg.fade === 'hidden') return 0;
+  if (seg.fade === 'out') return 1 - smooth((t - 0.2) / 0.7);
+  if (seg.fade === 'in') return smooth((t - 0.1) / 0.7);
+  return 1;
 }
 
 export function poseAt(path: TrackPath, distance: number): Pose {
@@ -127,5 +173,5 @@ export function poseAt(path: TrackPath, distance: number): Pose {
   const t = seg.length === 0 ? 0 : Math.min(1, (d - path.starts[i]) / seg.length);
   const p = pointAt(seg, t);
   const tg = tangentAt(seg, t);
-  return { x: p.x, y: p.y, angle: (Math.atan2(tg.y, tg.x) * 180) / Math.PI };
+  return { x: p.x, y: p.y, angle: (Math.atan2(tg.y, tg.x) * 180) / Math.PI, alpha: alphaAt(seg, t) };
 }

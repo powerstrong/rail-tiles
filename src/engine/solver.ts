@@ -67,6 +67,20 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean)
       return;
     }
 
+    if (cell.type === 'tunnel') {
+      // Each mouth has a single opening, so a tunnel can be ridden at most once.
+      if (cell.dir !== inEdge) return;
+      const exitKey = cellKey(cell.pair.x, cell.pair.y);
+      const exit = cellAt(stage, cell.pair.x, cell.pair.y);
+      if (visited.has(exitKey) || exit?.type !== 'tunnel') return;
+      visited.add(key);
+      visited.add(exitKey);
+      visit(cell.pair.x, cell.pair.y, exit.dir);
+      visited.delete(exitKey);
+      visited.delete(key);
+      return;
+    }
+
     if (cell.type === 'fixed') {
       const out = railExit(cell.rail, inEdge);
       if (out === null) return;

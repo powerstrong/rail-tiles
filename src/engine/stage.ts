@@ -9,7 +9,9 @@ export type Cell =
   /** `bridge` is purely visual: a fixed straight drawn as a bridge over water. */
   | { type: 'fixed'; rail: Rail; bridge: boolean }
   | { type: 'start' }
-  | { type: 'goal' };
+  | { type: 'goal' }
+  /** Tunnel mouth: track meets it through `dir`; the train re-emerges from `pair`. */
+  | { type: 'tunnel'; dir: Dir; pair: Pos; label: string };
 
 export interface Pos {
   x: number;
@@ -39,8 +41,10 @@ export interface Stage {
   goal: Station;
   inventory: Inventory;
   waypoints: Pos[];
-  /** One known solution, used by tests and the stage-1 ghost hint. */
+  /** A shortest solution (tests check it uses exactly `par` rails). Drives hints and the stage-1 ghost. */
   solution: Placement[];
+  /** Fewest player rails that can win: the ★★★ target. */
+  par: number;
   ghostHint: boolean;
 }
 
@@ -50,7 +54,11 @@ export interface Stage {
  *   S  start     G  goal
  *   T  tree      R  rock      M  mountain   W  water   H  house
  *   │ ─ └ ┌ ┐ ┘  fixed rail       ║ ═  fixed bridge over water
+ *   a b c …      tunnel mouths: each lowercase letter appears exactly twice;
+ *                `tunnels[letter]` gives the opening side of the first and second
+ *                occurrence in reading order (row by row, left to right)
  * `solution` uses the same grid, with rail glyphs on the cells the player fills.
+ * It must be a shortest solution: its rail count becomes the stage's par.
  */
 export interface StageDef {
   id: string;
@@ -61,6 +69,7 @@ export interface StageDef {
   goal: DirName;
   inventory: Inventory;
   solution: string[];
+  tunnels?: Record<string, [DirName, DirName]>;
   ghostHint?: boolean;
 }
 
@@ -100,6 +109,7 @@ export function parseStage(def: StageDef, number: number): Stage {
 
   const cells: Cell[] = [];
   const waypoints: Pos[] = [];
+  const mouths: Record<string, { index: number; pos: Pos }[]> = {};
   let start: Pos | null = null;
   let goal: Pos | null = null;
 
@@ -121,9 +131,30 @@ export function parseStage(def: StageDef, number: number): Stage {
       } else if (DECORATIONS[glyph]) cells.push({ type: 'obstacle', deco: DECORATIONS[glyph] });
       else if (RAIL_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...RAIL_GLYPHS[glyph] }, bridge: false });
       else if (BRIDGE_GLYPHS[glyph]) cells.push({ type: 'fixed', rail: { ...BRIDGE_GLYPHS[glyph] }, bridge: true });
+      else if (/^[a-z]$/.test(glyph)) {
+        (mouths[glyph] ??= []).push({ index: cells.length, pos: { x, y } });
+        cells.push({ type: 'empty', waypoint: false }); // replaced once both mouths are known
+      }
       else fail(`unknown glyph "${glyph}" at ${x},${y}`);
     });
   });
+
+  for (const [label, pair] of Object.entries(mouths)) {
+    const dirs = def.tunnels?.[label];
+    if (pair.length !== 2) fail(`tunnel "${label}" needs exactly two mouths, found ${pair.length}`);
+    if (!dirs) fail(`tunnel "${label}" has no entry in tunnels`);
+    pair.forEach((mouth, i) => {
+      const other = pair[1 - i].pos;
+      const dir = dirFromName(dirs![i]);
+      const nx = mouth.pos.x + DX[dir];
+      const ny = mouth.pos.y + DY[dir];
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) fail(`tunnel "${label}" mouth ${i + 1} faces off the board`);
+      cells[mouth.index] = { type: 'tunnel', dir, pair: { ...other }, label };
+    });
+  }
+  for (const label of Object.keys(def.tunnels ?? {})) {
+    if (!mouths[label]) fail(`tunnels.${label} has no mouths on the map`);
+  }
 
   if (!start) return fail('missing start (S)');
   if (!goal) return fail('missing goal (G)');
@@ -169,6 +200,7 @@ export function parseStage(def: StageDef, number: number): Stage {
     inventory: { ...def.inventory },
     waypoints,
     solution,
+    par: solution.length,
     ghostHint: def.ghostHint ?? false,
   };
 }
