@@ -7,6 +7,7 @@ import { type Stage, cellAt, cellKey } from '../engine/stage';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
+import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
 
 const KIND_LABEL: Record<RailKind, string> = { straight: '직선', curve: '곡선' };
@@ -29,6 +30,7 @@ type Mode = 'edit' | 'running' | 'result';
 interface Props {
   stage: Stage;
   hasNext: boolean;
+  allCleared: boolean;
   onBack: () => void;
   onNext: () => void;
   onCleared: (stageId: string) => void;
@@ -59,7 +61,7 @@ function ToolIcon({ tool }: { tool: Tool }) {
   );
 }
 
-export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props) {
+export function GameScreen({ stage, hasNext, allCleared, onBack, onNext, onCleared }: Props) {
   const [editor, setEditor] = useState(createEditor);
   const [tool, setTool] = useState<Tool>(() => RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
   const [mode, setMode] = useState<Mode>('edit');
@@ -69,6 +71,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
   const [picked, setPicked] = useState<ReadonlySet<string>>(() => new Set());
   const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
   const [bump, setBump] = useState<{ tool: Tool; n: number } | null>(null);
+  const [muted, setMutedState] = useState(isMuted);
   const trainRef = useRef<SVGGElement>(null);
   const smokeRef = useRef<SVGGElement>(null);
   const cancelRun = useRef<(() => void) | null>(null);
@@ -88,6 +91,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
 
   const say = (text: string) => setToast({ text, n: ++counter.current });
   const deny = (x: number, y: number, text?: string) => {
+    play('deny');
     setFlash({ x, y, n: ++counter.current });
     if (text) say(text);
   };
@@ -113,12 +117,14 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
     const placedHere = editor.placed[cellKey(x, y)];
     const cell = cellAt(stage, x, y);
     if (tool === 'eraser') {
-      if (placedHere) applyEdit(eraseRail(editor, x, y));
+      if (placedHere) {
+        if (applyEdit(eraseRail(editor, x, y))) play('erase');
+      }
       else if (cell?.type === 'fixed') deny(x, y, '고정 레일은 지울 수 없어요.');
       return;
     }
     if (placedHere) {
-      applyEdit(rotateRail(editor, x, y));
+      if (applyEdit(rotateRail(editor, x, y))) play('rotate');
       return;
     }
     const block = placeBlock(stage, editor.placed, x, y, tool);
@@ -131,7 +137,7 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
       deny(x, y, cell?.type === 'fixed' ? '고정 레일은 움직일 수 없어요.' : undefined);
       return;
     }
-    applyEdit(placeRail(stage, editor, x, y, tool));
+    if (applyEdit(placeRail(stage, editor, x, y, tool))) play('place');
   };
 
   const spawnPuff = (pose: Pose) => {
@@ -160,18 +166,24 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
         : [],
     );
     let nextPickup = 0;
+    let puffs = 0;
     setResult(null);
     setPicked(new Set());
     setRestPose(startPose(stage));
     setMode('running');
+    play('depart');
     cancelRun.current = runTrain(path, {
       speed: TRAIN_SPEED,
       brake: trace.success,
       onPose: (pose) => trainRef.current?.setAttribute('transform', poseTransform(pose, CELL)),
-      onPuff: spawnPuff,
+      onPuff: (pose) => {
+        spawnPuff(pose);
+        if (puffs++ % 2 === 1) play('chuff');
+      },
       onAdvance: (dist) => {
         while (nextPickup < pickups.length && pickups[nextPickup].at <= dist) {
           const { key } = pickups[nextPickup++];
+          play('pickup');
           setPicked((prev) => new Set(prev).add(key));
         }
       },
@@ -180,13 +192,18 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
         setRestPose(pose);
         setResult(trace);
         setMode('result');
+        play(trace.success ? 'arrive' : 'crash');
         if (trace.success) onCleared(stage.id);
       },
     });
   };
 
-  const doUndo = () => !running && applyEdit(undo(editor));
-  const doReset = () => !running && applyEdit(resetBoard(editor));
+  const doUndo = () => !running && applyEdit(undo(editor)) && play('rotate');
+  const doReset = () => !running && applyEdit(resetBoard(editor)) && play('erase');
+  const toggleMute = () => {
+    setMuted(!muted);
+    setMutedState(!muted);
+  };
 
   const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
   keyHandler.current = (e: KeyboardEvent) => {
@@ -223,6 +240,12 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
           <h1>{stage.title}</h1>
         </div>
         <div className="head-actions">
+          <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted}>
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <path d="M4 9.5 H7.5 L12 5.5 V18.5 L7.5 14.5 H4 Z" />
+              {muted ? <path d="M16 9.5 L21 14.5 M21 9.5 L16 14.5" /> : <path d="M15.5 9 Q17.5 12 15.5 15 M18 6.5 Q22 12 18 17.5" />}
+            </svg>
+          </button>
           <button className="icon-btn" onClick={doUndo} disabled={running || editor.history.length === 0} aria-label="되돌리기">
             <svg viewBox="0 0 24 24" aria-hidden>
               <path d="M9 7 L4 12 L9 17 M4 12 H14 A6 6 0 0 1 14 24" transform="translate(1 -3)" />
@@ -314,8 +337,17 @@ export function GameScreen({ stage, hasNext, onBack, onNext, onCleared }: Props)
               ))}
             </div>
             <p className="result-kicker">STAGE {stage.number}</p>
-            <h2>도착 완료!</h2>
-            <p className="result-sub">레일 {usedCount(editor.placed)}개로 기차가 무사히 도착했어요.</p>
+            {!hasNext && allCleared ? (
+              <>
+                <h2>모든 노선 완성!</h2>
+                <p className="result-sub">마지막 기차까지 무사히 도착했어요. 끝까지 함께해 줘서 고마워요!</p>
+              </>
+            ) : (
+              <>
+                <h2>도착 완료!</h2>
+                <p className="result-sub">레일 {usedCount(editor.placed)}개로 기차가 무사히 도착했어요.</p>
+              </>
+            )}
             <div className="result-actions">
               {hasNext ? (
                 <button className="primary" onClick={onNext} autoFocus>

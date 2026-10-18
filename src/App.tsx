@@ -11,6 +11,7 @@ export function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
   const [progress, setProgress] = useState(loadProgress);
   const cleared = useMemo(() => new Set(progress.cleared), [progress]);
+  const allCleared = STAGES.every((s) => cleared.has(s.id));
 
   // Persist outside the state updater (StrictMode may call updaters twice); skip the initial load.
   const loaded = useRef(progress);
@@ -28,6 +29,7 @@ export function App() {
         stages={STAGES}
         totalPlanned={TOTAL_PLANNED_STAGES}
         cleared={cleared}
+        allCleared={allCleared}
         onPick={(index) => setScreen({ name: 'game', index })}
         onBack={() => setScreen({ name: 'title' })}
       />
@@ -41,6 +43,7 @@ export function App() {
       key={stage.id}
       stage={stage}
       hasNext={nextIndex < STAGES.length}
+      allCleared={allCleared}
       onBack={() => setScreen({ name: 'select' })}
       // "Next" is only offered after a clear, which unlocks the following stage.
       onNext={() => setScreen(nextIndex < STAGES.length ? { name: 'game', index: nextIndex } : { name: 'select' })}

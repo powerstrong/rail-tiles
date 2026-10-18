@@ -4,6 +4,7 @@ interface Props {
   stages: Stage[];
   totalPlanned: number;
   cleared: ReadonlySet<string>;
+  allCleared: boolean;
   onPick: (index: number) => void;
   onBack: () => void;
 }
@@ -12,7 +13,7 @@ export function isUnlocked(stages: Stage[], cleared: ReadonlySet<string>, index:
   return index === 0 || cleared.has(stages[index - 1]?.id);
 }
 
-export function StageSelect({ stages, totalPlanned, cleared, onPick, onBack }: Props) {
+export function StageSelect({ stages, totalPlanned, cleared, allCleared, onPick, onBack }: Props) {
   return (
     <main className="select">
       <header className="select-head">
@@ -26,6 +27,11 @@ export function StageSelect({ stages, totalPlanned, cleared, onPick, onBack }: P
           {stages.filter((s) => cleared.has(s.id)).length} / {totalPlanned}
         </span>
       </header>
+      {allCleared && (
+        <p className="all-clear" role="status">
+          <strong>모든 노선 완성!</strong> {stages.length}개 스테이지를 모두 클리어했어요.
+        </p>
+      )}
       <ol className="stage-grid">
         {Array.from({ length: totalPlanned }, (_, i) => {
           const stage = stages[i];

@@ -3,7 +3,7 @@
 격자 위에 레일을 놓아 작은 기차를 출발역에서 도착역까지 데려다주는 싱글플레이 퍼즐 웹게임입니다.
 백엔드 없이 브라우저만으로 실행됩니다.
 
-현재 상태: **v0.1 프로토타입. 스테이지 1~3 플레이 가능** (전체 계획은 10개)
+현재 상태: **v0.1. 스테이지 10개 모두 플레이 가능**
 
 ## 실행
 
@@ -12,7 +12,12 @@ npm install
 npm run dev        # http://localhost:5173
 npm test           # Vitest 단위 테스트
 npm run build      # 타입 검사 + 프로덕션 빌드 (dist/)
+npm run stages     # 스테이지별 정답 경로 수, 최소 레일 수, 정답 그림 출력
 ```
+
+### 배포 (Cloudflare Pages)
+
+정적 사이트라 백엔드 설정이 필요 없습니다. 빌드 명령 `npm run build`, 출력 디렉터리 `dist`.
 
 ## 조작
 
@@ -26,6 +31,22 @@ npm run build      # 타입 검사 + 프로덕션 빌드 (dist/)
 | 출발 | `Enter` 또는 출발 버튼 | 출발 버튼 |
 
 새 레일은 이웃한 레일과 역을 보고 연결되는 방향으로 자동으로 놓입니다. 실패해도 배치는 그대로 남습니다.
+헤더의 스피커 버튼으로 효과음을 끄고 켤 수 있습니다(설정은 저장됨).
+
+## 스테이지
+
+| # | 이름 | 배우는 것 |
+|---|---|---|
+| 1 | 첫 번째 선로 | 직선 연결 |
+| 2 | 모퉁이 돌기 | 곡선과 회전 |
+| 3 | 언덕 너머 | 장애물 우회 |
+| 4 | 강 건너기 | 고정 레일(다리) |
+| 5 | 아껴 쓰기 | 곡선이 부족할 때 더 긴 길 찾기 |
+| 6 | 첫 손님 | 승객 경유지 1곳 |
+| 7 | 숲속 정류장 | 경유지 + 장애물 |
+| 8 | 두 손님 | 경유지 2곳 |
+| 9 | 되돌아오기 | 방향이 정해진 고정 곡선 |
+| 10 | 마지막 운행 | 종합 |
 
 ## 구조
 
@@ -45,7 +66,11 @@ src/
     Board.tsx        게임판 렌더링과 입력
     GameScreen.tsx   편집 → 주행 → 결과 상태 흐름
     trainRunner.ts   requestAnimationFrame 기반 기차 주행 (React 재렌더 없음)
+    sound.ts         Web Audio로 합성한 효과음 (에셋 파일 없음)
   storage.ts         localStorage 진행 기록 (손상된 데이터는 초기화)
+scripts/
+  stage-report.ts    npm run stages: 현재 스테이지 점검
+  stage-design.ts    npm run stage-design -- drafts.ts: 초안 맵의 인벤토리별 경로 수 표
 ```
 
 ### 핵심 설계
@@ -69,5 +94,12 @@ T  나무   R  바위   M  산   W  물   H  집
 │ ─ └ ┌ ┐ ┘   고정 레일
 ```
 
-`solution`에는 같은 크기의 격자에 정답 레일을 적습니다. 그리고 `stages.test.ts`의
-`EXPECTED_ROUTES`에 해 개수를 기록합니다.
+`║ ═`는 강 위의 고정 다리입니다. `solution`에는 같은 크기의 격자에 정답 레일을 적고,
+`stages.test.ts`의 `EXPECTED_ROUTES`에 해 개수를 기록합니다.
+
+새 스테이지 설계 순서:
+
+1. 초안 맵을 `StageDef` 배열로 export하는 파일을 만듭니다(인벤토리와 solution은 임시값).
+2. `npm run stage-design -- 초안.ts`로 직선×곡선 수량별 경로 수 표를 봅니다.
+3. 경로가 1~3개이고, 눈에 띄는 지름길이 수량 때문에 막히는 인벤토리를 고릅니다.
+4. 출력된 `solution:` 줄을 복사해 `stages.ts`에 넣고 `EXPECTED_ROUTES`를 기록합니다.
