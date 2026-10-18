@@ -128,22 +128,34 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     if (text) say(text);
   };
 
+  /** Leave the result view: train back in the station, failure mark and passengers cleared. */
+  const backToEdit = useCallback(() => {
+    setMode('edit');
+    setResult(null);
+    setPicked(new Set());
+    setSwitchStates(initialSwitches(stage));
+    setRestPose(startPose(stage));
+  }, [stage]);
+
   /** Any edit after a run puts the train back in the station and clears the result. */
   const applyEdit = useCallback(
     (next: typeof editor) => {
       if (next === editor) return false;
       setEditor(next);
-      if (mode === 'result') {
-        setMode('edit');
-        setResult(null);
-        setPicked(new Set());
-        setSwitchStates(initialSwitches(stage));
-        setRestPose(startPose(stage));
-      }
+      if (mode === 'result') backToEdit();
       return true;
     },
-    [editor, mode, stage],
+    [editor, mode, backToEdit],
   );
+
+  /** Fresh attempt: empty board and the hint penalty lifted, as if the stage was just opened. */
+  const restartStage = () => {
+    setEditor(createEditor());
+    setHinted(false);
+    setHintKey(null);
+    setTool(RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
+    backToEdit();
+  };
 
   const onCellClick = (x: number, y: number) => {
     if (running) return;
@@ -273,6 +285,8 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
       say('정답 레일은 모두 놓였어요. 출발해 보세요!');
       return;
     }
+    // The hint is only drawn in edit mode, so a hint asked for after a failed run goes back there.
+    if (mode === 'result') backToEdit();
     setHinted(true);
     setHintKey(cellKey(next.x, next.y));
     play('pickup');
@@ -458,6 +472,12 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                       레일 {stage.par}개로 다시 도전해 보세요!
                     </>
                   )}
+                  {hinted && (
+                    <>
+                      <br />
+                      힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
+                    </>
+                  )}
                   {bestStars > earned && (
                     <>
                       <br />
@@ -477,18 +497,14 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                   스테이지 목록
                 </button>
               )}
-              <button
-                className="secondary"
-                onClick={() => {
-                  setResult(null);
-                  setMode('edit');
-                  setPicked(new Set());
-                  setSwitchStates(initialSwitches(stage));
-                  setRestPose(startPose(stage));
-                }}
-              >
-                다시 배치하기
-              </button>
+              <div className="result-retry">
+                <button className="secondary" onClick={backToEdit}>
+                  배치 고치기
+                </button>
+                <button className="secondary" onClick={restartStage}>
+                  처음부터 다시
+                </button>
+              </div>
             </div>
           </div>
         </div>
