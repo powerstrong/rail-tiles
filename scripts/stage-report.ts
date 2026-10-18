@@ -9,7 +9,7 @@ import { draw } from './draw';
 
 for (const stage of STAGES) {
   const res = solve(stage, 5000);
-  const inv = `straight ${stage.inventory.straight}, curve ${stage.inventory.curve}`;
+  const inv = `straight ${stage.inventory.straight}, curve ${stage.inventory.curve}${stage.inventory.cross ? `, cross ${stage.inventory.cross}` : ''}`;
   console.log(`\n${stage.number}. ${stage.id} (${stage.width}×${stage.height}, ${inv})`);
   console.log(`   routes: ${res.count}${res.truncated ? '+' : ''}   fewest rails: ${res.minRails ?? '—'}`);
   console.log(draw(stage, res.first));

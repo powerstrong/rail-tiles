@@ -5,6 +5,7 @@ import { RAIL_KINDS, type RailKind, normalizeRot } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
 import { type Stars, starsFor } from '../engine/stars';
+import { type SwitchStates, initialSwitches } from '../engine/step';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
@@ -80,6 +81,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const [hinted, setHinted] = useState(false);
   const [hintKey, setHintKey] = useState<string | null>(null);
   const [earned, setEarned] = useState<Stars>(1);
+  const [switchStates, setSwitchStates] = useState<SwitchStates>(() => initialSwitches(stage));
   const trainRef = useRef<SVGGElement>(null);
   const smokeRef = useRef<SVGGElement>(null);
   const cancelRun = useRef<(() => void) | null>(null);
@@ -128,6 +130,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
         setMode('edit');
         setResult(null);
         setPicked(new Set());
+        setSwitchStates(initialSwitches(stage));
         setRestPose(startPose(stage));
       }
       return true;
@@ -195,10 +198,16 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
         ? [{ key: cellKey(step.x, step.y), at: path.stepMid[i] }]
         : [],
     );
+    // Switches flip once the train has cleared them.
+    const flips = trace.steps.flatMap((step, i) =>
+      step.kind === 'rail' && step.toggle ? [{ ...step.toggle, at: path.stepMid[i] + 0.45 }] : [],
+    );
     let nextPickup = 0;
+    let nextFlip = 0;
     let puffs = 0;
     setResult(null);
     setPicked(new Set());
+    setSwitchStates(initialSwitches(stage));
     setRestPose(startPose(stage));
     setMode('running');
     play('depart');
@@ -215,6 +224,11 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
         if (puffs++ % 2 === 1) play('chuff');
       },
       onAdvance: (dist) => {
+        while (nextFlip < flips.length && flips[nextFlip].at <= dist) {
+          const { key, to } = flips[nextFlip++];
+          play('rotate');
+          setSwitchStates((prev) => ({ ...prev, [key]: to }));
+        }
         while (nextPickup < pickups.length && pickups[nextPickup].at <= dist) {
           const { key } = pickups[nextPickup++];
           play('pickup');
@@ -262,7 +276,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
       return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    const idx = ['1', '2', '3'].indexOf(e.key);
+    const idx = ['1', '2', '3', '4'].indexOf(e.key);
     if (idx >= 0 && tools[idx]) setTool(tools[idx]);
     else if (e.key.toLowerCase() === 'e') setTool('eraser');
     else if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) start();
@@ -322,6 +336,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           flash={flash}
           picked={picked}
           hint={mode === 'edit' ? hint : null}
+          switchStates={switchStates}
           restPose={restPose}
           trainRef={trainRef}
           smokeRef={smokeRef}
@@ -446,6 +461,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                   setResult(null);
                   setMode('edit');
                   setPicked(new Set());
+                  setSwitchStates(initialSwitches(stage));
                   setRestPose(startPose(stage));
                 }}
               >

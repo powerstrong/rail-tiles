@@ -24,6 +24,12 @@ const EXPECTED_ROUTES: Record<string, number> = {
   'around-the-back': 3,
   'two-tunnels': 1,
   'under-the-river': 2,
+  'first-crossing': 1,
+  'first-switch': 3,
+  'wrong-way-switch': 1,
+  'figure-eight': 2,
+  'crossing-return': 1,
+  'grand-tour': 1,
 };
 
 describe('stages', () => {

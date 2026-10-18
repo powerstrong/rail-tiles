@@ -4,9 +4,10 @@ import { type Placements, autoOrient, placeBlock, remaining } from '../engine/ed
 import type { Pose } from '../engine/geometry';
 import type { Failure } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
+import type { SwitchStates } from '../engine/step';
 import { C } from './art/palette';
 import { BridgeArt, DecorationArt, GroundDetail, TunnelArt, TunnelBadge, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
-import { CELL, RailPieceArt } from './art/TrackArt';
+import { CELL, RailPieceArt, SwitchArt } from './art/TrackArt';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
 
@@ -33,6 +34,8 @@ interface BoardProps {
   picked: ReadonlySet<string>;
   /** Hint: one solution tile to show as a pulsing ghost. */
   hint: Placement | null;
+  /** Current branch of every switch (changes while the train runs). */
+  switchStates: SwitchStates;
   restPose: Pose;
   trainRef: RefObject<SVGGElement>;
   smokeRef: RefObject<SVGGElement>;
@@ -51,7 +54,7 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
     for (let x = 0; x < stage.width; x++) {
       const cell = cellAt(stage, x, y)!;
       const seed = cellHash(x, y, stage.number);
-      const variant = cell.type === 'fixed' && !cell.bridge ? 'stone' : cell.type === 'start' || cell.type === 'goal' ? 'paved' : 'grass';
+      const variant = (cell.type === 'fixed' && !cell.bridge) || cell.type === 'switch' ? 'stone' : cell.type === 'start' || cell.type === 'goal' ? 'paved' : 'grass';
       const t = `translate(${centre(x)} ${centre(y)})`;
       tiles.push(
         <g key={cellKey(x, y)} transform={t}>
@@ -159,7 +162,7 @@ function FailMarker({ failure }: { failure: Failure }) {
 }
 
 export function Board(props: BoardProps) {
-  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, hint, restPose, trainRef, smokeRef, onCellClick } = props;
+  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, hint, switchStates, restPose, trainRef, smokeRef, onCellClick } = props;
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const w = stage.width * CELL;
   const h = stage.height * CELL;
@@ -199,6 +202,17 @@ export function Board(props: BoardProps) {
           </g>
         </g>
       ))}
+
+      {stage.switches.map((key) => {
+        const [x, y] = key.split(',').map(Number);
+        const cell = cellAt(stage, x, y);
+        if (cell?.type !== 'switch') return null;
+        return (
+          <g key={key} transform={`translate(${centre(x)} ${centre(y)})`} pointerEvents="none">
+            <SwitchArt trunk={cell.trunk} turn={cell.turn} state={switchStates[key] ?? cell.initial} />
+          </g>
+        );
+      })}
 
       <PlacedRails
         placed={placed}

@@ -15,7 +15,7 @@ if (!file) throw new Error('usage: stage-design <drafts.ts>');
 const drafts: StageDef[] = (await import(pathToFileURL(resolve(file)).href)).default;
 
 for (const def of drafts) {
-  const open = parseStage({ ...def, inventory: { straight: 30, curve: 30 } }, 0);
+  const open = parseStage({ ...def, inventory: { ...def.inventory, straight: 30, curve: 30 } }, 0);
   const free = solve(open, 20000);
   console.log(`\n== ${def.id}: unlimited routes ${free.count}${free.truncated ? '+' : ''}, fewest rails ${free.minRails}`);
   const header = '  s\c ' + Array.from({ length: 13 }, (_, c) => String(c).padStart(5)).join('');
@@ -24,7 +24,7 @@ for (const def of drafts) {
     const cells: string[] = [];
     let any = false;
     for (let c = 0; c <= 12; c++) {
-      const n = solve(parseStage({ ...def, inventory: { straight: s, curve: c } }, 0), 999).count;
+      const n = solve(parseStage({ ...def, inventory: { ...def.inventory, straight: s, curve: c } }, 0), 999).count;
       if (n > 0) any = true;
       cells.push((n === 0 ? '.' : n >= 999 ? '999+' : String(n)).padStart(5));
     }
@@ -36,7 +36,7 @@ for (const def of drafts) {
   shown.forEach((route, i) => console.log(`  route ${i + 1}:
 ${draw(parseStage(def, 0), route)}`));
   // The listed solution must be a shortest route (it defines par).
-  const shortest = chosen.routes?.reduce((a, b) => (b.length < a.length ? b : a));
+  const shortest = chosen.routes?.length ? chosen.routes.reduce((a, b) => (b.length < a.length ? b : a)) : null;
   if (shortest) {
     console.log(`  shortest (${shortest.length} rails):
 ${draw(parseStage(def, 0), shortest)}`);

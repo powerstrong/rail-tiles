@@ -355,6 +355,165 @@ export const STAGE_DEFS: StageDef[] = [
       '. ┘ . . . . .',
     ],
   },
+  {
+    id: 'first-crossing',
+    title: '교차로',
+    tip: '교차 레일에서는 두 길이 엇갈려 지나가요. 기차는 교차로에서 언제나 곧게 달려요.',
+    start: 'E',
+    goal: 'N',
+    inventory: { straight: 6, curve: 4, cross: 1 },
+    map: [
+      'T . . . . T', //
+      '. . . . . .',
+      'S . . . P .',
+      'R . R R . .',
+      'T G . . . T',
+      '. . . W W .',
+    ],
+    solution: [
+      '. . . . . .', //
+      '. ┌ ─ ─ ┐ .',
+      '. ┼ ─ ─ ┘ .',
+      '. │ . . . .',
+      '. . . . . .',
+      '. . . . . .',
+    ],
+  },
+  {
+    id: 'first-switch',
+    title: '선로 전환기',
+    tip: '분기기는 기차가 앞에서 지나갈 때마다 방향이 바뀌어요. 한 바퀴 돌아오면 다른 길로 갈 수 있어요.',
+    start: 'E',
+    goal: 'S',
+    inventory: { straight: 6, curve: 6 },
+    switches: { '1': { trunk: 'W', turn: 'N' }, '2': { trunk: 'E', turn: 'S' } },
+    map: [
+      'T . . . G . T', //
+      'T . . R . R T',
+      '. M . R . R .',
+      'S . 2 . 1 . T',
+      '. M . . . . T',
+      'T . . P . . T',
+      'T T W W W T T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . . . │ . .',
+      '. . . . │ . .',
+      '. ─ . ─ . ┐ .',
+      '. . └ ┐ . │ .',
+      '. . . └ ─ ┘ .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'wrong-way-switch',
+    title: '반대로 놓인 분기기',
+    tip: '도착역이 바로 앞인데 분기기가 위를 가리키고 있어요. 먼저 손님을 태우고 돌아와 보세요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 7, curve: 3 },
+    switches: { '1': { trunk: 'W', turn: 'N', initial: 'turn' }, '2': { trunk: 'E', turn: 'N' } },
+    map: [
+      'T . . . . . T', //
+      '. . . P . . .',
+      '. M . R . R .',
+      'S . 2 . 1 . G',
+      '. M . R . R .',
+      'T . . . . . T',
+      'T T W W W T T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . ┌ ─ ┐ . .',
+      '. . │ . │ . .',
+      '. ─ . ─ . ─ .',
+      '. . . . . . .',
+      '. . . . . . .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'figure-eight',
+    title: '8자 노선',
+    tip: '양쪽 끝의 손님을 모두 태우려면 선로가 한 번 엇갈려야 해요.',
+    start: 'E',
+    goal: 'N',
+    inventory: { straight: 13, curve: 8, cross: 1 },
+    map: [
+      'T . . . . P T', //
+      '. . . . . . .',
+      '. . R . R . .',
+      'S . . . . . .',
+      '. . R . R . .',
+      'P . . . . . T',
+      'T . . G . . T',
+    ],
+    solution: [
+      '. . . ┌ ─ ┐ .', //
+      '. . . │ . │ .',
+      '. . . │ . │ .',
+      '. ┐ . │ . │ .',
+      '┌ ┘ . │ . │ .',
+      '└ ─ ─ ┼ ─ ┘ .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'crossing-return',
+    title: '엇갈린 귀환',
+    tip: '분기기로 돌아오는 길이 출발 선로를 가로질러야 해요.',
+    start: 'E',
+    goal: 'S',
+    inventory: { straight: 7, curve: 6, cross: 1 },
+    switches: { '1': { trunk: 'W', turn: 'N' }, '2': { trunk: 'E', turn: 'N' } },
+    map: [
+      'T . . . G . T', //
+      '. . . R . R .',
+      '. . . R . R .',
+      'S . 2 . 1 . .',
+      '. . . . . . .',
+      '. . . . . . .',
+      'T . . . . . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . . . │ . .',
+      '. ┌ ┐ . │ . .',
+      '. ┼ . ─ . ┐ .',
+      '. └ ─ ─ ─ ┘ .',
+      '. . . . . . .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'grand-tour',
+    title: '대륙 횡단',
+    tip: '분기기, 터널, 손님. 터널로 한 바퀴 돌아 손님을 태운 뒤 다시 분기기로 돌아오세요.',
+    start: 'E',
+    goal: 'S',
+    inventory: { straight: 10, curve: 4 },
+    switches: { '1': { trunk: 'W', turn: 'N' }, '2': { trunk: 'E', turn: 'S' } },
+    tunnels: { a: ['W', 'E'] },
+    map: [
+      'T . . . G . T', //
+      '. . . R . R .',
+      '. . . R . R .',
+      'S . 2 . 1 . a',
+      'M M . . . M M',
+      'a . . . P . .',
+      'T . . . . . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . . . │ . .',
+      '. . . . │ . .',
+      '. ─ . ─ . ─ .',
+      '. . └ ─ ┐ . .',
+      '. ─ ─ ─ ┘ . .',
+      '. . . . . . .',
+    ],
+  },
 ];
 
 export const STAGES: Stage[] = STAGE_DEFS.map((def, i) => parseStage(def, i + 1));

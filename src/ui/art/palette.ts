@@ -21,6 +21,7 @@ export const C = {
   tieDark: '#92704D',
   steel: '#5D6271',
   steelHi: '#E1E4EA',
+  steelPlate: '#B9BEC9',
 
   stone: '#E3DACB',
   stoneSide: '#C2B5A0',

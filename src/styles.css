@@ -788,6 +788,10 @@ p {
   animation: celebrate 0.9s ease-out 2 forwards;
 }
 
+.switch-idle {
+  opacity: 0.35;
+}
+
 .passenger-halo {
   transform-box: fill-box;
   transform-origin: center;

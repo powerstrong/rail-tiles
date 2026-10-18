@@ -20,7 +20,7 @@ for (let s = s0 - radius; s <= s0 + radius; s++) {
       row.push(''.padStart(6));
       continue;
     }
-    const res = solve(parseStage({ ...def, inventory: { straight: s, curve: c } }, 0), 999);
+    const res = solve(parseStage({ ...def, inventory: { ...def.inventory, straight: s, curve: c } }, 0), 999);
     const cell = res.count === 0 ? '.' : `${res.count >= 999 ? '999+' : res.count}`;
     row.push(((s === s0 && c === c0 ? '*' : '') + cell).padStart(6));
   }
