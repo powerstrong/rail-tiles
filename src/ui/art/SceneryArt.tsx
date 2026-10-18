@@ -298,43 +298,45 @@ export function StationLabel({ dir, kind }: { dir: Dir; kind: 'start' | 'goal' }
   );
 }
 
-/** Small paved stop pad in the corner of a passenger tile (static layer, under the rails). */
+/**
+ * Passenger stop ground (static layer, under the rails): the whole tile gets a warm
+ * tint and a dashed border so "the train must pass here" reads at a glance.
+ */
 export function StopPad() {
   return (
-    <g transform="translate(-30 -30)">
-      <rect x={-17} y={-15} width={34} height={33} rx={9} fill={C.platformEdge} />
-      <rect x={-17} y={-17} width={34} height={33} rx={9} fill={C.platform} />
-      <rect x={-14} y={-14} width={28} height={27} rx={7} fill="none" stroke={C.brass} strokeWidth={1.5} strokeDasharray="3 3" />
+    <g>
+      <rect x={-46} y={-46} width={92} height={89} rx={11} fill={C.stopTint} />
+      <rect x={-41} y={-41} width={82} height={79} rx={9} fill="none" stroke={C.amber} strokeWidth={3} strokeDasharray="7 6" />
     </g>
   );
 }
 
 const SHIRTS = [C.amber, C.trainRed, C.teal] as const;
 
-/** A passenger waiting on the stop pad, or a check badge once the train has picked them up. */
+/** A passenger on a round sticker in the tile corner, or a check badge once picked up. Drawn above the rails. */
 export function PassengerArt({ picked, seed }: { picked: boolean; seed: number }) {
   if (picked) {
     return (
-      <g transform="translate(-30 -30)">
+      <g transform="translate(-26 -26)">
         <g className="pop-in">
-          <circle r={13} fill={C.teal} stroke={C.cream} strokeWidth={3} />
-          <path d="M-5.5 0.5 L-1.5 4.5 L6 -4" stroke={C.cream} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle r={18} fill={C.teal} stroke={C.cream} strokeWidth={4} />
+          <path d="M-7.5 0.5 L-2 6 L8 -5.5" stroke={C.cream} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </g>
       </g>
     );
   }
   const shirt = SHIRTS[Math.floor(seed * SHIRTS.length) % SHIRTS.length];
   return (
-    <g transform="translate(-30 -30)">
-      <ellipse cy={13} rx={10} ry={3.5} fill={C.shadow} />
-      <g className="passenger-bob">
+    <g transform="translate(-26 -26)">
+      <circle className="passenger-halo" r={21} fill="none" stroke={C.amber} strokeWidth={4} />
+      <circle r={21} fill={C.cream} stroke={C.amber} strokeWidth={3.5} />
+      <g className="passenger-bob" transform="translate(0 3) scale(1.35)">
         <path d="M-9 12 Q-9 -1 0 -1 Q9 -1 9 12 Z" fill={shirt} />
         <path d="M-3 -1 L0 4 L3 -1" fill={C.cream} />
         <circle cy={-8} r={7.5} fill="#F7D2B4" />
         <path d="M-7.5 -9 Q-7 -16.5 0 -16.5 Q7 -16.5 7.5 -9 Q3 -13 -7.5 -9Z" fill={C.ink} />
         <circle cx={-2.6} cy={-7} r={1.1} fill={C.ink} />
         <circle cx={2.6} cy={-7} r={1.1} fill={C.ink} />
-        <path d="M10 -2 L14 -12" stroke="#F7D2B4" strokeWidth={3.2} strokeLinecap="round" />
       </g>
     </g>
   );

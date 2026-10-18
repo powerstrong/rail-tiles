@@ -347,9 +347,18 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
               <strong>앗!</strong> {FAIL_TEXT[failure.reason]}
             </>
           ) : running ? (
-            '칙칙폭폭…'
+            <span>
+              칙칙폭폭…
+              {stage.waypoints.length > 0 && (
+                <span className="riders">
+                  {' '}
+                  · 손님 {picked.size}/{stage.waypoints.length}
+                </span>
+              )}
+            </span>
           ) : (
             <span>
+              {stage.waypoints.length > 0 && <span className="riders">손님 {stage.waypoints.length}명 · </span>}
               레일 <b>{usedCount(editor.placed)}</b>개 · <span className="par">★★★ {stage.par}개 이하</span>
               {hinted && <span className="hinted"> · 힌트 사용(최대 ★★)</span>}
             </span>

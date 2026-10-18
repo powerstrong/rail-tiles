@@ -788,6 +788,17 @@ p {
   animation: celebrate 0.9s ease-out 2 forwards;
 }
 
+.passenger-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+.status .riders {
+  color: var(--teal);
+  font-weight: 800;
+}
+
 .passenger-bob {
   animation: bob 1.4s ease-in-out infinite;
 }

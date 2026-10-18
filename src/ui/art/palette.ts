@@ -28,6 +28,7 @@ export const C = {
   paving: '#F3EBD9',
   platform: '#FFF5DF',
   platformEdge: '#D9CAB0',
+  stopTint: '#F8DFA6',
 
   treeDark: '#397F59',
   tree: '#58A773',
