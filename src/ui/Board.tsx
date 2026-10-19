@@ -1,6 +1,6 @@
-import { type RefObject, memo, useMemo, useState } from 'react';
+import { type PointerEvent as ReactPointerEvent, type RefObject, memo, useMemo, useRef, useState } from 'react';
 import { ALL_DIRS, type Dir, DX, DY } from '../engine/dir';
-import { type Placements, autoOrient, placeBlock, remaining } from '../engine/editor';
+import { type CellPos, type Placements, autoOrient, placeBlock, remaining } from '../engine/editor';
 import type { Pose } from '../engine/geometry';
 import type { Failure } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
@@ -8,7 +8,7 @@ import type { SwitchStates } from '../engine/step';
 import { C } from './art/palette';
 import { BridgeArt, DecorationArt, GroundDetail, TunnelArt, TunnelBadge, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
 import { CELL, RailPieceArt, SwitchArt } from './art/TrackArt';
-import { Ceremony } from './art/Ceremony';
+import { BoardingFx, Ceremony } from './art/Ceremony';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
 
@@ -41,6 +41,30 @@ interface BoardProps {
   trainRef: RefObject<SVGGElement>;
   smokeRef: RefObject<SVGGElement>;
   onCellClick: (x: number, y: number) => void;
+  /**
+   * Press-and-drag across cells: called with the whole path (adjacent cells, drag order)
+   * each time it grows, then once with `done` when the finger lifts.
+   * A press that never leaves its cell is a plain tap and goes to onCellClick instead.
+   */
+  onDrag: (path: readonly CellPos[], done: boolean) => void;
+}
+
+interface Stroke {
+  pointerId: number;
+  path: CellPos[];
+  dragging: boolean;
+}
+
+/** Cells stepped through going from `a` to `b` (exclusive of a), one axis at a time so the path stays adjacent. */
+function walk(a: CellPos, b: CellPos): CellPos[] {
+  const out: CellPos[] = [];
+  let { x, y } = a;
+  while (x !== b.x || y !== b.y) {
+    if (Math.abs(b.x - x) >= Math.abs(b.y - y)) x += Math.sign(b.x - x);
+    else y += Math.sign(b.y - y);
+    out.push({ x, y });
+  }
+  return out;
 }
 
 const centre = (v: number) => v * CELL + CELL / 2;
@@ -163,8 +187,52 @@ function FailMarker({ failure }: { failure: Failure }) {
 }
 
 export function Board(props: BoardProps) {
-  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, hint, switchStates, restPose, trainRef, smokeRef, onCellClick } = props;
+  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, hint, switchStates, restPose, trainRef, smokeRef, onCellClick, onDrag } = props;
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const stroke = useRef<Stroke | null>(null);
+
+  const cellFromEvent = (e: ReactPointerEvent): CellPos | null => {
+    const svg = svgRef.current;
+    const ctm = svg?.getScreenCTM();
+    if (!svg || !ctm) return null;
+    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse());
+    const x = Math.floor(pt.x / CELL);
+    const y = Math.floor(pt.y / CELL);
+    return x >= 0 && y >= 0 && x < stage.width && y < stage.height ? { x, y } : null;
+  };
+
+  const onPointerDown = (e: ReactPointerEvent<SVGSVGElement>) => {
+    if (!editable || stroke.current || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const cell = cellFromEvent(e);
+    if (!cell) return;
+    stroke.current = { pointerId: e.pointerId, path: [cell], dragging: false };
+    try {
+      svgRef.current?.setPointerCapture(e.pointerId);
+    } catch {
+      // Capture is a nicety (keeps the drag when the finger slides off the board); carry on without it.
+    }
+  };
+
+  const onPointerMove = (e: ReactPointerEvent<SVGSVGElement>) => {
+    const s = stroke.current;
+    const cell = cellFromEvent(e);
+    if (e.pointerType === 'mouse') setHover((h) => (h?.x === cell?.x && h?.y === cell?.y ? h : cell));
+    if (!s || s.pointerId !== e.pointerId || !cell) return;
+    const last = s.path[s.path.length - 1];
+    if (last.x === cell.x && last.y === cell.y) return;
+    s.path.push(...walk(last, cell));
+    s.dragging = true;
+    onDrag([...s.path], false);
+  };
+
+  const endStroke = (e: ReactPointerEvent<SVGSVGElement>, cancelled: boolean) => {
+    const s = stroke.current;
+    if (!s || s.pointerId !== e.pointerId) return;
+    stroke.current = null;
+    if (s.dragging) onDrag(s.path, true);
+    else if (!cancelled) onCellClick(s.path[0].x, s.path[0].y);
+  };
   const w = stage.width * CELL;
   const h = stage.height * CELL;
   const hoverKey = hover ? cellKey(hover.x, hover.y) : null;
@@ -190,8 +258,13 @@ export function Board(props: BoardProps) {
     <svg
       className="board"
       viewBox={`${-BOARD_PAD} ${-BOARD_PAD} ${w + BOARD_PAD * 2} ${h + BOARD_PAD * 2 + 10}`}
+      ref={svgRef}
       role="grid"
       aria-label={`${stage.width}×${stage.height} 게임판`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={(e) => endStroke(e, false)}
+      onPointerCancel={(e) => endStroke(e, true)}
       onPointerLeave={() => setHover(null)}
     >
       <StaticLayer stage={stage} />
@@ -255,6 +328,17 @@ export function Board(props: BoardProps) {
         </g>
       </g>
 
+      {/* Boarding greetings sit above the train that is waiting on the passenger's tile. */}
+      {stage.waypoints.map((p) => {
+        const key = cellKey(p.x, p.y);
+        if (!picked.has(key)) return null;
+        return (
+          <g key={key} transform={`translate(${centre(p.x)} ${centre(p.y)})`}>
+            <BoardingFx seed={cellHash(p.x, p.y, 11)} bubbleBelow={p.y === 0} />
+          </g>
+        );
+      })}
+
       {/* Station signs sit above the train so they stay readable while it waits in the station. */}
       {(['start', 'goal'] as const).map((kind) => (
         <g key={kind} transform={`translate(${centre(stage[kind].x)} ${centre(stage[kind].y)})`}>
@@ -298,10 +382,6 @@ export function Board(props: BoardProps) {
               width={CELL}
               height={CELL}
               fill="transparent"
-              onClick={() => onCellClick(x, y)}
-              onPointerEnter={(e) => {
-                if (e.pointerType === 'mouse') setHover({ x, y });
-              }}
             />
           )),
         )}

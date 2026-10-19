@@ -1,5 +1,5 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createEditor, eraseRail, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
+import { type CellPos, type EditorState, createEditor, eraseRail, paintStroke, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
 import { type Pose, traceToPath } from '../engine/geometry';
 import { RAIL_KINDS, type RailKind, normalizeRot } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
@@ -28,6 +28,8 @@ const FAIL_TEXT: Record<FailReason, string> = {
 };
 
 const TRAIN_SPEED = 2.6;
+/** Seconds the train waits at a passenger stop while they say thanks and hop on. */
+const BOARDING_DWELL = 1.2;
 
 type Mode = 'edit' | 'running' | 'result';
 
@@ -192,6 +194,29 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     if (applyEdit(placeRail(stage, editor, x, y, tool))) play('place');
   };
 
+  // A drag is replayed from the board as it was when the drag began, so the whole stroke is one undo step.
+  const strokeBase = useRef<{ editor: EditorState; warned: boolean } | null>(null);
+  const onDrag = (path: readonly CellPos[], done: boolean) => {
+    if (running) return;
+    if (!strokeBase.current) {
+      strokeBase.current = { editor, warned: false };
+      if (mode === 'result') backToEdit();
+    }
+    const base = strokeBase.current;
+    const { state, ranOut } = paintStroke(stage, base.editor, path, tool);
+    const before = usedCount(editor.placed);
+    const after = usedCount(state.placed);
+    if (after > before) play('place');
+    else if (after < before) play('erase');
+    setEditor(state);
+    if (ranOut && !base.warned && tool !== 'eraser') {
+      base.warned = true;
+      say(`${KIND_LABEL[tool]} 레일이 더 없어요.`);
+      setBump({ tool, n: ++counter.current });
+    }
+    if (done) strokeBase.current = null;
+  };
+
   const spawnPuff = (pose: Pose) => {
     const layer = smokeRef.current;
     if (!layer) return;
@@ -212,18 +237,17 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     celebrationTimers.current = [];
     const trace = simulate(stage, editor.placed);
     const path = traceToPath(trace.steps);
-    // Passengers are picked up as the train passes the middle of their tile.
-    const stops = new Set(stage.waypoints.map((p) => cellKey(p.x, p.y)));
-    const pickups = trace.steps.flatMap((step, i) =>
-      step.kind === 'rail' && stops.has(cellKey(step.x, step.y))
-        ? [{ key: cellKey(step.x, step.y), at: path.stepMid[i] }]
-        : [],
-    );
+    // The train stops in the middle of each passenger's tile (first visit only) to let them board.
+    const waiting = new Set(stage.waypoints.map((p) => cellKey(p.x, p.y)));
+    const pickups = trace.steps.flatMap((step, i) => {
+      const key = step.kind === 'rail' ? cellKey(step.x, step.y) : '';
+      if (!waiting.delete(key)) return [];
+      return [{ key, at: path.stepMid[i] }];
+    });
     // Switches flip once the train has cleared them.
     const flips = trace.steps.flatMap((step, i) =>
       step.kind === 'rail' && step.toggle ? [{ ...step.toggle, at: path.stepMid[i] + 0.45 }] : [],
     );
-    let nextPickup = 0;
     let nextFlip = 0;
     let puffs = 0;
     setResult(null);
@@ -235,6 +259,14 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     cancelRun.current = runTrain(path, {
       speed: TRAIN_SPEED,
       brake: trace.success,
+      stops: pickups.map((p) => p.at),
+      dwell: BOARDING_DWELL,
+      onStop: (i) => {
+        const { key } = pickups[i];
+        play('thanks');
+        celebrationTimers.current.push(window.setTimeout(() => play('pickup'), 480));
+        setPicked((prev) => new Set(prev).add(key));
+      },
       onPose: (pose) => {
         trainRef.current?.setAttribute('transform', poseTransform(pose, CELL));
         trainRef.current?.setAttribute('opacity', pose.alpha.toFixed(3));
@@ -249,11 +281,6 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           const { key, to } = flips[nextFlip++];
           play('rotate');
           setSwitchStates((prev) => ({ ...prev, [key]: to }));
-        }
-        while (nextPickup < pickups.length && pickups[nextPickup].at <= dist) {
-          const { key } = pickups[nextPickup++];
-          play('pickup');
-          setPicked((prev) => new Set(prev).add(key));
         }
       },
       onDone: (pose) => {
@@ -369,6 +396,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           trainRef={trainRef}
           smokeRef={smokeRef}
           onCellClick={onCellClick}
+          onDrag={onDrag}
         />
         {toast && (
           <div key={toast.n} className="toast" role="status">

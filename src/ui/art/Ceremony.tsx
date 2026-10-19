@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { cellHash } from './SceneryArt';
+import { cellHash, passengerShirt } from './SceneryArt';
 import { C } from './palette';
 
 const CONFETTI_COLORS = [C.trainRed, C.gold, C.tealHi, C.tunnelB];
@@ -90,6 +90,51 @@ function HoppingPassenger({ index, total, seed, ty }: { index: number; total: nu
       <path d="M-2.5 -3.5 Q0 -1.5 2.5 -3.5" stroke={C.ink} strokeWidth={1.2} fill="none" strokeLinecap="round" />
       <g className="wave-arm" style={{ animationDelay: `${0.6 + Math.min(index, 2) * 0.1}s` }}>
         <path d="M8 2 L14 -9" stroke={C.skin} strokeWidth={3.4} strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+const THANKS = ['땡큐!', '고마워요!', '감사해요!', '야호!'];
+
+/**
+ * A passenger boarding at their stop, drawn at the tile centre while the train waits there:
+ * they say thanks in a speech bubble, wave, hop from their corner sticker into the train,
+ * and a couple of hearts float up. Mounts when the passenger is picked up and plays once.
+ */
+export function BoardingFx({ seed, bubbleBelow }: { seed: number; bubbleBelow: boolean }) {
+  const text = THANKS[Math.floor(seed * THANKS.length) % THANKS.length];
+  const bw = 22 + text.length * 17;
+  const by = bubbleBelow ? 74 : -74;
+  return (
+    <g className="boarding" pointerEvents="none">
+      <Hearts seed={Math.round(seed * 97)} />
+      {/* Starts where the waiting passenger sticker sits (tile corner) and jumps into the train. */}
+      <g transform="translate(-26 -23) scale(1.35)">
+        <g className="hop-in" style={vars({ tx: 19, ty: 17 })}>
+          <path d="M-9 12 Q-9 -1 0 -1 Q9 -1 9 12 Z" fill={passengerShirt(seed)} />
+          <path d="M-3 -1 L0 4 L3 -1" fill={C.cream} />
+          <circle cy={-8} r={7.5} fill={C.skin} />
+          <path d="M-7.5 -9 Q-7 -16.5 0 -16.5 Q7 -16.5 7.5 -9 Q3 -13 -7.5 -9Z" fill={C.ink} />
+          <path d="M-4.2 -7.4 Q-2.6 -9 -1 -7.4 M1 -7.4 Q2.6 -9 4.2 -7.4" stroke={C.ink} strokeWidth={1.2} fill="none" strokeLinecap="round" />
+          <circle cx={-4.6} cy={-4.4} r={1.5} fill={C.trainRed} opacity={0.35} />
+          <circle cx={4.6} cy={-4.4} r={1.5} fill={C.trainRed} opacity={0.35} />
+          <path d="M-2.5 -3.2 Q0 -0.6 2.5 -3.2" stroke={C.ink} strokeWidth={1.2} fill="none" strokeLinecap="round" />
+          <g className="wave-arm">
+            <path d="M8 2 L14 -9" stroke={C.skin} strokeWidth={3.4} strokeLinecap="round" />
+          </g>
+        </g>
+      </g>
+      <g transform={`translate(0 ${by}) scale(1.2)`}>
+        <g className="thanks-bubble">
+          <rect x={-bw / 2} y={-13} width={bw} height={34} rx={17} fill={C.amberDark} opacity={0.22} />
+          <rect x={-bw / 2} y={-17} width={bw} height={34} rx={17} fill={C.snow} stroke={C.trainRed} strokeWidth={3} />
+          <path d={bubbleBelow ? 'M-6 -16 L0 -25 L6 -16 Z' : 'M-6 16 L0 25 L6 16 Z'} fill={C.snow} stroke={C.trainRed} strokeWidth={3} strokeLinejoin="round" />
+          <rect x={-7} y={bubbleBelow ? -18 : 12} width={14} height={6} fill={C.snow} />
+          <text y={6} textAnchor="middle" fontSize={17} fontWeight={900} fill={C.ink}>
+            {text}
+          </text>
+        </g>
       </g>
     </g>
   );

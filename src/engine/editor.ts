@@ -130,15 +130,24 @@ function sideIsOpen(stage: Stage, placed: Placements, x: number, y: number, d: D
 /**
  * Picks the initial rotation for a newly placed piece: connect to as many neighbours
  * that point at this cell as possible, then prefer ports that lead somewhere usable.
+ * `links` are sides that must connect if at all possible (the drag path through this cell).
  */
-export function autoOrient(stage: Stage, placed: Placements, x: number, y: number, kind: RailKind): number {
+export function autoOrient(
+  stage: Stage,
+  placed: Placements,
+  x: number,
+  y: number,
+  kind: RailKind,
+  links: readonly Dir[] = [],
+): number {
   const wants = new Set(ALL_DIRS.filter((d) => neighbourWants(stage, placed, x, y, d)));
   let best = 0;
   let bestScore = -Infinity;
   for (let rot = 0; rot < rotationCount(kind); rot++) {
     let score = 0;
     for (const port of railPorts({ kind, rot })) {
-      if (wants.has(port)) score += 10;
+      if (links.includes(port)) score += 20;
+      else if (wants.has(port)) score += 10;
       else if (sideIsOpen(stage, placed, x, y, port)) score += 1;
       else score -= 3;
     }
@@ -148,4 +157,76 @@ export function autoOrient(stage: Stage, placed: Placements, x: number, y: numbe
     }
   }
   return best;
+}
+
+export interface CellPos {
+  x: number;
+  y: number;
+}
+
+function dirBetween(a: CellPos, b: CellPos): Dir | null {
+  const d = ALL_DIRS.find((dir) => a.x + DX[dir] === b.x && a.y + DY[dir] === b.y);
+  return d ?? null;
+}
+
+/**
+ * One drag across the board, applied as a single undo step on top of `state`.
+ * A rail tool lays its piece on every empty cell along `path` (cells already holding track
+ * are left alone) and turns each new piece to join its neighbours on the path; the eraser
+ * clears every placed rail it crosses. `path` is a list of adjacent cells in drag order.
+ * Returns `state` itself when nothing changes; `ranOut` tells the caller the inventory
+ * stopped the drag short.
+ */
+export function paintStroke(
+  stage: Stage,
+  state: EditorState,
+  path: readonly CellPos[],
+  tool: RailKind | 'eraser',
+): { state: EditorState; ranOut: boolean } {
+  const placed: Record<string, PlacedRail> = { ...state.placed };
+  let changed = false;
+  let ranOut = false;
+
+  if (tool === 'eraser') {
+    for (const { x, y } of path) {
+      const key = cellKey(x, y);
+      if (placed[key]) {
+        delete placed[key];
+        changed = true;
+      }
+    }
+    return { state: changed ? commit(state, placed) : state, ranOut };
+  }
+
+  // Lay pieces first so orientation can see every new neighbour.
+  const mine = new Set<string>();
+  for (const { x, y } of path) {
+    const key = cellKey(x, y);
+    if (mine.has(key)) continue;
+    const block = placeBlock(stage, placed, x, y, tool);
+    if (block === 'none_left') ranOut = true;
+    if (block) continue;
+    placed[key] = { kind: tool, rot: 0, spin: 0 };
+    mine.add(key);
+  }
+  if (mine.size === 0) return { state, ranOut };
+
+  // Then turn each new piece toward the path cells before and after it that hold new track.
+  const oriented = new Set<string>();
+  path.forEach((cell, i) => {
+    const key = cellKey(cell.x, cell.y);
+    if (!mine.has(key) || oriented.has(key)) return;
+    oriented.add(key);
+    const links: Dir[] = [];
+    for (const other of [path[i - 1], path[i + 1]]) {
+      if (!other || !mine.has(cellKey(other.x, other.y))) continue;
+      const d = dirBetween(cell, other);
+      if (d !== null) links.push(d);
+    }
+    const without = { ...placed };
+    delete without[key];
+    const rot = autoOrient(stage, without, cell.x, cell.y, tool, links);
+    placed[key] = { kind: tool, rot, spin: rot };
+  });
+  return { state: commit(state, placed), ranOut };
 }

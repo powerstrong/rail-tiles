@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { E, N, S, W } from './dir';
-import { createEditor, eraseRail, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo } from './editor';
+import { createEditor, eraseRail, paintStroke, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo } from './editor';
 import { RAIL_GLYPHS, type Rail, railExit, railPorts } from './rail';
 import { type RailMap, simulate } from './simulate';
 import { solve } from './solver';
@@ -388,6 +388,49 @@ describe('editor', () => {
     const turn = stage(['. . . . .', '. . . . .', 'S . R . .', '. . . . .', '. . . . G'], 'E', 'N');
     const c = placeRail(turn, createEditor(), 1, 2, 'curve');
     expect(railPorts(c.placed[cellKey(1, 2)])).toContain(W);
+  });
+});
+
+describe('drag painting', () => {
+  const open = stage(['. . . . .', '. . . . .', 'S . . . G', '. . . . .', '. . . . .'], 'E', 'W', { straight: 3, curve: 4 });
+  const row = (y: number, xs: number[]) => xs.map((x) => ({ x, y }));
+
+  it('a straight drag lays a connected line in one undo step', () => {
+    const { state, ranOut } = paintStroke(open, createEditor(), row(2, [1, 2, 3]), 'straight');
+    expect(ranOut).toBe(false);
+    for (const x of [1, 2, 3]) expect([...railPorts(state.placed[cellKey(x, 2)])].sort()).toEqual([E, W].sort());
+    expect(simulate(open, state.placed).success).toBe(true);
+    expect(state.history).toHaveLength(1);
+    expect(undo(state).placed).toEqual({});
+  });
+
+  it('a vertical drag away from any station still lines up along the drag', () => {
+    const { state } = paintStroke(open, createEditor(), [{ x: 2, y: 0 }, { x: 2, y: 1 }], 'straight');
+    for (const y of [0, 1]) expect([...railPorts(state.placed[cellKey(2, y)])].sort()).toEqual([N, S].sort());
+  });
+
+  it('a curve drag around a corner joins each piece to the next', () => {
+    const path = [{ x: 1, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 2 }, { x: 1, y: 2 }];
+    const { state } = paintStroke(open, createEditor(), path, 'curve');
+    expect([...railPorts(state.placed[cellKey(1, 1)])]).toContain(E);
+    expect([...railPorts(state.placed[cellKey(2, 1)])].sort()).toEqual([W, S].sort());
+    expect([...railPorts(state.placed[cellKey(2, 2)])].sort()).toEqual([N, W].sort());
+    expect([...railPorts(state.placed[cellKey(1, 2)])]).toContain(E);
+  });
+
+  it('skips occupied and blocked cells, stops at the inventory and reports it', () => {
+    const s = stage(['. . . . .', '. . R . .', 'S . ─ . G', '. . . . .', '. . . . .'], 'E', 'W', { straight: 1, curve: 0 });
+    const { state, ranOut } = paintStroke(s, createEditor(), row(2, [0, 1, 2, 3, 4]), 'straight');
+    expect(Object.keys(state.placed)).toEqual([cellKey(1, 2)]);
+    expect(ranOut).toBe(true);
+  });
+
+  it('the eraser clears every placed rail it crosses; a no-op returns the same state', () => {
+    const laid = paintStroke(open, createEditor(), row(2, [1, 2, 3]), 'straight').state;
+    const erased = paintStroke(open, laid, row(2, [0, 1, 2]), 'eraser').state;
+    expect(Object.keys(erased.placed)).toEqual([cellKey(3, 2)]);
+    expect(paintStroke(open, erased, row(0, [0, 1]), 'eraser').state).toBe(erased);
+    expect(paintStroke(open, erased, row(2, [0, 3, 4]), 'straight').state).toBe(erased);
   });
 });
 

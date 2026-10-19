@@ -7,6 +7,12 @@ export interface RunOptions {
   brake: boolean;
   onPose: (pose: Pose) => void;
   onPuff?: (pose: Pose) => void;
+  /** Distances (cells, ascending) where the train brakes, waits `dwell` seconds, then pulls away. */
+  stops?: readonly number[];
+  /** Seconds spent standing at each stop. */
+  dwell?: number;
+  /** Fired the moment the train comes to rest at stops[index]. */
+  onStop?: (index: number) => void;
   /** Distance travelled so far (cells), every frame. */
   onAdvance?: (distance: number) => void;
   onDone: (pose: Pose) => void;
@@ -26,15 +32,33 @@ export function runTrain(path: TrackPath, opts: RunOptions): () => void {
   let dist = 0;
   let v = 0;
   let nextPuff = 0.15;
+  const stops = (opts.stops ?? []).filter((s) => s > 0 && s < path.length);
+  let nextStop = 0;
+  let waiting = 0;
 
   const tick = (now: number) => {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
+    if (waiting > 0) {
+      waiting -= dt;
+      frame = requestAnimationFrame(tick);
+      return;
+    }
     const left = path.length - dist;
+    const stopAt = nextStop < stops.length ? stops[nextStop] : null;
     let target = opts.speed;
     if (opts.brake && left < BRAKE_DIST) target = opts.speed * Math.max(0.16, Math.sqrt(left / BRAKE_DIST));
+    if (stopAt !== null && stopAt - dist < BRAKE_DIST) {
+      target = Math.min(target, opts.speed * Math.max(0.16, Math.sqrt((stopAt - dist) / BRAKE_DIST)));
+    }
     v = v < target ? Math.min(target, v + ACCEL * dt) : target;
     dist = Math.min(path.length, dist + v * dt);
+    if (stopAt !== null && dist >= stopAt) {
+      dist = stopAt;
+      v = 0;
+      waiting = opts.dwell ?? 0.9;
+      opts.onStop?.(nextStop++);
+    }
 
     const pose = poseAt(path, dist);
     opts.onPose(pose);

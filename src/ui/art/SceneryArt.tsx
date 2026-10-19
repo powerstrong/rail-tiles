@@ -317,19 +317,22 @@ export function StopPad() {
 
 const SHIRTS = [C.amber, C.trainRed, C.teal] as const;
 
+/** Shirt colour for the passenger waiting at a stop (shared with the boarding animation). */
+export const passengerShirt = (seed: number) => SHIRTS[Math.floor(seed * SHIRTS.length) % SHIRTS.length];
+
 /** A passenger on a round sticker in the tile corner, or a check badge once picked up. Drawn above the rails. */
 export function PassengerArt({ picked, seed }: { picked: boolean; seed: number }) {
   if (picked) {
     return (
       <g transform="translate(-26 -26)">
-        <g className="pop-in">
+        <g className="badge-in">
           <circle r={18} fill={C.teal} stroke={C.cream} strokeWidth={4} />
           <path d="M-7.5 0.5 L-2 6 L8 -5.5" stroke={C.cream} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </g>
       </g>
     );
   }
-  const shirt = SHIRTS[Math.floor(seed * SHIRTS.length) % SHIRTS.length];
+  const shirt = passengerShirt(seed);
   return (
     <g transform="translate(-26 -26)">
       <circle className="passenger-halo" r={21} fill="none" stroke={C.amber} strokeWidth={4} />

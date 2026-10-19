@@ -388,7 +388,10 @@ p {
   /* Leave room for header, tip, status line and dock so the whole game fits one screen. */
   max-height: max(260px, calc(100dvh - 300px));
   user-select: none;
-  touch-action: manipulation;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  /* Drags paint rails, so the board must not scroll or zoom the page. */
+  touch-action: none;
 }
 
 .hit-layer rect {
@@ -808,6 +811,62 @@ p {
 
 .pop-in {
   animation: pop-in 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* ---------- passenger boarding (timed to BOARDING_DWELL in GameScreen) ---------- */
+
+/* The check badge replaces the passenger sticker once they have hopped aboard. */
+.badge-in {
+  animation: pop-in 0.3s cubic-bezier(0.3, 1.6, 0.5, 1) 0.8s both;
+}
+
+.boarding .wave-arm {
+  animation: wave 0.16s ease-in-out 4 alternate both;
+}
+
+.hop-in {
+  animation: hop-in 0.42s cubic-bezier(0.4, 0, 0.6, 1) 0.5s both;
+}
+
+.thanks-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: thanks-bubble 1.5s ease-out both;
+}
+
+@keyframes hop-in {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5 - 22px)) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.35);
+    opacity: 0;
+  }
+}
+
+@keyframes thanks-bubble {
+  0% {
+    transform: scale(0.2) translateY(14px);
+    opacity: 0;
+  }
+  18% {
+    transform: scale(1.08) translateY(0);
+    opacity: 1;
+  }
+  26%,
+  72% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9) translateY(-10px);
+    opacity: 0;
+  }
 }
 
 .train-crash {

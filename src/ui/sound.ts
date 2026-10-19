@@ -2,7 +2,7 @@
  * Tiny synthesized sound effects (Web Audio, no asset files). The AudioContext is
  * created lazily on the first sound, which always follows a user gesture.
  */
-export type Sfx = 'place' | 'rotate' | 'erase' | 'deny' | 'depart' | 'chuff' | 'pickup' | 'arrive' | 'crash' | 'pop' | 'star1' | 'star2' | 'star3';
+export type Sfx = 'place' | 'rotate' | 'erase' | 'deny' | 'depart' | 'chuff' | 'pickup' | 'thanks' | 'arrive' | 'crash' | 'pop' | 'star1' | 'star2' | 'star3';
 
 const MUTE_KEY = 'rail-tiles:muted';
 
@@ -104,6 +104,11 @@ export function play(sfx: Sfx): void {
     case 'pickup':
       tone(ac, 1046, t, 0.12, { type: 'sine', gain: 0.14 });
       tone(ac, 1568, t + 0.08, 0.2, { type: 'sine', gain: 0.12 });
+      break;
+    case 'thanks':
+      // A chirpy little "thank you!": two quick rising blips.
+      tone(ac, 880, t, 0.08, { type: 'sine', gain: 0.12, slideTo: 1175 });
+      tone(ac, 1175, t + 0.11, 0.12, { type: 'sine', gain: 0.12, slideTo: 1568 });
       break;
     case 'arrive':
       [523, 659, 784, 1046].forEach((f, i) => tone(ac, f, t + i * 0.1, 0.28, { type: 'triangle', gain: 0.15 }));
