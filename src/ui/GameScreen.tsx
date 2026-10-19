@@ -42,6 +42,8 @@ interface Props {
   onBack: () => void;
   onNext: () => void;
   onCleared: (stageId: string, stars: Stars) => void;
+  /** Extra line on the clear card (e.g. the daily streak). */
+  clearNote?: string;
 }
 
 function startPose(stage: Stage): Pose {
@@ -69,7 +71,7 @@ function ToolIcon({ tool }: { tool: Tool }) {
   );
 }
 
-export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared }: Props) {
+export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared, clearNote }: Props) {
   const [editor, setEditor] = useState(createEditor);
   const [tool, setTool] = useState<Tool>(() => RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
   const [mode, setMode] = useState<Mode>('edit');
@@ -354,7 +356,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           </svg>
         </button>
         <div className="game-title">
-          <span className="stage-no">STAGE {stage.number}</span>
+          <span className="stage-no">{stage.label ?? `STAGE ${stage.number}`}</span>
           <h1>{stage.title}</h1>
         </div>
         <div className="head-actions">
@@ -482,7 +484,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                 <path d="M6 6 L18 18 M18 6 L6 18" />
               </svg>
             </button>
-            <p className="result-kicker">STAGE {stage.number}</p>
+            <p className="result-kicker">{stage.label ?? `STAGE ${stage.number}`}</p>
             <StarRow count={earned} className="result-stars" />
             {!hasNext && allCleared ? (
               <>
@@ -504,6 +506,12 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                     <>
                       <br />
                       힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
+                    </>
+                  )}
+                  {clearNote && (
+                    <>
+                      <br />
+                      <strong className="clear-note">{clearNote}</strong>
                     </>
                   )}
                   {bestStars > earned && (

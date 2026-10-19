@@ -65,6 +65,8 @@ export interface Stage {
   /** Fewest player rails that can win: the ★★★ target. */
   par: number;
   ghostHint: boolean;
+  /** Replaces "STAGE n" in the UI (e.g. the daily puzzle). */
+  label?: string;
 }
 
 /**

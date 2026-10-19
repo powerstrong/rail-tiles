@@ -230,6 +230,110 @@ p {
   margin-right: 6px;
 }
 
+.daily-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #fff6e6, #ffe9c9);
+  box-shadow: 0 3px 0 #efc98f, 0 10px 24px rgba(120, 85, 45, 0.12);
+  text-align: left;
+  color: var(--ink);
+  transition: transform 0.12s ease;
+}
+
+.daily-card:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.daily-card.waiting {
+  background: #efe3cf;
+  box-shadow: none;
+  color: #a99d8c;
+}
+
+.daily-icon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--amber);
+}
+
+.daily-card.waiting .daily-icon {
+  background: #e3d5bd;
+}
+
+.daily-card.done .daily-icon {
+  background: var(--teal);
+}
+
+.daily-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.daily-card:not(.done) .daily-check {
+  display: none;
+}
+
+.daily-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.daily-kicker {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--amber-deep);
+}
+
+.daily-card.waiting .daily-kicker {
+  color: inherit;
+}
+
+.daily-title {
+  font-size: 17px;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.daily-card.waiting .daily-title {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.daily-side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.daily-streak {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--amber-deep);
+}
+
 .stage-grid {
   list-style: none;
   margin: 0;
@@ -736,6 +840,13 @@ p {
   font-size: 15px;
   word-break: keep-all;
   margin-bottom: 22px;
+}
+
+.clear-note {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--amber-deep);
+  font-weight: 800;
 }
 
 .result-actions {

@@ -8,6 +8,49 @@ interface Props {
   allCleared: boolean;
   onPick: (index: number) => void;
   onBack: () => void;
+  daily: DailyCardProps;
+}
+
+interface DailyCardProps {
+  /** null while today's puzzle is still being built. */
+  title: string | null;
+  stars: number;
+  unlocked: boolean;
+  unlockAfter: number;
+  failed: boolean;
+  /** Consecutive days cleared. */
+  streak: number;
+  onPlay: () => void;
+}
+
+function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay }: DailyCardProps) {
+  const ready = unlocked && title !== null;
+  const sub = !unlocked
+    ? `${unlockAfter}스테이지를 깨면 열려요`
+    : failed
+      ? '오늘의 퍼즐을 만들지 못했어요'
+      : title === null
+        ? '오늘의 노선을 까는 중…'
+        : title;
+  return (
+    <button className={`daily-card ${ready ? '' : 'waiting'} ${stars > 0 ? 'done' : ''}`} disabled={!ready} onClick={onPlay}>
+      <span className="daily-icon" aria-hidden>
+        <svg viewBox="0 0 24 24">
+          <rect x="3.5" y="5" width="17" height="15" rx="3" />
+          <path d="M3.5 10 H20.5 M8 3 V7 M16 3 V7" />
+          <path d="M8.5 15 L11 17.2 L15.5 12.8" className="daily-check" />
+        </svg>
+      </span>
+      <span className="daily-text">
+        <span className="daily-kicker">오늘의 퍼즐</span>
+        <span className="daily-title">{sub}</span>
+      </span>
+      <span className="daily-side">
+        {ready && <StarRow count={stars} />}
+        {streak > 0 && <span className="daily-streak">🔥 {streak}일 연속</span>}
+      </span>
+    </button>
+  );
 }
 
 export function isUnlocked(stages: Stage[], cleared: ReadonlySet<string>, index: number): boolean {
@@ -27,7 +70,7 @@ export function StarRow({ count, className }: { count: number; className?: strin
   );
 }
 
-export function StageSelect({ stages, stars, cleared, allCleared, onPick, onBack }: Props) {
+export function StageSelect({ stages, stars, cleared, allCleared, onPick, onBack, daily }: Props) {
   const totalStars = stages.reduce((sum, s) => sum + (stars[s.id] ?? 0), 0);
   return (
     <main className="select">
@@ -47,6 +90,7 @@ export function StageSelect({ stages, stars, cleared, allCleared, onPick, onBack
           <strong>모든 노선 완성!</strong> {stages.length}개 스테이지를 모두 클리어했어요.
         </p>
       )}
+      <DailyCard {...daily} />
       <ol className="stage-grid">
         {stages.map((stage, i) => {
           const unlocked = isUnlocked(stages, cleared, i);
