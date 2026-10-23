@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "stages": "vite-node scripts/stage-report.ts",
-    "stage-design": "vite-node scripts/stage-design.ts"
+    "stage-design": "vite-node scripts/stage-design.ts",
+    "difficulty": "vite-node scripts/difficulty.ts"
   },
   "dependencies": {
     "react": "18.3.1",

@@ -14,6 +14,7 @@ import { pathToFileURL } from 'node:url';
 import { type Placement, type StageDef, parseStage } from '../src/engine/stage';
 import { solve } from '../src/engine/solver';
 import { TWO_STAR_SLACK } from '../src/engine/stars';
+import { audit, difficultyScore } from './audit';
 import { draw, solutionGrid } from './draw';
 
 export interface Concept extends StageDef {
@@ -25,6 +26,8 @@ export interface Concept extends StageDef {
   keep?: number;
   /** Reject maps whose shortest routes do not use this piece (e.g. a crossing stage that must need its crossing). */
   mustUse?: 'cross';
+  /** Keep maps whose audited difficulty (scripts/audit.ts) falls in this range, hardest first. */
+  difficulty?: [number, number];
 }
 
 const [file, ...ids] = process.argv.slice(2);
@@ -109,7 +112,7 @@ function evaluate(def: StageDef, parRange: [number, number], mustUse?: 'cross'):
 
 for (const concept of concepts) {
   if (ids.length && !ids.includes(concept.id)) continue;
-  const { par: parRange = [0, 99], density = 0.35, tries: conceptTries = 400, seed = 1, scenery = 'TTTRRMWH', keep = 3, mustUse, ...base } = concept;
+  const { par: parRange = [0, 99], density = 0.35, tries: conceptTries = 400, seed = 1, scenery = 'TTTRRMWH', keep = 3, mustUse, difficulty, ...base } = concept;
   const tries = Number(process.env.TRIES ?? conceptTries);
   const rand = rng(seed * 7919 + concept.id.length);
   const seen = new Set<string>();
@@ -128,6 +131,12 @@ for (const concept of concepts) {
     if (res) found.push(res);
   }
   found.sort((a, b) => b.score - a.score);
+  const rated = new Map<Result, number>();
+  if (difficulty) {
+    // Audit the most promising maps and keep the hardest within range.
+    for (const r of found.slice(0, 30)) rated.set(r, difficultyScore(audit(parseStage(r.def, 0))));
+    found.splice(0, found.length, ...[...rated].filter(([, d]) => d >= difficulty[0] && d <= difficulty[1]).sort((a, b) => b[1] - a[1]).map(([r]) => r));
+  }
   console.log(`\n== ${concept.id}: ${found.length} good of ${seen.size} maps`, JSON.stringify(why));
   for (const k of Object.keys(why)) delete why[k];
   for (const r of found.slice(0, keep)) {
@@ -135,7 +144,7 @@ for (const concept of concepts) {
     const check = solve(stage, 3000, true);
     const sol = check.routes!.find((x) => x.length === r.par)!;
     const optimal = check.routes!.filter((x) => x.length === r.par).length;
-    console.log(`-- score ${r.score.toFixed(1)}  par ${r.par}  ★★★ ${optimal}  total ${check.count}  open ${r.open}  inv s${r.def.inventory.straight} c${r.def.inventory.curve}`);
+    console.log(`-- score ${r.score.toFixed(1)}${rated.has(r) ? `  difficulty ${rated.get(r)!.toFixed(1)}` : ''}  par ${r.par}  ★★★ ${optimal}  total ${check.count}  open ${r.open}  inv s${r.def.inventory.straight} c${r.def.inventory.curve}`);
     console.log(draw(stage, sol));
     console.log(
       JSON.stringify({ map: r.def.map, inventory: r.def.inventory, solution: solutionGrid(stage, sol), expected: [optimal, check.count] }),

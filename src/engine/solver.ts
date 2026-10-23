@@ -47,7 +47,14 @@ export function solve(stage: Stage, limit = 1000, collectRoutes = false, maxNode
   return { ...all, truncated };
 }
 
-function search(stage: Stage, limit: number, maxRails: number, collect: boolean, maxNodes = Infinity): Omit<SolveResult, 'truncated'> & { aborted?: boolean } {
+function search(
+  stage: Stage,
+  limit: number,
+  maxRails: number,
+  collect: boolean,
+  maxNodes = Infinity,
+  preset: readonly Placement[] = [],
+): Omit<SolveResult, 'truncated'> & { aborted?: boolean; nodes?: number } {
   const left = { ...stage.inventory };
   const built = new Map<string, Rail>();
   const path: Placement[] = [];
@@ -58,7 +65,7 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean,
   const riders = initialRiders(stage);
   const stopVisits = new Map<string, number>(stage.waypoints.map((p) => [cellKey(p.x, p.y), 0]));
   let nodes = 0;
-  const result: Omit<SolveResult, 'truncated'> & { aborted?: boolean } = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
+  const result: Omit<SolveResult, 'truncated'> & { aborted?: boolean; nodes?: number } = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
   const lookup = (x: number, y: number) => built.get(cellKey(x, y)) ?? null;
 
   const record = () => {
@@ -135,8 +142,33 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean,
     }
   };
 
+  // Pieces already laid (difficulty probes): the train simply follows them.
+  for (const p of preset) {
+    const key = cellKey(p.x, p.y);
+    built.set(key, p.rail);
+    left[p.rail.kind] -= 1;
+    path.push(p);
+    if (p.rail.kind === 'cross') crossAxes.set(key, 0);
+  }
   const start = stage.start;
   seen.add(motionKey(stage, start.x, start.y, start.dir, switches));
   if (cellAt(stage, start.x, start.y)) visit(start.x, start.y, start.dir);
+  result.nodes = nodes;
   return result;
+}
+
+/**
+ * Difficulty probe: with `preset` pieces already laid, can the stage still be won, and how
+ * much searching did it take? Returns null when the node budget ran out.
+ */
+export function probe(stage: Stage, preset: readonly Placement[], maxNodes = 200_000): { winnable: boolean; nodes: number } | null {
+  const r = search(stage, 1, Infinity, false, maxNodes, preset);
+  if (r.aborted) return null;
+  return { winnable: r.count > 0, nodes: r.nodes ?? 0 };
+}
+
+/** Search effort to enumerate every winning route within the stage's own inventory. */
+export function searchEffort(stage: Stage, maxNodes = 5_000_000): number | null {
+  const r = search(stage, Infinity, Infinity, false, maxNodes);
+  return r.aborted ? null : (r.nodes ?? 0);
 }
