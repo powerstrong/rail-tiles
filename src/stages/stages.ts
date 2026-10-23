@@ -5,7 +5,7 @@ import { type Stage, type StageDef, parseStage } from '../engine/stage';
  * Every stage is checked by stages.test.ts: it parses, its listed solution wins,
  * and the solver's route count is pinned so difficulty changes are deliberate.
  */
-export const STAGE_DEFS: StageDef[] = [
+const CH1_BASICS: StageDef[] = [
   {
     id: 'first-line',
     title: '첫 번째 선로',
@@ -249,6 +249,9 @@ export const STAGE_DEFS: StageDef[] = [
       '. . . . . . .',
     ],
   },
+];
+
+const CH2_TUNNELS: StageDef[] = [
   {
     id: 'tunnel-intro',
     title: '터널 통과',
@@ -302,6 +305,56 @@ export const STAGE_DEFS: StageDef[] = [
     ],
   },
   {
+    id: 'tunnel-passenger',
+    title: '터널 너머 손님',
+    tip: '산 너머에서 손님이 기다려요. 터널로 산을 지나 손님을 태워 주세요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 5, curve: 8 },
+    tunnels: { a: ['E', 'W'] },
+    map: [
+      'T . . M . .', //
+      'S . . M a .',
+      '. . . M T .',
+      '. . a M . .',
+      '. . T M P T',
+      '. . . M . G',
+    ],
+    solution: [
+      '. . . . . .', //
+      '. ┐ . . . ┐',
+      '. │ . . . │',
+      '. └ . . ┌ ┘',
+      '. . . . │ .',
+      '. . . . └ .',
+    ],
+  },
+  {
+    id: 'under-the-water',
+    title: '강 밑 터널',
+    tip: '다리가 없는 강이에요. 터널 입구가 어느 쪽으로 열려 있는지 잘 보세요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 7, curve: 6 },
+    tunnels: { a: ['N', 'S'] },
+    map: [
+      'R . . . . .', //
+      'S . M . a .',
+      '. . . . . .',
+      'W W W W W W',
+      '. a . . . .',
+      '. . . P . G',
+    ],
+    solution: [
+      '. ┌ ─ ─ ┐ .', //
+      '. ┘ . . . .',
+      '. . . . . .',
+      '. . . . . .',
+      '. . . . . .',
+      '. └ ─ ─ ─ .',
+    ],
+  },
+  {
     id: 'two-tunnels',
     title: '두 갈래 터널',
     tip: '터널이 두 개예요. 가까운 터널이 정답이라는 보장은 없어요.',
@@ -326,6 +379,114 @@ export const STAGE_DEFS: StageDef[] = [
       '┌ ─ ─ ─ ─ ┐ .',
       '└ . . . . └ .',
       '. . . . . . .',
+    ],
+  },
+  {
+    id: 'two-ridges',
+    title: '두 줄 산맥',
+    tip: '산이 두 줄로 막고 있어요. 터널 두 개를 차례로 지나야 해요.',
+    start: 'E',
+    goal: 'N',
+    inventory: { straight: 7, curve: 9 },
+    tunnels: { a: ['S', 'W'], b: ['E', 'N'] },
+    map: [
+      '. . M . M . T', //
+      'S . M a M . .',
+      '. . M . M b .',
+      '. . M . M . .',
+      '. a M . M . .',
+      '. . M b M . .',
+      'T . M . M . G',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. ┐ . . . . .',
+      '. │ . │ . . ┐',
+      '┌ ┘ . │ . . │',
+      '└ . . │ . . │',
+      '. . . . . . │',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'four-rooms',
+    title: '네 개의 방',
+    tip: '산으로 나뉜 네 구역을 터널 세 개로 차례차례 지나가요.',
+    start: 'E',
+    goal: 'E',
+    inventory: { straight: 3, curve: 11 },
+    tunnels: { a: ['S', 'W'], b: ['N', 'S'], c: ['E', 'E'] },
+    map: [
+      'S . T M a . .', //
+      '. . a M . P .',
+      '. . . M H b .',
+      'M M M M M M M',
+      '. c . M . b .',
+      '. . . M . . .',
+      'G . . M c . .',
+    ],
+    solution: [
+      '. ┐ . . . . .', //
+      '. └ . . └ ┐ .',
+      '. . . . . . .',
+      '. . . . . . .',
+      '. . ┐ . . . .',
+      '. . │ . . │ .',
+      '. ─ ┘ . . ┘ .',
+    ],
+  },
+  {
+    id: 'there-and-back',
+    title: '건너갔다 돌아오기',
+    tip: '다리로 강을 건너 손님을 태우고, 터널로 다시 돌아와야 도착역이에요.',
+    start: 'E',
+    goal: 'E',
+    inventory: { straight: 5, curve: 9 },
+    tunnels: { a: ['S', 'E'] },
+    map: [
+      '. . . W . . R', //
+      'S . T W . P .',
+      '. . . ═ . R .',
+      'T . . W . . .',
+      '. a . W R a .',
+      '. . . W . R R',
+      'G . . W . T .',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. ┐ . . ┌ ─ ┐',
+      '. └ ─ . ┘ . │',
+      '. . . . . . │',
+      '. . . . . . ┘',
+      '. │ . . . . .',
+      '. ┘ . . . . .',
+    ],
+  },
+  {
+    id: 'river-and-ridge',
+    title: '강 건너 산 넘어',
+    tip: '강은 a 터널로, 산은 b 터널로 건너요. 가는 길에 손님도 태워요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 10, curve: 8 },
+    tunnels: { a: ['W', 'E'], b: ['W', 'E'] },
+    map: [
+      '. . . . . a T', //
+      'S . . . . . .',
+      '. . R . P . .',
+      'W W W W W W W',
+      '. a . . . b .',
+      'M M M M M M M',
+      '. b . . . . G',
+    ],
+    solution: [
+      '. . . . ┌ . .', //
+      '. ─ ─ ┐ │ . .',
+      '. . . └ ┘ . .',
+      '. . . . . . .',
+      '. . ─ ─ ─ . .',
+      '. . . . . . .',
+      '. . ─ ─ ─ ─ .',
     ],
   },
   {
@@ -355,6 +516,9 @@ export const STAGE_DEFS: StageDef[] = [
       '. ┘ . . . . .',
     ],
   },
+];
+
+const CH3_JUNCTIONS: StageDef[] = [
   {
     id: 'first-crossing',
     title: '교차로',
@@ -377,6 +541,54 @@ export const STAGE_DEFS: StageDef[] = [
       '. │ . . . .',
       '. . . . . .',
       '. . . . . .',
+    ],
+  },
+  {
+    id: 'loop-back',
+    title: '한 바퀴 돌아 교차',
+    tip: '손님을 태우고 돌아오는 길이 처음 지난 길과 엇갈려요. 교차 레일을 써 보세요.',
+    start: 'E',
+    goal: 'N',
+    inventory: { straight: 5, curve: 5, cross: 1 },
+    map: [
+      'H . . . . .', //
+      'R . . . P .',
+      'S . . . . M',
+      'R . R . . H',
+      'H G . . . .',
+      'H . . H R .',
+    ],
+    solution: [
+      '. . . . . .', //
+      '. ┌ ─ ─ ┐ .',
+      '. ┼ ─ ─ ┘ .',
+      '. │ . . . .',
+      '. . . . . .',
+      '. . . . . .',
+    ],
+  },
+  {
+    id: 'loop-and-cross',
+    title: '고리 모양 길',
+    tip: '위쪽 손님을 태우고 아래쪽 손님에게 가려면 길이 한 번 엇갈려야 해요.',
+    start: 'E',
+    goal: 'E',
+    inventory: { straight: 10, curve: 8, cross: 1 },
+    map: [
+      '. . . . P .', //
+      'T . . H T .',
+      'S . . . . .',
+      'G . . R . .',
+      '. . . . . .',
+      '. P . T . .',
+    ],
+    solution: [
+      '. . ┌ ─ ─ ┐', //
+      '. . │ . . │',
+      '. ─ ┼ ─ ─ ┘',
+      '. ┐ │ . . .',
+      '. │ │ . . .',
+      '. └ ┘ . . .',
     ],
   },
   {
@@ -434,6 +646,33 @@ export const STAGE_DEFS: StageDef[] = [
     ],
   },
   {
+    id: 'switch-down',
+    title: '아래로 가는 분기기',
+    tip: '이번엔 분기기가 아래로 갈라져요. 한 바퀴 돌고 오면 도착역 길이 열려요.',
+    start: 'E',
+    goal: 'N',
+    inventory: { straight: 8, curve: 5 },
+    switches: { '1': { trunk: 'W', turn: 'S' }, '2': { trunk: 'E', turn: 'N' } },
+    map: [
+      '. . . . . . .', //
+      '. . . P . . .',
+      'R . . M T . .',
+      'S . 2 . 1 . .',
+      '. R . R . R .',
+      'R . T R . R .',
+      '. . R . G . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . ┌ ─ ─ ┐ .',
+      '. . │ . . │ .',
+      '. ─ . ─ . ┘ .',
+      '. . . . │ . .',
+      '. . . . │ . .',
+      '. . . . . . .',
+    ],
+  },
+  {
     id: 'figure-eight',
     title: '8자 노선',
     tip: '양쪽 끝의 손님을 모두 태우려면 선로가 한 번 엇갈려야 해요.',
@@ -487,6 +726,33 @@ export const STAGE_DEFS: StageDef[] = [
     ],
   },
   {
+    id: 'both-sides',
+    title: '양쪽 손님',
+    tip: '분기기로 돌아오기 전에 양쪽 손님을 모두 태워야 해요. 교차 레일이 하나 있어요.',
+    start: 'E',
+    goal: 'S',
+    inventory: { straight: 8, curve: 7, cross: 1 },
+    switches: { '1': { trunk: 'W', turn: 'N' }, '2': { trunk: 'E', turn: 'N' } },
+    map: [
+      'T T . . G R T', //
+      '. . . R . R T',
+      '. P . R . R T',
+      'S . 2 . 1 . W',
+      'R . T . . . .',
+      '. . . . . P .',
+      'T . . . . . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . . . │ . .',
+      '. ┌ ┐ . │ . .',
+      '. ┼ . ─ . ┐ .',
+      '. │ . . . │ .',
+      '. └ ─ ─ ─ ┘ .',
+      '. . . . . . .',
+    ],
+  },
+  {
     id: 'grand-tour',
     title: '대륙 횡단',
     tip: '분기기, 터널, 손님. 터널로 한 바퀴 돌아 손님을 태운 뒤 다시 분기기로 돌아오세요.',
@@ -516,4 +782,293 @@ export const STAGE_DEFS: StageDef[] = [
   },
 ];
 
-export const STAGES: Stage[] = STAGE_DEFS.map((def, i) => parseStage(def, i + 1));
+const CH4_DELIVERY: StageDef[] = [
+  {
+    id: 'first-delivery',
+    title: '첫 배달',
+    tip: '손님을 태운 다음, 손님 옷과 같은 색 지붕 집 칸을 지나면 손님이 내려요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 4, curve: 4 },
+    map: [
+      'T . . . . T', //
+      '. . A . . .',
+      'S . R . . .',
+      '. . . . X .',
+      '. M . . . G',
+      'T . . . . T',
+    ],
+    solution: [
+      '. . . . . .', //
+      '. ┌ ─ ─ ┐ .',
+      '. ┘ . . │ .',
+      '. . . . │ .',
+      '. . . . └ .',
+      '. . . . . .',
+    ],
+  },
+  {
+    id: 'pickup-first',
+    title: '먼저 태우고 내려요',
+    tip: '집 칸을 먼저 지나면 아무도 내리지 않아요. 손님을 먼저 태우고 집으로 돌아와야 해요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 6, curve: 10 },
+    map: [
+      '. T . . . T', //
+      '. . . . A T',
+      'S . X . . .',
+      '. . . . . .',
+      'T . . W . G',
+      'T . . . . .',
+    ],
+    solution: [
+      '. . . . . .', //
+      '. ┌ ─ ─ ┐ .',
+      '. ┘ ┌ ─ ┘ .',
+      '. . └ ─ ┐ .',
+      '. . . . └ .',
+      '. . . . . .',
+    ],
+  },
+  {
+    id: 'tunnel-delivery',
+    title: '터널 택배',
+    tip: '손님을 태우고 터널을 지나 산 너머 집까지 가요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 4, curve: 6 },
+    tunnels: { a: ['E', 'W'] },
+    map: [
+      'T . . M . . .', //
+      'R R T M . T .',
+      'S . . M . . T',
+      '. A . M a . .',
+      '. . a M . X .',
+      'T . . M . . G',
+      '. . . M . . .',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . . . . . .',
+      '. ┐ . . . . .',
+      '. │ . . . ┐ .',
+      '. └ . . . │ .',
+      '. . . . . └ .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'switch-delivery',
+    title: '분기기 배달',
+    tip: '한 바퀴 돌며 손님을 태우면, 분기기가 집으로 가는 길을 열어 줘요.',
+    start: 'E',
+    goal: 'S',
+    inventory: { straight: 10, curve: 5 },
+    switches: { '1': { trunk: 'W', turn: 'N' }, '2': { trunk: 'E', turn: 'S' } },
+    map: [
+      'T . . . G . T', //
+      'T . . R X R T',
+      '. M . R . R .',
+      'S . 2 . 1 . .',
+      'T M . T W . .',
+      'T . . A . . .',
+      'T . . . . . .',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. . . . │ . .',
+      '. . . . │ . .',
+      '. ─ . ─ . ┐ .',
+      '. . │ . . │ .',
+      '. . └ ─ ─ ┘ .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'crossing-delivery',
+    title: '교차로 배달',
+    tip: '손님 집이 출발역 가까이에 있어요. 교차 레일로 되돌아와 보세요.',
+    start: 'E',
+    goal: 'N',
+    inventory: { straight: 8, curve: 7, cross: 1 },
+    map: [
+      'T . . . . . T', //
+      '. . . . . . .',
+      'S . . . . A .',
+      '. . R . R . .',
+      '. X . . . . .',
+      'T . . G . . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. ┌ ─ ─ ─ ┐ .',
+      '. ┼ ─ ─ ─ ┘ .',
+      '. │ . . . . .',
+      '. └ ─ ┐ . . .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'two-bridges',
+    title: '다리 두 번',
+    tip: '손님이 두 명! 분홍 손님은 분홍 집, 파랑 손님은 파랑 집으로. 다리 두 개를 모두 건너야 해요.',
+    start: 'E',
+    goal: 'E',
+    inventory: { straight: 8, curve: 8 },
+    map: [
+      'T T . W . . .', //
+      'T A . ═ . X .',
+      'T . T W T . .',
+      'S . . W T B .',
+      '. . . W R . .',
+      '. Y . ═ . . .',
+      'G . T W R R .',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. ┌ ─ . ─ ┐ .',
+      '. │ . . . │ .',
+      '. ┘ . . . │ .',
+      '. . . . . │ .',
+      '. ┌ ─ . ─ ┘ .',
+      '. ┘ . . . . .',
+    ],
+  },
+  {
+    id: 'two-homes',
+    title: '두 집 배달',
+    tip: '두 손님의 집이 서로 대각선 반대편에 있어요. 어느 쪽부터 돌지 잘 생각해 보세요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 9, curve: 14 },
+    map: [
+      'T . . . . . T', //
+      '. A . . . Y .',
+      '. . . M . . .',
+      'S . . . . . G',
+      '. . . M . . .',
+      '. X . . . B .',
+      'T . . . . . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. ┌ ┐ . ┌ ┐ .',
+      '. │ │ . │ │ .',
+      '. ┘ │ . │ └ .',
+      '. ┌ ┘ . └ ┐ .',
+      '. └ ─ ─ ─ ┘ .',
+      '. . . . . . .',
+    ],
+  },
+  {
+    id: 'zigzag-homes',
+    title: '엇갈린 집',
+    tip: '두 손님의 집이 서로 반대편에 있어요. 누구를 먼저 태울까요?',
+    start: 'S',
+    goal: 'N',
+    inventory: { straight: 12, curve: 10 },
+    map: [
+      'S . . T . . .', //
+      '. . A . . B .',
+      '. R . . R . .',
+      '. . . M . . .',
+      '. Y . . . X .',
+      '. . R . . . .',
+      'T . . . . G T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '└ ─ ─ ─ ─ ┐ .',
+      '. . . . . │ .',
+      '. . . . . │ .',
+      '. ┌ ─ ─ ─ ┘ .',
+      '. │ . . ┌ ┐ .',
+      '. └ ─ ─ ┘ . .',
+    ],
+  },
+  {
+    id: 'deliver-and-ride',
+    title: '배달하고 태우고',
+    tip: '집에 갈 손님과 함께 타고 갈 손님이 모두 기다려요.',
+    start: 'E',
+    goal: 'W',
+    inventory: { straight: 11, curve: 14 },
+    map: [
+      '. . T . . . .', //
+      'T A . . . P .',
+      '. . . . . . .',
+      'S . . . M . G',
+      'R W T . . . .',
+      '. P . . . X .',
+      '. . . . . . T',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '. ┌ ─ ─ ─ ┐ .',
+      '. │ . ┌ ─ ┘ .',
+      '. ┘ . │ . ┌ .',
+      '. . . │ . │ .',
+      '. ┌ ─ ┘ ┌ ┘ .',
+      '. └ ─ ─ ┘ . .',
+    ],
+  },
+  {
+    id: 'last-delivery',
+    title: '마지막 배달',
+    tip: '세 손님, 터널, 교차 레일. 직선은 조금, 곡선은 많이. 지금까지 중 가장 어려운 노선이에요!',
+    start: 'N',
+    goal: 'W',
+    inventory: { straight: 6, curve: 16, cross: 1 },
+    tunnels: { a: ['N', 'E'] },
+    map: [
+      '. . . T . . .', //
+      'A . Z R X . G',
+      '. . . . . M .',
+      'T a Y . . . .',
+      '. . a . . . T',
+      'R . T . . . C',
+      '. T T S B . .',
+    ],
+    solution: [
+      '. . . . . . .', //
+      '┌ ─ ┐ . ┌ ─ .',
+      '└ ┐ │ ┌ ┘ . .',
+      '. . └ ┘ . . .',
+      '. . . ─ ┐ . .',
+      '. . . ┌ ┼ ─ ┐',
+      '. . . . └ ─ ┘',
+    ],
+  },
+];
+
+export interface Chapter {
+  number: number;
+  title: string;
+  blurb: string;
+  /** Accent colour for the chapter header. */
+  color: string;
+  /** Index range [start, start + count) into STAGES. */
+  start: number;
+  count: number;
+}
+
+const CHAPTER_DEFS: { title: string; blurb: string; color: string; stages: StageDef[] }[] = [
+  { title: '기본 선로', blurb: '직선과 곡선으로 길을 잇고 손님을 태워요.', color: '#58A773', stages: CH1_BASICS },
+  { title: '산과 터널', blurb: '같은 글자의 터널 입구끼리 이어져요.', color: '#8E6BD1', stages: CH2_TUNNELS },
+  { title: '교차로와 분기기', blurb: '길이 엇갈리고, 분기기가 방향을 바꿔요.', color: '#3A9AD9', stages: CH3_JUNCTIONS },
+  { title: '손님 배달', blurb: '손님을 태워 같은 색 집까지 데려다줘요.', color: '#EC6A8E', stages: CH4_DELIVERY },
+];
+
+export const STAGE_DEFS: StageDef[] = CHAPTER_DEFS.flatMap((c) => c.stages);
+
+export const CHAPTERS: Chapter[] = CHAPTER_DEFS.reduce<Chapter[]>((acc, c, i) => {
+  const start = acc.length ? acc[acc.length - 1].start + acc[acc.length - 1].count : 0;
+  return [...acc, { number: i + 1, title: c.title, blurb: c.blurb, color: c.color, start, count: c.stages.length }];
+}, []).filter((c) => c.count > 0);
+
+export const STAGES: Stage[] = STAGE_DEFS.map((def, i) => {
+  const stage = parseStage(def, i + 1);
+  const ch = CHAPTERS.find((c) => i >= c.start && i < c.start + c.count)!;
+  return { ...stage, label: `STAGE ${ch.number}-${i - ch.start + 1}` };
+});

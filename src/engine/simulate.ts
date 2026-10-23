@@ -1,7 +1,7 @@
 import { type Dir, DX, DY } from './dir';
 import type { Rail } from './rail';
 import { type Pos, type Stage, cellAt, cellKey } from './stage';
-import { type FailReason, type TraceStep, enter, initialSwitches, motionKey } from './step';
+import { type FailReason, type TraceStep, enter, initialRiders, initialSwitches, motionKey, riderPass } from './step';
 
 export type { FailReason, TraceStep } from './step';
 
@@ -17,10 +17,20 @@ export interface Failure {
   /** Edge of `from` where the train stopped. Absent for missed_waypoint (train reached the goal centre). */
   edge?: Dir;
   missedWaypoints?: Pos[];
+  /** Delivery passengers not yet dropped off (undelivered). */
+  undelivered?: string[];
+}
+
+/** A delivery passenger boarding or getting off while the train drives through step `index`. */
+export interface RiderEvent {
+  index: number;
+  id: string;
+  event: 'board' | 'drop';
 }
 
 export interface Trace {
   steps: TraceStep[];
+  riderEvents: RiderEvent[];
   success: boolean;
   failure: Failure | null;
 }
@@ -45,6 +55,8 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
   const visited = new Set<string>();
   const seen = new Set<string>();
   const switches = initialSwitches(stage);
+  const riders = initialRiders(stage);
+  const riderEvents: RiderEvent[] = [];
   const lookup = (x: number, y: number) => placed[cellKey(x, y)] ?? null;
 
   let x = stage.start.x;
@@ -53,6 +65,7 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
 
   const fail = (reason: FailReason, extra: Partial<Failure> = {}): Trace => ({
     steps,
+    riderEvents,
     success: false,
     failure: { reason, cell: { x: x + DX[heading], y: y + DY[heading] }, from: { x, y }, edge: heading, ...extra },
   });
@@ -70,14 +83,21 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
       const missed = stage.waypoints.filter((p) => !visited.has(cellKey(p.x, p.y)));
       if (missed.length > 0) {
         const at = { x: entry.step.x, y: entry.step.y };
-        return { steps, success: false, failure: { reason: 'missed_waypoint', cell: at, from: at, missedWaypoints: missed } };
+        return { steps, riderEvents, success: false, failure: { reason: 'missed_waypoint', cell: at, from: at, missedWaypoints: missed } };
       }
-      return { steps, success: true, failure: null };
+      const undelivered = stage.riders.filter((r) => riders[r.id] !== 2).map((r) => r.id);
+      if (undelivered.length > 0) {
+        const at = { x: entry.step.x, y: entry.step.y };
+        return { steps, riderEvents, success: false, failure: { reason: 'undelivered', cell: at, from: at, undelivered } };
+      }
+      return { steps, riderEvents, success: true, failure: null };
     }
 
     steps.push(entry.step);
     if (entry.step.kind === 'rail') {
       visited.add(cellKey(entry.step.x, entry.step.y));
+      const ride = riderPass(stage, riders, entry.step.x, entry.step.y);
+      if (ride) riderEvents.push({ index: steps.length - 1, ...ride });
       if (entry.step.toggle) switches[entry.step.toggle.key] = entry.step.toggle.to;
     }
     x = entry.x;

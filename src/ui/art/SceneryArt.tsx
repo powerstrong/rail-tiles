@@ -306,11 +306,11 @@ export function StationLabel({ dir, kind }: { dir: Dir; kind: 'start' | 'goal' }
  * Passenger stop ground (static layer, under the rails): the whole tile gets a warm
  * tint and a dashed border so "the train must pass here" reads at a glance.
  */
-export function StopPad() {
+export function StopPad({ color }: { color?: string }) {
   return (
     <g>
-      <rect x={-46} y={-46} width={92} height={89} rx={11} fill={C.stopTint} />
-      <rect x={-41} y={-41} width={82} height={79} rx={9} fill="none" stroke={C.amber} strokeWidth={3} strokeDasharray="7 6" />
+      <rect x={-46} y={-46} width={92} height={89} rx={11} fill={color ?? C.stopTint} opacity={color ? 0.24 : 1} />
+      <rect x={-41} y={-41} width={82} height={79} rx={9} fill="none" stroke={color ?? C.amber} strokeWidth={3} strokeDasharray="7 6" />
     </g>
   );
 }
@@ -321,22 +321,23 @@ const SHIRTS = [C.amber, C.trainRed, C.teal] as const;
 export const passengerShirt = (seed: number) => SHIRTS[Math.floor(seed * SHIRTS.length) % SHIRTS.length];
 
 /** A passenger on a round sticker in the tile corner, or a check badge once picked up. Drawn above the rails. */
-export function PassengerArt({ picked, seed }: { picked: boolean; seed: number }) {
+export function PassengerArt({ picked, seed, color }: { picked: boolean; seed: number; color?: string }) {
   if (picked) {
     return (
       <g transform="translate(-26 -26)">
         <g className="badge-in">
-          <circle r={18} fill={C.teal} stroke={C.cream} strokeWidth={4} />
+          <circle r={18} fill={color ?? C.teal} stroke={C.cream} strokeWidth={4} />
           <path d="M-7.5 0.5 L-2 6 L8 -5.5" stroke={C.cream} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </g>
       </g>
     );
   }
-  const shirt = passengerShirt(seed);
+  const shirt = color ?? passengerShirt(seed);
+  const ring = color ?? C.amber;
   return (
     <g transform="translate(-26 -26)">
-      <circle className="passenger-halo" r={21} fill="none" stroke={C.amber} strokeWidth={4} />
-      <circle r={21} fill={C.cream} stroke={C.amber} strokeWidth={3.5} />
+      <circle className="passenger-halo" r={21} fill="none" stroke={ring} strokeWidth={4} />
+      <circle r={21} fill={C.cream} stroke={ring} strokeWidth={3.5} />
       <g className="passenger-bob" transform="translate(0 3) scale(1.35)">
         <path d="M-9 12 Q-9 -1 0 -1 Q9 -1 9 12 Z" fill={shirt} />
         <path d="M-3 -1 L0 4 L3 -1" fill={C.cream} />
@@ -345,6 +346,30 @@ export function PassengerArt({ picked, seed }: { picked: boolean; seed: number }
         <circle cx={-2.6} cy={-7} r={1.1} fill={C.ink} />
         <circle cx={2.6} cy={-7} r={1.1} fill={C.ink} />
       </g>
+    </g>
+  );
+}
+
+/**
+ * A delivery passenger's destination: a little house with a roof in their colour, on a
+ * sticker in the tile corner. It pulses until they are dropped off, then shows a check.
+ */
+export function HomeArt({ color, delivered }: { color: string; delivered: boolean }) {
+  return (
+    <g transform="translate(-26 -26)">
+      {!delivered && <circle className="passenger-halo" r={21} fill="none" stroke={color} strokeWidth={4} />}
+      <circle r={21} fill={C.cream} stroke={color} strokeWidth={3.5} />
+      <g transform="translate(0 2)">
+        <rect x={-10} y={-3} width={20} height={14} rx={2} fill={C.houseWall} stroke={C.inkSoft} strokeWidth={1.4} />
+        <path d="M-14 -2 L0 -14 L14 -2 Z" fill={color} stroke={C.inkSoft} strokeWidth={1.4} strokeLinejoin="round" />
+        <rect x={-3} y={3} width={6} height={8} rx={1} fill={C.inkSoft} />
+      </g>
+      {delivered && (
+        <g className="badge-in" transform="translate(14 14)">
+          <circle r={10} fill={C.teal} stroke={C.cream} strokeWidth={3} />
+          <path d="M-4.5 0.5 L-1.2 3.8 L4.8 -3.3" stroke={C.cream} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </g>
+      )}
     </g>
   );
 }

@@ -5,7 +5,7 @@ import { RAIL_KINDS, type RailKind, normalizeRot } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
-import { type SwitchStates, initialSwitches } from '../engine/step';
+import { type RiderProgress, type SwitchStates, initialRiders, initialSwitches } from '../engine/step';
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
@@ -24,6 +24,7 @@ const FAIL_TEXT: Record<FailReason, string> = {
   tunnel_wrong_side: '터널 입구가 아닌 쪽으로 들어갔어요.',
   start_reentry: '기차가 출발역으로 되돌아왔어요.',
   missed_waypoint: '아직 태우지 못한 승객이 있어요.',
+  undelivered: '목적지에 내려 주지 못한 손님이 있어요.',
   loop: '기차가 같은 길을 끝없이 맴돌아요.',
 };
 
@@ -79,6 +80,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const [restPose, setRestPose] = useState(() => startPose(stage));
   const [flash, setFlash] = useState<Flash | null>(null);
   const [picked, setPicked] = useState<ReadonlySet<string>>(() => new Set());
+  const [riders, setRiders] = useState<RiderProgress>(() => initialRiders(stage));
   const [toast, setToast] = useState<{ text: string; n: number } | null>(null);
   const [bump, setBump] = useState<{ tool: Tool; n: number } | null>(null);
   const [muted, setMutedState] = useState(isMuted);
@@ -137,6 +139,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     setMode('edit');
     setResult(null);
     setPicked(new Set());
+    setRiders(initialRiders(stage));
     setSwitchStates(initialSwitches(stage));
     setRestPose(startPose(stage));
   }, [stage]);
@@ -241,11 +244,15 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     const path = traceToPath(trace.steps);
     // The train stops in the middle of each passenger's tile (first visit only) to let them board.
     const waiting = new Set(stage.waypoints.map((p) => cellKey(p.x, p.y)));
-    const pickups = trace.steps.flatMap((step, i) => {
+    type Stop = { at: number; key?: string; rider?: { id: string; event: 'board' | 'drop' } };
+    const pickups: Stop[] = trace.steps.flatMap((step, i) => {
       const key = step.kind === 'rail' ? cellKey(step.x, step.y) : '';
       if (!waiting.delete(key)) return [];
       return [{ key, at: path.stepMid[i] }];
     });
+    // Delivery passengers board and get off the same way: the train waits on their tile.
+    for (const e of trace.riderEvents) pickups.push({ at: path.stepMid[e.index], rider: { id: e.id, event: e.event } });
+    pickups.sort((a, b) => a.at - b.at);
     // Switches flip once the train has cleared them.
     const flips = trace.steps.flatMap((step, i) =>
       step.kind === 'rail' && step.toggle ? [{ ...step.toggle, at: path.stepMid[i] + 0.45 }] : [],
@@ -254,6 +261,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     let puffs = 0;
     setResult(null);
     setPicked(new Set());
+    setRiders(initialRiders(stage));
     setSwitchStates(initialSwitches(stage));
     setRestPose(startPose(stage));
     setMode('running');
@@ -264,10 +272,11 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
       stops: pickups.map((p) => p.at),
       dwell: BOARDING_DWELL,
       onStop: (i) => {
-        const { key } = pickups[i];
+        const { key, rider } = pickups[i];
         play('thanks');
         celebrationTimers.current.push(window.setTimeout(() => play('pickup'), 480));
-        setPicked((prev) => new Set(prev).add(key));
+        if (rider) setRiders((prev) => ({ ...prev, [rider.id]: rider.event === 'board' ? 1 : 2 }));
+        else if (key) setPicked((prev) => new Set(prev).add(key));
       },
       onPose: (pose) => {
         trainRef.current?.setAttribute('transform', poseTransform(pose, CELL));
@@ -392,6 +401,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           arrived={success}
           flash={flash}
           picked={picked}
+          riders={riders}
           hint={mode === 'edit' ? hint : null}
           switchStates={switchStates}
           restPose={restPose}
@@ -428,10 +438,17 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                   · 손님 {picked.size}/{stage.waypoints.length}
                 </span>
               )}
+              {stage.riders.length > 0 && (
+                <span className="riders">
+                  {' '}
+                  · 배달 {Object.values(riders).filter((s) => s === 2).length}/{stage.riders.length}
+                </span>
+              )}
             </span>
           ) : (
             <span>
               {stage.waypoints.length > 0 && <span className="riders">손님 {stage.waypoints.length}명 · </span>}
+              {stage.riders.length > 0 && <span className="riders">배달 {stage.riders.length}명 · </span>}
               레일 <b>{usedCount(editor.placed)}</b>개 ·{' '}
               <span className="par">
                 ★★★ {stage.par} · ★★ {stage.par + TWO_STAR_SLACK}개 이하

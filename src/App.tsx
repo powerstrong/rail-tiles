@@ -3,7 +3,7 @@ import { loadDaily } from './daily/loadDaily';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stage } from './engine/stage';
 import type { Stars } from './engine/stars';
-import { STAGES } from './stages/stages';
+import { CHAPTERS, STAGES } from './stages/stages';
 import { loadProgress, recordClear, saveProgress } from './storage';
 import { GameScreen } from './ui/GameScreen';
 import { StageSelect } from './ui/StageSelect';
@@ -11,8 +11,8 @@ import { TitleScreen } from './ui/TitleScreen';
 
 type Screen = { name: 'title' } | { name: 'select' } | { name: 'game'; index: number } | { name: 'daily' };
 
-/** The daily puzzle opens once players have met passengers (stage 6). */
-export const DAILY_UNLOCK_AFTER = 6;
+/** The daily puzzle opens once players have met passengers. */
+const DAILY_UNLOCK_ID = 'first-passenger';
 
 export function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
@@ -44,7 +44,7 @@ export function App() {
     };
   }, [wantDaily, today, daily]);
   const dailyStage = daily.date === today ? daily.stage : null;
-  const dailyUnlocked = cleared.has(STAGES[DAILY_UNLOCK_AFTER - 1].id);
+  const dailyUnlocked = cleared.has(DAILY_UNLOCK_ID);
   const streak = dailyStreak(Object.keys(progress.stars), today);
 
   if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'select' })} />;
@@ -53,6 +53,7 @@ export function App() {
     return (
       <StageSelect
         stages={STAGES}
+        chapters={CHAPTERS}
         stars={progress.stars}
         cleared={cleared}
         allCleared={allCleared}
@@ -62,7 +63,7 @@ export function App() {
           title: dailyStage?.title ?? null,
           stars: dailyStage ? (progress.stars[dailyStage.id] ?? 0) : 0,
           unlocked: dailyUnlocked,
-          unlockAfter: DAILY_UNLOCK_AFTER,
+          unlockAfter: STAGES.find((s) => s.id === DAILY_UNLOCK_ID)?.label ?? '',
           failed: daily.failed,
           streak,
           onPlay: () => setScreen({ name: 'daily' }),

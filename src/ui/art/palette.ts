@@ -85,6 +85,13 @@ export const C = {
   amberDark: '#BC702F',
   gold: '#F6C443',
 
+  riderA: '#EC6A8E',
+  riderB: '#3F8BD9',
+  riderC: '#E3AE1F',
+
   danger: '#E24C4B',
   shadow: 'rgba(70, 45, 20, 0.16)',
 } as const;
+
+/** Each delivery passenger's colour: their shirt, their pickup pad and their destination house. */
+export const RIDER_COLORS: Record<string, string> = { A: C.riderA, B: C.riderB, C: C.riderC };

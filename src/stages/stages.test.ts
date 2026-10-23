@@ -32,8 +32,28 @@ const EXPECTED: Record<string, [optimal: number, total: number]> = {
   'figure-eight': [2, 5],
   'crossing-return': [1, 39],
   'grand-tour': [1, 6],
+  'tunnel-passenger': [1, 4],
+  'under-the-water': [1, 3],
+  'two-ridges': [2, 8],
+  'four-rooms': [2, 4],
+  'there-and-back': [1, 4],
+  'river-and-ridge': [1, 7],
+  'loop-back': [1, 8],
+  'loop-and-cross': [1, 12],
+  'switch-down': [1, 7],
+  'both-sides': [1, 8],
+  'first-delivery': [1, 1],
+  'pickup-first': [1, 9],
+  'tunnel-delivery': [1, 7],
+  'switch-delivery': [1, 11],
+  'crossing-delivery': [1, 9],
+  'two-bridges': [1, 7],
+  'two-homes': [1, 13],
+  'zigzag-homes': [2, 16],
+  'deliver-and-ride': [1, 10],
+  'last-delivery': [1, 9],
 };
-const TUTORIALS = new Set(['first-line', 'tunnel-intro']);
+const TUTORIALS = new Set(['first-line', 'tunnel-intro', 'first-delivery']);
 
 describe('stages', () => {
   it('have unique ids', () => {

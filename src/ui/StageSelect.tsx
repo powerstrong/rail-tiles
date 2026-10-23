@@ -1,8 +1,11 @@
+import type { CSSProperties } from 'react';
 import type { Stage } from '../engine/stage';
+import type { Chapter } from '../stages/stages';
 import type { Stars } from '../engine/stars';
 
 interface Props {
   stages: Stage[];
+  chapters: Chapter[];
   stars: Readonly<Record<string, Stars>>;
   cleared: ReadonlySet<string>;
   allCleared: boolean;
@@ -16,7 +19,8 @@ interface DailyCardProps {
   title: string | null;
   stars: number;
   unlocked: boolean;
-  unlockAfter: number;
+  /** Label of the stage that opens it, e.g. "STAGE 1-6". */
+  unlockAfter: string;
   failed: boolean;
   /** Consecutive days cleared. */
   streak: number;
@@ -26,7 +30,7 @@ interface DailyCardProps {
 function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay }: DailyCardProps) {
   const ready = unlocked && title !== null;
   const sub = !unlocked
-    ? `${unlockAfter}스테이지를 깨면 열려요`
+    ? `${unlockAfter.replace('STAGE ', '')} 스테이지를 깨면 열려요`
     : failed
       ? '오늘의 퍼즐을 만들지 못했어요'
       : title === null
@@ -53,8 +57,12 @@ function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay
   );
 }
 
+/**
+ * A stage opens once the one before it is cleared. Stages already cleared stay open,
+ * so stages added in the middle of a chapter later never lock a player's old progress.
+ */
 export function isUnlocked(stages: Stage[], cleared: ReadonlySet<string>, index: number): boolean {
-  return index === 0 || cleared.has(stages[index - 1]?.id);
+  return index === 0 || cleared.has(stages[index]?.id) || cleared.has(stages[index - 1]?.id);
 }
 
 /** Three small stars, filled up to `count`. */
@@ -70,7 +78,7 @@ export function StarRow({ count, className }: { count: number; className?: strin
   );
 }
 
-export function StageSelect({ stages, stars, cleared, allCleared, onPick, onBack, daily }: Props) {
+export function StageSelect({ stages, chapters, stars, cleared, allCleared, onPick, onBack, daily }: Props) {
   const totalStars = stages.reduce((sum, s) => sum + (stars[s.id] ?? 0), 0);
   return (
     <main className="select">
@@ -91,34 +99,52 @@ export function StageSelect({ stages, stars, cleared, allCleared, onPick, onBack
         </p>
       )}
       <DailyCard {...daily} />
-      <ol className="stage-grid">
-        {stages.map((stage, i) => {
-          const unlocked = isUnlocked(stages, cleared, i);
-          const done = cleared.has(stage.id);
-          return (
-            <li key={stage.id}>
-              <button
-                className={`stage-card ${done ? 'done' : ''} ${unlocked ? '' : 'locked'}`}
-                disabled={!unlocked}
-                onClick={() => onPick(i)}
-                aria-label={`스테이지 ${i + 1} ${stage.title}${done ? `, 별 ${stars[stage.id]}개` : unlocked ? '' : ', 잠김'}`}
-              >
-                <span className="stage-num">{i + 1}</span>
-                <span className="stage-name">{stage.title}</span>
-                {unlocked && <StarRow count={stars[stage.id] ?? 0} className="card-stars" />}
-                {!unlocked && (
-                  <span className="lock" aria-hidden>
-                    <svg viewBox="0 0 24 24">
-                      <rect x="5" y="11" width="14" height="10" rx="2.5" />
-                      <path d="M8 11 V8 A4 4 0 0 1 16 8 V11" />
-                    </svg>
-                  </span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      {chapters.map((ch) => {
+        const list = stages.slice(ch.start, ch.start + ch.count);
+        const got = list.reduce((sum, st) => sum + (stars[st.id] ?? 0), 0);
+        const open = isUnlocked(stages, cleared, ch.start);
+        return (
+          <section key={ch.number} className={`chapter ${open ? '' : 'locked'}`} style={{ '--chapter': ch.color } as CSSProperties}>
+            <header className="chapter-head">
+              <span className="chapter-num">챕터 {ch.number}</span>
+              <h2>{ch.title}</h2>
+              <span className="chapter-stars" aria-label={`별 ${got}개 / ${ch.count * 3}개`}>
+                ★ {got} / {ch.count * 3}
+              </span>
+              <p className="chapter-blurb">{open ? ch.blurb : `챕터 ${ch.number - 1}을 깨면 열려요`}</p>
+            </header>
+            <ol className="stage-grid">
+              {list.map((stage, k) => {
+                const i = ch.start + k;
+                const unlocked = isUnlocked(stages, cleared, i);
+                const done = cleared.has(stage.id);
+                return (
+                  <li key={stage.id}>
+                    <button
+                      className={`stage-card ${done ? 'done' : ''} ${unlocked ? '' : 'locked'}`}
+                      disabled={!unlocked}
+                      onClick={() => onPick(i)}
+                      aria-label={`챕터 ${ch.number} 스테이지 ${k + 1} ${stage.title}${done ? `, 별 ${stars[stage.id]}개` : unlocked ? '' : ', 잠김'}`}
+                    >
+                      <span className="stage-num">{k + 1}</span>
+                      <span className="stage-name">{stage.title}</span>
+                      {unlocked && <StarRow count={stars[stage.id] ?? 0} className="card-stars" />}
+                      {!unlocked && (
+                        <span className="lock" aria-hidden>
+                          <svg viewBox="0 0 24 24">
+                            <rect x="5" y="11" width="14" height="10" rx="2.5" />
+                            <path d="M8 11 V8 A4 4 0 0 1 16 8 V11" />
+                          </svg>
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        );
+      })}
     </main>
   );
 }

@@ -4,7 +4,7 @@ import { RAIL_GLYPHS, type Rail, type RailKind } from './rail';
 export type Decoration = 'tree' | 'rock' | 'mountain' | 'water' | 'house';
 
 export type Cell =
-  | { type: 'empty'; waypoint: boolean }
+  | { type: 'empty'; waypoint: boolean; rider?: RiderMark }
   | { type: 'obstacle'; deco: Decoration }
   /** `bridge` is purely visual: a fixed straight drawn as a bridge over water. */
   | { type: 'fixed'; rail: Rail; bridge: boolean }
@@ -18,6 +18,19 @@ export type Cell =
    * entering from either branch always leaves through the trunk.
    */
   | { type: 'switch'; trunk: Dir; turn: Dir; initial: SwitchState; label: string };
+
+/** A delivery passenger's pickup or drop-off tile (still an empty cell the player lays track on). */
+export interface RiderMark {
+  id: string;
+  role: 'pickup' | 'drop';
+}
+
+/** A passenger who boards at `pickup` and must be carried to `drop` (in that order). */
+export interface Rider {
+  id: string;
+  pickup: Pos;
+  drop: Pos;
+}
 
 /** 0: trunk ↔ straight branch, 1: trunk ↔ turn branch. */
 export type SwitchState = 0 | 1;
@@ -58,6 +71,8 @@ export interface Stage {
   goal: Station;
   inventory: Inventory;
   waypoints: Pos[];
+  /** Delivery passengers (chapter 4), in id order. */
+  riders: Rider[];
   /** Cell keys of every switch, in reading order (fixes the order of switch state signatures). */
   switches: string[];
   /** A shortest solution (tests check it uses exactly `par` rails). Drives hints and the stage-1 ghost. */
@@ -72,6 +87,8 @@ export interface Stage {
 /**
  * Authoring format. `map` rows are space-separated glyphs:
  *   .  empty     P  passenger stop (empty, must be visited)
+ *   A B C        delivery passenger pickups; X Y Z  their drop-offs (A→X, B→Y, C→Z):
+ *                the train must pass the pickup first, then the drop-off
  *   S  start     G  goal
  *   T  tree      R  rock      M  mountain   W  water   H  house
  *   │ ─ └ ┌ ┐ ┘  fixed rail       ║ ═  fixed bridge over water
@@ -114,6 +131,9 @@ const DECORATIONS: Record<string, Decoration> = {
   H: 'house',
 };
 
+const PICKUPS = ['A', 'B', 'C'];
+const DROPS = ['X', 'Y', 'Z'];
+
 function splitRow(row: string): string[] {
   return row.trim().split(/\s+/);
 }
@@ -134,6 +154,7 @@ export function parseStage(def: StageDef, number: number): Stage {
 
   const cells: Cell[] = [];
   const waypoints: Pos[] = [];
+  const riderAt: Record<string, { pickup?: Pos; drop?: Pos }> = {};
   const mouths: Record<string, { index: number; pos: Pos }[]> = {};
   const switches: string[] = [];
   let start: Pos | null = null;
@@ -146,6 +167,14 @@ export function parseStage(def: StageDef, number: number): Stage {
       else if (glyph === 'P') {
         cells.push({ type: 'empty', waypoint: true });
         waypoints.push({ x, y });
+      } else if (PICKUPS.includes(glyph) || DROPS.includes(glyph)) {
+        const pickup = PICKUPS.includes(glyph);
+        const id = pickup ? glyph : PICKUPS[DROPS.indexOf(glyph)];
+        const r = (riderAt[id] ??= {});
+        if (pickup ? r.pickup : r.drop) fail(`rider ${id} has more than one ${pickup ? 'pickup' : 'drop-off'}`);
+        if (pickup) r.pickup = { x, y };
+        else r.drop = { x, y };
+        cells.push({ type: 'empty', waypoint: false, rider: { id, role: pickup ? 'pickup' : 'drop' } });
       } else if (glyph === 'S') {
         if (start) fail('more than one start');
         start = { x, y };
@@ -189,6 +218,14 @@ export function parseStage(def: StageDef, number: number): Stage {
   for (const label of Object.keys(def.tunnels ?? {})) {
     if (!mouths[label]) fail(`tunnels.${label} has no mouths on the map`);
   }
+
+  const riders: Rider[] = Object.keys(riderAt)
+    .sort()
+    .map((id) => {
+      const r = riderAt[id];
+      if (!r.pickup || !r.drop) fail(`rider ${id} needs both a pickup (${id}) and a drop-off (${DROPS[PICKUPS.indexOf(id)]})`);
+      return { id, pickup: r.pickup!, drop: r.drop! };
+    });
 
   if (!start) return fail('missing start (S)');
   if (!goal) return fail('missing goal (G)');
@@ -234,6 +271,7 @@ export function parseStage(def: StageDef, number: number): Stage {
     goal: goalStation,
     inventory,
     waypoints,
+    riders,
     switches,
     solution,
     par: solution.length,

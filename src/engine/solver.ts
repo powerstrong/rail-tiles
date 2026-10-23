@@ -1,12 +1,12 @@
 import { type Dir, DX, DY, opposite, rotateCW } from './dir';
 import { type Rail, type RailKind, railPorts, rotationCount } from './rail';
 import { type Placement, type Stage, cellAt, cellKey } from './stage';
-import { type SwitchStates, enter, initialSwitches, motionKey } from './step';
+import { type SwitchStates, enter, initialRiders, initialSwitches, motionKey, riderPass } from './step';
 
 export interface SolveResult {
   /** Number of distinct winning routes (capped at `limit`). */
   count: number;
-  /** True when the route count hit `limit`, i.e. `count` is a lower bound. */
+  /** True when the search stopped early: the route count hit `limit` (`count` is a lower bound) or the `maxNodes` budget ran out (then `minRails` may not be exact either). */
   truncated: boolean;
   /** Fewest player rails any winning route needs, or null when unsolvable. Exact even when truncated. */
   minRails: number | null;
@@ -34,8 +34,9 @@ function pieceFor(inEdge: Dir, outEdge: Dir): Rail {
  * and switches make such revisits possible; a repeated (cell, heading, switches) state
  * means an endless loop and ends that branch.
  */
-export function solve(stage: Stage, limit = 1000, collectRoutes = false): SolveResult {
-  const all = search(stage, limit, Infinity, collectRoutes);
+export function solve(stage: Stage, limit = 1000, collectRoutes = false, maxNodes = Infinity): SolveResult {
+  const all = search(stage, limit, Infinity, collectRoutes, maxNodes);
+  if (all.aborted) return { ...all, truncated: true };
   const truncated = all.count >= limit;
   if (!truncated || all.minRails === null) return { ...all, truncated };
   // The capped enumeration may have stopped before reaching the shortest route:
@@ -46,7 +47,7 @@ export function solve(stage: Stage, limit = 1000, collectRoutes = false): SolveR
   return { ...all, truncated };
 }
 
-function search(stage: Stage, limit: number, maxRails: number, collect: boolean): Omit<SolveResult, 'truncated'> {
+function search(stage: Stage, limit: number, maxRails: number, collect: boolean, maxNodes = Infinity): Omit<SolveResult, 'truncated'> & { aborted?: boolean } {
   const left = { ...stage.inventory };
   const built = new Map<string, Rail>();
   const path: Placement[] = [];
@@ -54,12 +55,15 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean)
   const crossAxes = new Map<string, number>();
   const switches: SwitchStates = initialSwitches(stage);
   const seen = new Set<string>();
+  const riders = initialRiders(stage);
   const stopVisits = new Map<string, number>(stage.waypoints.map((p) => [cellKey(p.x, p.y), 0]));
-  const result: Omit<SolveResult, 'truncated'> = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
+  let nodes = 0;
+  const result: Omit<SolveResult, 'truncated'> & { aborted?: boolean } = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
   const lookup = (x: number, y: number) => built.get(cellKey(x, y)) ?? null;
 
   const record = () => {
     if ([...stopVisits.values()].some((n) => n === 0)) return;
+    if (stage.riders.some((r) => riders[r.id] !== 2)) return;
     // A crossing driven on only one axis acts as a straight. If enough straights are left
     // to swap them in, the same route with straights is counted on its own: skip this copy.
     const singleAxis = [...crossAxes.values()].filter((mask) => mask !== 3).length;
@@ -83,7 +87,9 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean)
       if (stop !== undefined) stopVisits.set(key, stop + 1);
       const cross = crossAxes.get(key);
       if (cross !== undefined) crossAxes.set(key, cross | (heading % 2 === 0 ? 1 : 2));
+      const ride = riderPass(stage, riders, x, y);
       visit(x, y, heading);
+      if (ride) riders[ride.id] = ride.event === 'board' ? 0 : 1;
       if (cross !== undefined) crossAxes.set(key, cross);
       if (stop !== undefined) stopVisits.set(key, stop);
       seen.delete(motion);
@@ -92,7 +98,11 @@ function search(stage: Stage, limit: number, maxRails: number, collect: boolean)
   };
 
   const visit = (x: number, y: number, heading: Dir): void => {
-    if (result.count >= limit) return;
+    if (result.count >= limit || result.aborted) return;
+    if (++nodes > maxNodes) {
+      result.aborted = true;
+      return;
+    }
     const entry = enter(stage, lookup, switches, x, y, heading);
     if (entry.kind === 'fail') return;
     if (entry.kind === 'goal') return record();

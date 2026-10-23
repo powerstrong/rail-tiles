@@ -14,6 +14,7 @@ export type FailReason =
   | 'tunnel_wrong_side'
   | 'start_reentry'
   | 'missed_waypoint'
+  | 'undelivered'
   | 'loop';
 
 /**
@@ -101,6 +102,34 @@ export function enter(
       return { kind: 'move', x: nx, y: ny, heading: out, step: { kind: 'rail', x: nx, y: ny, inEdge, outEdge: out } };
     }
   }
+}
+
+/** Per delivery passenger: 0 waiting at the pickup, 1 aboard, 2 delivered. */
+export type RiderProgress = Record<string, 0 | 1 | 2>;
+
+export function initialRiders(stage: Stage): RiderProgress {
+  return Object.fromEntries(stage.riders.map((r) => [r.id, 0]));
+}
+
+/**
+ * The train has just driven through (x, y): a waiting passenger there boards, or the
+ * passenger aboard whose stop this is gets off. Returns what happened (and mutates
+ * `progress`), or null. Shared by simulate and the solver.
+ */
+export function riderPass(stage: Stage, progress: RiderProgress, x: number, y: number): { id: string; event: 'board' | 'drop' } | null {
+  const cell = cellAt(stage, x, y);
+  const mark = cell?.type === 'empty' ? cell.rider : undefined;
+  if (!mark) return null;
+  const state = progress[mark.id];
+  if (mark.role === 'pickup' && state === 0) {
+    progress[mark.id] = 1;
+    return { id: mark.id, event: 'board' };
+  }
+  if (mark.role === 'drop' && state === 1) {
+    progress[mark.id] = 2;
+    return { id: mark.id, event: 'drop' };
+  }
+  return null;
 }
 
 /** Initial branch of every switch on the stage. */

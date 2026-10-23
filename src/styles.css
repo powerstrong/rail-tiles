@@ -334,6 +334,57 @@ p {
   color: var(--amber-deep);
 }
 
+.chapter {
+  --chapter: var(--teal);
+  margin-bottom: 26px;
+}
+
+.chapter-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: 10px;
+  margin: 0 2px 12px;
+  padding-left: 12px;
+  border-left: 5px solid var(--chapter);
+}
+
+.chapter-num {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--chapter);
+}
+
+.chapter-head h2 {
+  font-size: 19px;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chapter-stars {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.chapter-blurb {
+  grid-column: 1 / -1;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.chapter.locked .chapter-head {
+  border-left-color: #d8c8ad;
+}
+
+.chapter.locked .chapter-num {
+  color: #a99d8c;
+}
+
 .stage-grid {
   list-style: none;
   margin: 0;
@@ -1347,4 +1398,8 @@ p {
   .arrival-ceremony * {
     animation-delay: 0s !important;
   }
+}
+
+.chapter .stage-card.done .stage-num {
+  background: var(--chapter);
 }

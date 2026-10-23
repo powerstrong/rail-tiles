@@ -391,6 +391,44 @@ describe('editor', () => {
   });
 });
 
+describe('delivery passengers', () => {
+  // A boards at (1,0) and wants to go to X at (3,0); the train runs along the top row.
+  const top = stage(['S A . X . G', '. . . . . .', '. . . . . .', '. . . . . .', '. . . . . .'].map((r) => r), 'E', 'W');
+  const line = rails(['. ─ ─ ─ ─ .', '. . . . . .', '. . . . . .', '. . . . . .', '. . . . . .']);
+
+  it('parses pickups and drop-offs into riders', () => {
+    expect(top.riders).toEqual([{ id: 'A', pickup: { x: 1, y: 0 }, drop: { x: 3, y: 0 } }]);
+    expect(() => stage(['S A . . . G', '. . . . . .', '. . . . . .', '. . . . . .', '. . . . . .'], 'E', 'W')).toThrow(/drop-off/);
+  });
+
+  it('boards at the pickup and gets off at the drop-off, in that order', () => {
+    const t = simulate(top, line);
+    expect(t.success).toBe(true);
+    expect(t.riderEvents.map((e) => [e.id, e.event])).toEqual([['A', 'board'], ['A', 'drop']]);
+  });
+
+  it('fails at the goal when a passenger was never dropped off (drop-off passed first does not count)', () => {
+    const rev = stage(['S X . A . G', '. . . . . .', '. . . . . .', '. . . . . .', '. . . . . .'], 'E', 'W');
+    const t = simulate(rev, line);
+    expect(t.success).toBe(false);
+    expect(t.failure?.reason).toBe('undelivered');
+    expect(t.failure?.undelivered).toEqual(['A']);
+    expect(solve(rev, 100).count).toBe(0);
+  });
+
+  it('the solver only counts routes that deliver everyone', () => {
+    // Drop-off below the pickup's row: the route has to dip down after boarding.
+    const s = stage(['S A . . . G', '. . . . . .', '. . X . . .', '. . . . . .', '. . . . . .'], 'E', 'W');
+    const res = solve(s, 500, true);
+    expect(res.count).toBeGreaterThan(0);
+    for (const r of res.routes!) {
+      const placed = Object.fromEntries(r.map((p) => [cellKey(p.x, p.y), p.rail]));
+      expect(simulate(s, placed).success).toBe(true);
+      expect(r.some((p) => p.x === 2 && p.y === 2)).toBe(true);
+    }
+  });
+});
+
 describe('drag painting', () => {
   const open = stage(['. . . . .', '. . . . .', 'S . . . G', '. . . . .', '. . . . .'], 'E', 'W', { straight: 3, curve: 4 });
   const row = (y: number, xs: number[]) => xs.map((x) => ({ x, y }));

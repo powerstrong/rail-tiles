@@ -4,11 +4,11 @@ import { type CellPos, type Placements, autoOrient, placeBlock, remaining } from
 import type { Pose } from '../engine/geometry';
 import type { Failure } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
-import type { SwitchStates } from '../engine/step';
-import { C } from './art/palette';
-import { BridgeArt, DecorationArt, GroundDetail, TunnelArt, TunnelBadge, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
+import type { RiderProgress, SwitchStates } from '../engine/step';
+import { C, RIDER_COLORS } from './art/palette';
+import { BridgeArt, DecorationArt, GroundDetail, HomeArt, TunnelArt, TunnelBadge, PassengerArt, StationArt, StationLabel, StopPad, TileBase, cellHash } from './art/SceneryArt';
 import { CELL, RailPieceArt, SwitchArt } from './art/TrackArt';
-import { BoardingFx, Ceremony } from './art/Ceremony';
+import { AlightFx, BoardingFx, Ceremony } from './art/Ceremony';
 import { TrainArt } from './art/TrainArt';
 import { poseTransform } from './trainRunner';
 
@@ -33,6 +33,8 @@ interface BoardProps {
   flash: Flash | null;
   /** Passenger stops the train has already passed through on this run. */
   picked: ReadonlySet<string>;
+  /** Delivery passengers: waiting, aboard or home (changes while the train runs). */
+  riders: RiderProgress;
   /** Hint: one solution tile to show as a pulsing ghost. */
   hint: Placement | null;
   /** Current branch of every switch (changes while the train runs). */
@@ -84,7 +86,7 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
       tiles.push(
         <g key={cellKey(x, y)} transform={t}>
           <TileBase variant={variant} alt={(x + y) % 2 === 1} />
-          {cell.type === 'empty' && (cell.waypoint ? <StopPad /> : <GroundDetail seed={seed} />)}
+          {cell.type === 'empty' && (cell.waypoint ? <StopPad /> : cell.rider ? <StopPad color={RIDER_COLORS[cell.rider.id]} /> : <GroundDetail seed={seed} />)}
         </g>,
       );
       // Water joins neighbouring water and bridges, so rivers read as one body.
@@ -166,13 +168,18 @@ function PlacedRails({ placed, eraseHover, swapHover }: { placed: Placements; er
   );
 }
 
-function FailMarker({ failure }: { failure: Failure }) {
+function FailMarker({ failure, stage, riders }: { failure: Failure; stage: Stage; riders: RiderProgress }) {
+  // Undelivered passengers: ring the pickup if they never boarded, else their house.
+  const missedRiders = (failure.undelivered ?? []).flatMap((id) => {
+    const r = stage.riders.find((rr) => rr.id === id);
+    return r ? [(riders[id] ?? 0) === 0 ? r.pickup : r.drop] : [];
+  });
   const at = failure.edge === undefined ? failure.cell : failure.from;
   const ex = failure.edge === undefined ? 0 : DX[failure.edge] * 0.5;
   const ey = failure.edge === undefined ? 0 : DY[failure.edge] * 0.5;
   return (
     <g pointerEvents="none">
-      {failure.missedWaypoints?.map((p) => (
+      {[...(failure.missedWaypoints ?? []), ...missedRiders].map((p) => (
         <circle key={cellKey(p.x, p.y)} className="pulse-ring" cx={centre(p.x) - 30} cy={centre(p.y) - 30} r={22} fill="none" stroke={C.danger} strokeWidth={5} />
       ))}
       <g transform={`translate(${(at.x + 0.5 + ex) * CELL} ${(at.y + 0.5 + ey) * CELL})`}>
@@ -187,7 +194,7 @@ function FailMarker({ failure }: { failure: Failure }) {
 }
 
 export function Board(props: BoardProps) {
-  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, hint, switchStates, restPose, trainRef, smokeRef, onCellClick, onDrag } = props;
+  const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, riders, hint, switchStates, restPose, trainRef, smokeRef, onCellClick, onDrag } = props;
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const stroke = useRef<Stroke | null>(null);
@@ -320,6 +327,21 @@ export function Board(props: BoardProps) {
         );
       })}
 
+      {stage.riders.map((r) => {
+        const color = RIDER_COLORS[r.id];
+        const state = riders[r.id] ?? 0;
+        return (
+          <g key={r.id} pointerEvents="none">
+            <g transform={`translate(${centre(r.pickup.x)} ${centre(r.pickup.y)})`}>
+              <PassengerArt picked={state > 0} seed={cellHash(r.pickup.x, r.pickup.y, 11)} color={color} />
+            </g>
+            <g transform={`translate(${centre(r.drop.x)} ${centre(r.drop.y)})`}>
+              <HomeArt color={color} delivered={state === 2} />
+            </g>
+          </g>
+        );
+      })}
+
 
       <g ref={smokeRef} pointerEvents="none" />
       <g ref={trainRef} transform={poseTransform(restPose, CELL)} opacity={restPose.alpha} pointerEvents="none">
@@ -339,6 +361,25 @@ export function Board(props: BoardProps) {
         );
       })}
 
+      {stage.riders.map((r) => {
+        const state = riders[r.id] ?? 0;
+        const color = RIDER_COLORS[r.id];
+        return (
+          <g key={`fx-${r.id}`}>
+            {state >= 1 && (
+              <g transform={`translate(${centre(r.pickup.x)} ${centre(r.pickup.y)})`}>
+                <BoardingFx seed={cellHash(r.pickup.x, r.pickup.y, 11)} bubbleBelow={r.pickup.y === 0} color={color} />
+              </g>
+            )}
+            {state === 2 && (
+              <g transform={`translate(${centre(r.drop.x)} ${centre(r.drop.y)})`}>
+                <AlightFx seed={cellHash(r.drop.x, r.drop.y, 5)} color={color} bubbleBelow={r.drop.y === 0} />
+              </g>
+            )}
+          </g>
+        );
+      })}
+
       {/* Station signs sit above the train so they stay readable while it waits in the station. */}
       {(['start', 'goal'] as const).map((kind) => (
         <g key={kind} transform={`translate(${centre(stage[kind].x)} ${centre(stage[kind].y)})`}>
@@ -346,7 +387,7 @@ export function Board(props: BoardProps) {
         </g>
       ))}
 
-      {failure && <FailMarker failure={failure} />}
+      {failure && <FailMarker failure={failure} stage={stage} riders={riders} />}
 
       {arrived && (
         <Ceremony
