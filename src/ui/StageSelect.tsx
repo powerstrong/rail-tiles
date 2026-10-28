@@ -6,9 +6,12 @@ import type { Stars } from '../engine/stars';
 export interface StageCard {
   id: string;
   title: string;
-  /** Bonus stages (a robot rescue) are marked; a chapter's last stage is always its boss. */
+  /** Bonus stages (a robot rescue, a village escape) are marked; a chapter's last stage is always its boss. */
   battery?: number;
+  race?: boolean;
 }
+
+const isBonus = (s: StageCard | undefined) => !!s && (s.battery !== undefined || !!s.race);
 
 interface Props {
   stages: StageCard[];
@@ -78,7 +81,7 @@ function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay
 export function isUnlocked(stages: StageCard[], cleared: ReadonlySet<string>, index: number): boolean {
   if (index === 0 || cleared.has(stages[index]?.id) || cleared.has(stages[index - 1]?.id)) return true;
   // Bonus stages are optional: the stage after one opens once the stage before the bonus is cleared.
-  return stages[index - 1]?.battery !== undefined && index >= 2 && cleared.has(stages[index - 2].id);
+  return isBonus(stages[index - 1]) && index >= 2 && cleared.has(stages[index - 2].id);
 }
 
 /** Three small stars, filled up to `count`. */
@@ -134,7 +137,7 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
                 const i = ch.start + k;
                 const unlocked = isUnlocked(stages, cleared, i);
                 const done = cleared.has(stage.id);
-                const kind = stage.battery !== undefined ? 'bonus' : k === ch.count - 1 ? 'boss' : '';
+                const kind = isBonus(stage) ? 'bonus' : k === ch.count - 1 ? 'boss' : '';
                 return (
                   <li key={stage.id}>
                     <button

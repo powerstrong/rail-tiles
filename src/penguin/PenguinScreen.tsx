@@ -1,3 +1,4 @@
+import { type Intro, IntroCard } from '../ui/IntroCard';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import type { Dir } from '../engine/dir';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
@@ -14,6 +15,8 @@ interface Props {
   stage: PenguinStage;
   hasNext: boolean;
   bestStars: number;
+  /** "New thing" card for a stage that brings in a mechanic. */
+  intro?: Intro;
   onBack: () => void;
   onNext: () => void;
   onCleared: (id: string, stars: Stars) => void;
@@ -23,7 +26,8 @@ interface Props {
 
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
-export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCleared, clearNote }: Props) {
+export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const [state, setState] = useState<IceState>(() => initialState(stage));
   const [history, setHistory] = useState<IceState[]>([]);
   const [moves, setMoves] = useState(0);
@@ -383,6 +387,7 @@ export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCle
           </div>
         </div>
       )}
+      {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>
   );
 }

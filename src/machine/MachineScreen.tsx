@@ -1,3 +1,4 @@
+import { type Intro, IntroCard } from '../ui/IntroCard';
 import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { StarRow } from '../ui/StageSelect';
@@ -14,6 +15,8 @@ interface Props {
   stage: MachineStage;
   hasNext: boolean;
   bestStars: number;
+  /** "New thing" card for a stage that brings in a mechanic. */
+  intro?: Intro;
   onBack: () => void;
   onNext: () => void;
   onCleared: (id: string, stars: Stars) => void;
@@ -41,7 +44,8 @@ const Floor = memo(function Floor({ stage }: { stage: MachineStage }) {
   );
 });
 
-export function MachineScreen({ stage, hasNext, bestStars, onBack, onNext, onCleared }: Props) {
+export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared }: Props) {
+  const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const wins = useMemo(() => solveLaser(stage).wins, [stage]);
   const [config, setConfig] = useState(stage.start);
   const [spins, setSpins] = useState<number[]>(() => stage.devices.map(() => 0));
@@ -344,6 +348,7 @@ export function MachineScreen({ stage, hasNext, bestStars, onBack, onNext, onCle
           </div>
         </div>
       )}
+      {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>
   );
 }

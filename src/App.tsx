@@ -8,13 +8,18 @@ import { loadProgress, recordClear, saveProgress } from './storage';
 import { loadIceDaily } from './daily/loadIceDaily';
 import { ICE_DAILY_PREFIX } from './penguin/generate';
 import type { PenguinStage } from './penguin/model';
+import { MACHINE_INTROS } from './machine/intros';
 import { MachineScreen } from './machine/MachineScreen';
 import { MACHINE_CHAPTERS, MACHINE_STAGES } from './machine/stages';
+import { ICE_INTROS } from './penguin/intros';
 import { PenguinScreen } from './penguin/PenguinScreen';
 import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
 import { GameScreen } from './ui/GameScreen';
 import { StageSelect } from './ui/StageSelect';
 import { TitleScreen } from './ui/TitleScreen';
+import { VOLCANO_INTROS } from './volcano/intros';
+import { VolcanoScreen } from './volcano/VolcanoScreen';
+import { VOLCANO_CHAPTERS, VOLCANO_STAGES } from './volcano/stages';
 import { type WorldCard, WorldSelect } from './ui/WorldSelect';
 
 type Screen =
@@ -27,7 +32,9 @@ type Screen =
   | { name: 'ice-game'; index: number }
   | { name: 'ice-daily' }
   | { name: 'mc-select' }
-  | { name: 'mc-game'; index: number };
+  | { name: 'mc-game'; index: number }
+  | { name: 'vo-select' }
+  | { name: 'vo-game'; index: number };
 
 /** The penguin world opens once the train world's last boss is beaten. */
 const ICE_UNLOCK_ID = 'last-delivery';
@@ -35,6 +42,8 @@ const ICE_UNLOCK_ID = 'last-delivery';
 const ICE_DAILY_UNLOCK_ID = 'ice-snow-pile';
 /** The machine world opens once the penguin world's last boss is beaten. */
 const MACHINE_UNLOCK_ID = 'ice-conquer';
+/** The volcano world opens once the machine world's last boss is beaten. */
+const VOLCANO_UNLOCK_ID = 'mc-final-boss';
 
 /** The daily puzzle opens once players have met passengers. */
 const DAILY_UNLOCK_ID = 'first-passenger';
@@ -119,12 +128,24 @@ export function App() {
         state: !cleared.has(MACHINE_UNLOCK_ID) ? 'locked' : MACHINE_STAGES.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
         lockNote: '펭귄 얼음 나라 마지막 보스(3-10)를 깨면 열려요',
       },
-      { id: 'volcano', title: '화산 월드', blurb: '', color: '#F0692E', emblem: 'volcano', stars: 0, maxStars: 0, state: 'soon' },
+      {
+        id: 'volcano',
+        title: '화산 섬',
+        blurb: '돌을 놓아 용암으로부터 마을을 지켜요',
+        color: '#F0692E',
+        emblem: 'volcano',
+        stars: starsOf(VOLCANO_STAGES),
+        maxStars: VOLCANO_STAGES.length * 3,
+        state: !cleared.has(VOLCANO_UNLOCK_ID) ? 'locked' : VOLCANO_STAGES.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
+        lockNote: '로봇 공장 마지막 보스(3-10)를 깨면 열려요',
+      },
     ];
     return (
       <WorldSelect
         worlds={worlds}
-        onPick={(id) => setScreen(id === 'ice' ? { name: 'ice-select' } : id === 'machine' ? { name: 'mc-select' } : { name: 'select' })}
+        onPick={(id) =>
+          setScreen(id === 'ice' ? { name: 'ice-select' } : id === 'machine' ? { name: 'mc-select' } : id === 'volcano' ? { name: 'vo-select' } : { name: 'select' })
+        }
         onBack={() => setScreen({ name: 'title' })}
       />
     );
@@ -172,6 +193,39 @@ export function App() {
     );
   }
 
+  if (screen.name === 'vo-select') {
+    return (
+      <StageSelect
+        heading="화산 섬"
+        theme="world-volcano"
+        stages={VOLCANO_STAGES}
+        chapters={VOLCANO_CHAPTERS}
+        stars={progress.stars}
+        cleared={cleared}
+        allCleared={VOLCANO_STAGES.every((s) => cleared.has(s.id))}
+        onPick={(index) => setScreen({ name: 'vo-game', index })}
+        onBack={() => setScreen({ name: 'worlds' })}
+      />
+    );
+  }
+
+  if (screen.name === 'vo-game') {
+    const stage = VOLCANO_STAGES[screen.index];
+    const nextIndex = screen.index + 1;
+    return (
+      <VolcanoScreen
+        key={stage.id}
+        stage={stage}
+        hasNext={nextIndex < VOLCANO_STAGES.length}
+        bestStars={progress.stars[stage.id] ?? 0}
+        intro={VOLCANO_INTROS[stage.id]}
+        onBack={() => setScreen({ name: 'vo-select' })}
+        onNext={() => setScreen(nextIndex < VOLCANO_STAGES.length ? { name: 'vo-game', index: nextIndex } : { name: 'vo-select' })}
+        onCleared={onCleared}
+      />
+    );
+  }
+
   if (screen.name === 'mc-game') {
     const stage = MACHINE_STAGES[screen.index];
     const nextIndex = screen.index + 1;
@@ -181,6 +235,7 @@ export function App() {
         stage={stage}
         hasNext={nextIndex < MACHINE_STAGES.length}
         bestStars={progress.stars[stage.id] ?? 0}
+        intro={MACHINE_INTROS[stage.id]}
         onBack={() => setScreen({ name: 'mc-select' })}
         onNext={() => setScreen(nextIndex < MACHINE_STAGES.length ? { name: 'mc-game', index: nextIndex } : { name: 'mc-select' })}
         onCleared={onCleared}
@@ -213,6 +268,7 @@ export function App() {
         stage={stage}
         hasNext={nextIndex < ICE_STAGES.length}
         bestStars={progress.stars[stage.id] ?? 0}
+        intro={ICE_INTROS[stage.id]}
         onBack={() => setScreen({ name: 'ice-select' })}
         onNext={() => setScreen(nextIndex < ICE_STAGES.length ? { name: 'ice-game', index: nextIndex } : { name: 'ice-select' })}
         onCleared={onCleared}

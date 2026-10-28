@@ -53,3 +53,21 @@ for (const ch of MACHINE_CHAPTERS) {
     );
   }
 }
+
+// Volcano world (lava puzzles): see src/volcano/audit.ts.
+const { VOLCANO_CHAPTERS, VOLCANO_STAGES } = await import('../src/volcano/stages');
+const { auditLava } = await import('../src/volcano/audit');
+console.log('\n\n=== 화산 섬 ===');
+for (const ch of VOLCANO_CHAPTERS) {
+  const list = VOLCANO_STAGES.slice(ch.start, ch.start + ch.count).filter((s) => !ids.length || ids.includes(s.id));
+  if (!list.length) continue;
+  console.log(`\n챕터 ${ch.number} ${ch.title}`);
+  console.log('  판     이름              돌  흐르는칸  차가운오답  난이도');
+  for (const st of list) {
+    const a = auditLava(st)!;
+    const tag = st.boss ? ' [보스]' : st.race ? ' [보너스]' : '';
+    console.log(
+      `  ${st.label!.replace('STAGE ', '').padEnd(5)}  ${st.title.padEnd(12, '　')}  ${String(a.par).padStart(3)}  ${String(a.open).padStart(6)}  ${String(a.coldSets).padStart(8)}  ${a.score.toFixed(1).padStart(6)}${tag}`,
+    );
+  }
+}

@@ -153,20 +153,20 @@ const CH1: MachineStageDef[] = [
   {
     id: 'mc-boss-1',
     title: '거울 공장장',
-    tip: '거울 열한 개! 거울 반사의 마지막 시험이에요.',
-    lasers: [['W', 'white']],
+    tip: '거울 열두 개! 거울 반사의 마지막 시험이에요.',
+    lasers: [['S', 'white']],
     boss: true,
     map: [
-      'N . . . . m o', //
-      '. . M m n n .',
-      'm . . m n . .',
-      'n o . o o . L',
-      'm . n . . . .',
-      '. . . . . . .',
-      '# . . . n . #',
+      '. L o m . # .', //
+      '. . . . . m .',
+      '. o . . . M .',
+      '. o n n . . m',
+      '. o . . M . .',
+      'n . n . . . .',
+      'm n . . n . #',
     ],
-    par: 8,
-    solution: [3, 4, 5, 7, 8, 9, 10, 11],
+    par: 7,
+    solution: [0, 3, 4, 7, 8, 9, 10],
   },
 ];
 const CH2: MachineStageDef[] = [
@@ -327,16 +327,16 @@ const CH2: MachineStageDef[] = [
     lasers: [['E', 'white']],
     boss: true,
     map: [
-      '. # . # . . .', //
-      'm . D # o . n',
-      '. . o . . . m',
-      '. . t o o o m',
-      '# # x n . m D',
-      'L . n m n . .',
-      's . . . . m n',
+      '. # . m . # .', //
+      '. . . . . . .',
+      '. . # . n m .',
+      '. . . . x o .',
+      '. m n D s m D',
+      'n . o t n n .',
+      'L o o o n . .',
     ],
-    par: 9,
-    solution: [3, 4, 5, 6, 7, 8, 9, 11, 12],
+    par: 8,
+    solution: [1, 2, 4, 5, 6, 9, 10, 11],
   },
 ];
 const CH3: MachineStageDef[] = [
@@ -376,16 +376,16 @@ const CH3: MachineStageDef[] = [
     id: 'mc-purple',
     title: '보라 전구',
     tip: '보라 전구는 빨강과 파랑 빛을 둘 다 받아야 켜져요.',
-    lasers: [['S', 'blue'], ['S', 'red']],
+    lasers: [['E', 'blue'], ['E', 'red']],
     map: [
-      '. L . L .', //
-      '. . n . .',
+      'n . . n .', //
+      'L . . . m',
+      '. n . . p',
+      'L n . . .',
       '. . . . .',
-      'n n . n .',
-      'm p . . .',
     ],
-    par: 4,
-    solution: [1, 2, 3, 4],
+    par: 3,
+    solution: [2, 3, 4],
   },
   {
     id: 'mc-three-bulbs',
@@ -393,16 +393,15 @@ const CH3: MachineStageDef[] = [
     tip: '빨강, 파랑, 보라 전구를 모두 켜요.',
     lasers: [['W', 'blue'], ['N', 'red']],
     map: [
-      '. . . . . . .', //
-      'n m . . n . .',
-      'm . . m . . .',
-      '. m . . . r .',
-      '. . . . . . .',
-      '# u . p . . L',
-      '. # . L . . .',
+      'm . n m . .', //
+      'n . . . . .',
+      '. . . . . .',
+      'n . n p u L',
+      'r . . . . .',
+      'L . . . . .',
     ],
-    par: 5,
-    solution: [0, 1, 3, 4, 5],
+    par: 4,
+    solution: [1, 2, 4, 5],
   },
   {
     id: 'mc-bonus-3',
@@ -493,19 +492,19 @@ const CH3: MachineStageDef[] = [
     id: 'mc-final-boss',
     title: '로봇 공장 정복',
     tip: '빨강, 파랑, 노랑 레이저 세 개! 로봇 공장 마지막 보스예요.',
-    lasers: [['W', 'white'], ['N', 'red'], ['N', 'blue']],
+    lasers: [['S', 'blue'], ['E', 'red'], ['N', 'white']],
     boss: true,
     map: [
-      'm r n m n p .', //
-      '. . . D . . .',
-      'n n . . . t x',
-      'm . . t . u L',
-      '. m . n . . .',
-      '. . . # . o .',
-      '# . L . . L n',
+      '. L . . . # .', //
+      'L p o m . . r',
+      '. . . m m . .',
+      '. . n . n n .',
+      '. m u . . # .',
+      'x . s . D . n',
+      '. . L . m n .',
     ],
-    par: 9,
-    solution: [1, 2, 4, 5, 6, 7, 8, 9, 10],
+    par: 8,
+    solution: [0, 1, 2, 3, 4, 6, 7, 8],
   },
 ];
 

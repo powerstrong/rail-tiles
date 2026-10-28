@@ -1894,3 +1894,150 @@ body:has(.world-machine) {
   margin-left: 4px;
   vertical-align: 1px;
 }
+
+/* ---------- volcano world ---------- */
+
+.world-volcano {
+  --bg: #fbf1e8;
+  --card: #fffaf5;
+  --line: #ecd8c6;
+  --teal: #8a4a2e;
+  --ink-soft: #7a5d4e;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-volcano) {
+  background: #fbf1e8;
+}
+
+.world-volcano .board {
+  max-height: max(240px, calc(100dvh - 330px));
+}
+
+.volcano-board .tappable {
+  cursor: pointer;
+}
+
+.lava-in {
+  animation: lava-in 0.28s ease-out both;
+}
+
+@keyframes lava-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lava-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lava-bubble 1.6s ease-in-out infinite;
+}
+
+.lava-bubble.late {
+  animation-delay: 0.8s;
+}
+
+@keyframes lava-bubble {
+  0%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.crater-glow {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
+
+.crater-puff {
+  animation: crater-puff 0.9s ease-out infinite;
+}
+
+@keyframes crater-puff {
+  from {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+}
+
+.smoke {
+  animation: crater-puff 1.6s ease-out infinite;
+}
+
+.erupt-row {
+  display: flex;
+  justify-content: center;
+}
+
+.erupt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 6px 22px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #ff8a3d, #e0461f);
+  box-shadow: 0 4px 0 #a8321a;
+  cursor: pointer;
+  word-break: keep-all;
+}
+
+.erupt-btn svg {
+  width: 36px;
+  height: 36px;
+}
+
+.erupt-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.erupt-btn.cool {
+  font-size: 15px;
+  background: linear-gradient(135deg, #6aa8d8, #3f7fb8);
+  box-shadow: 0 4px 0 #2c5f8c;
+}
+
+.erupt-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #a8321a;
+}
+
+.lava-bar {
+  background: linear-gradient(135deg, #fff1e3, #ffd9b8);
+  box-shadow: 0 3px 0 #efb98f;
+}
+
+/* ---------- "new thing" cards ---------- */
+
+.intro-card .intro-art {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin: 6px auto 2px;
+}
+
+/* The "new thing" card shows right away (the clear card waits for the win animation). */
+.intro-overlay,
+.intro-overlay .result-card {
+  animation-delay: 0.05s;
+}
