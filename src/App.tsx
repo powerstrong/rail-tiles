@@ -5,6 +5,9 @@ import type { Stage } from './engine/stage';
 import type { Stars } from './engine/stars';
 import { CHAPTERS, STAGES } from './stages/stages';
 import { loadProgress, recordClear, saveProgress } from './storage';
+import { loadIceDaily } from './daily/loadIceDaily';
+import { ICE_DAILY_PREFIX } from './penguin/generate';
+import type { PenguinStage } from './penguin/model';
 import { PenguinScreen } from './penguin/PenguinScreen';
 import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
 import { GameScreen } from './ui/GameScreen';
@@ -19,10 +22,13 @@ type Screen =
   | { name: 'game'; index: number }
   | { name: 'daily' }
   | { name: 'ice-select' }
-  | { name: 'ice-game'; index: number };
+  | { name: 'ice-game'; index: number }
+  | { name: 'ice-daily' };
 
 /** The penguin world opens once the train world's last boss is beaten. */
 const ICE_UNLOCK_ID = 'last-delivery';
+/** The penguin daily puzzle opens after the snow-pile stage (1-3). */
+const ICE_DAILY_UNLOCK_ID = 'ice-snow-pile';
 
 /** The daily puzzle opens once players have met passengers. */
 const DAILY_UNLOCK_ID = 'first-passenger';
@@ -59,6 +65,23 @@ export function App() {
   const dailyStage = daily.date === today ? daily.stage : null;
   const dailyUnlocked = cleared.has(DAILY_UNLOCK_ID);
   const streak = dailyStreak(Object.keys(progress.stars), today);
+
+  // Today's penguin puzzle, built in the background once the penguin world is opened.
+  const [iceDaily, setIceDaily] = useState<{ date: string; stage: PenguinStage | null; failed: boolean }>({ date: today, stage: null, failed: false });
+  const wantIceDaily = screen.name.startsWith('ice');
+  useEffect(() => {
+    if (!wantIceDaily || (iceDaily.date === today && (iceDaily.stage || iceDaily.failed))) return;
+    let live = true;
+    loadIceDaily(today).then(
+      (stage) => live && setIceDaily({ date: today, stage, failed: false }),
+      () => live && setIceDaily({ date: today, stage: null, failed: true }),
+    );
+    return () => {
+      live = false;
+    };
+  }, [wantIceDaily, today, iceDaily]);
+  const iceDailyStage = iceDaily.date === today ? iceDaily.stage : null;
+  const iceStreak = dailyStreak(Object.keys(progress.stars), today, ICE_DAILY_PREFIX);
 
   if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'worlds' })} />;
 
@@ -97,6 +120,32 @@ export function App() {
         allCleared={iceAllCleared}
         onPick={(index) => setScreen({ name: 'ice-game', index })}
         onBack={() => setScreen({ name: 'worlds' })}
+        daily={{
+          title: iceDailyStage?.title ?? null,
+          stars: iceDailyStage ? (progress.stars[iceDailyStage.id] ?? 0) : 0,
+          unlocked: cleared.has(ICE_DAILY_UNLOCK_ID),
+          unlockAfter: ICE_STAGES.find((s) => s.id === ICE_DAILY_UNLOCK_ID)?.label ?? '',
+          failed: iceDaily.failed,
+          streak: iceStreak,
+          loadingText: '오늘의 얼음판을 얼리는 중…',
+          onPlay: () => setScreen({ name: 'ice-daily' }),
+        }}
+      />
+    );
+  }
+
+  if (screen.name === 'ice-daily') {
+    if (!iceDailyStage) return null;
+    return (
+      <PenguinScreen
+        key={iceDailyStage.id}
+        stage={iceDailyStage}
+        hasNext={false}
+        bestStars={progress.stars[iceDailyStage.id] ?? 0}
+        onBack={() => setScreen({ name: 'ice-select' })}
+        onNext={() => setScreen({ name: 'ice-select' })}
+        onCleared={onCleared}
+        clearNote={iceStreak > 0 ? `🔥 ${iceStreak}일 연속 클리어 · 내일 새 얼음판이 열려요` : undefined}
       />
     );
   }

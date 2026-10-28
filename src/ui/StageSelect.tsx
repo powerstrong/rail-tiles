@@ -34,16 +34,18 @@ interface DailyCardProps {
   /** Consecutive days cleared. */
   streak: number;
   onPlay: () => void;
+  /** Shown while the puzzle is being built. */
+  loadingText?: string;
 }
 
-function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay }: DailyCardProps) {
+function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay, loadingText = '오늘의 노선을 까는 중…' }: DailyCardProps) {
   const ready = unlocked && title !== null;
   const sub = !unlocked
     ? `${unlockAfter.replace('STAGE ', '')} 스테이지를 깨면 열려요`
     : failed
       ? '오늘의 퍼즐을 만들지 못했어요'
       : title === null
-        ? '오늘의 노선을 까는 중…'
+        ? loadingText
         : title;
   return (
     <button className={`daily-card ${ready ? '' : 'waiting'} ${stars > 0 ? 'done' : ''}`} disabled={!ready} onClick={onPlay}>

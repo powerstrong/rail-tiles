@@ -183,8 +183,8 @@ export function dailyStage(date: string): Stage {
 }
 
 /** Days in a row with a cleared daily puzzle, counting back from today (or yesterday if today is still open). */
-export function dailyStreak(clearedIds: Iterable<string>, today: string): number {
-  const done = new Set([...clearedIds].filter((id) => id.startsWith(DAILY_PREFIX)).map((id) => id.slice(DAILY_PREFIX.length)));
+export function dailyStreak(clearedIds: Iterable<string>, today: string, prefix = DAILY_PREFIX): number {
+  const done = new Set([...clearedIds].filter((id) => id.startsWith(prefix)).map((id) => id.slice(prefix.length)));
   const day = new Date(`${today}T12:00:00`);
   if (!done.has(today)) day.setDate(day.getDate() - 1);
   let streak = 0;

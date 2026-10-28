@@ -1578,7 +1578,7 @@ body:has(.world-ice) {
 .dpad {
   display: grid;
   grid-template-columns: repeat(3, 52px);
-  grid-template-rows: repeat(3, 44px);
+  grid-template-rows: repeat(2, 42px);
   gap: 4px;
 }
 
@@ -1619,7 +1619,12 @@ body:has(.world-ice) {
 }
 
 .dpad-2 {
-  grid-area: 3 / 2;
+  grid-area: 2 / 2;
+}
+
+/* The arrow pad is taller than the train tool dock: leave it room on short phones. */
+.world-ice .board {
+  max-height: max(230px, calc(100dvh - 330px));
 }
 
 .ice-board {
@@ -1677,5 +1682,44 @@ body:has(.world-ice) {
   }
   to {
     transform: translateY(-14px);
+  }
+}
+
+.swipe-finger {
+  animation: swipe-finger 1.6s ease-in-out infinite;
+}
+
+@keyframes swipe-finger {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-120px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-140px);
+    opacity: 0;
+  }
+}
+
+/* Three penguin buttons plus the arrow pad must fit a 360px phone. */
+@media (max-width: 420px) {
+  .ice-dock {
+    gap: 12px;
+  }
+
+  .penguin-chip {
+    width: 46px;
+    height: 54px;
+  }
+
+  .dpad {
+    grid-template-columns: repeat(3, 46px);
+    grid-template-rows: repeat(2, 40px);
   }
 }

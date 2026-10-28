@@ -46,6 +46,8 @@ interface Props {
   selected: number;
   won: boolean;
   hint: Push | null;
+  /** First-stage coaching: a finger swiping the penguin this way. */
+  guide?: Push | null;
   penguinRefs: RefObject<(SVGGElement | null)[]>;
   /** A tap on a cell, or a swipe that started on `from` heading `dir`. */
   onTap: (cell: number) => void;
@@ -53,7 +55,7 @@ interface Props {
   locked: boolean;
 }
 
-export function IceBoard({ stage, pos, fish, broken, selected, won, hint, penguinRefs, onTap, onSwipe, locked }: Props) {
+export function IceBoard({ stage, pos, fish, broken, selected, won, hint, guide, penguinRefs, onTap, onSwipe, locked }: Props) {
   const w = stage.width * ICE_CELL;
   const h = stage.height * ICE_CELL;
   const svgRef = useRef<SVGSVGElement>(null);
@@ -138,6 +140,19 @@ export function IceBoard({ stage, pos, fish, broken, selected, won, hint, pengui
       {hint && (
         <g transform={`translate(${cx(stage, pos[hint.penguin])} ${cy(stage, pos[hint.penguin])}) rotate(${hint.dir * 90})`} pointerEvents="none" className="ice-hint">
           <path d="M0 -92 L22 -62 H9 V-46 H-9 V-62 H-22 Z" fill="#F6C443" stroke="#fff" strokeWidth={4} strokeLinejoin="round" />
+        </g>
+      )}
+
+      {guide && (
+        <g transform={`translate(${cx(stage, pos[guide.penguin])} ${cy(stage, pos[guide.penguin])}) rotate(${guide.dir * 90})`} pointerEvents="none">
+          <g className="swipe-guide">
+            <path d="M0 -40 V-150" stroke="#fff" strokeWidth={10} strokeLinecap="round" strokeDasharray="2 20" opacity={0.9} />
+            <path d="M-16 -132 L0 -156 L16 -132" stroke="#fff" strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <g className="swipe-finger">
+              <circle r={20} fill="#F6C443" stroke="#fff" strokeWidth={5} opacity={0.95} />
+              <circle r={7} fill="#fff" />
+            </g>
+          </g>
         </g>
       )}
 

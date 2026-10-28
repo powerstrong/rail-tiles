@@ -17,11 +17,13 @@ interface Props {
   onBack: () => void;
   onNext: () => void;
   onCleared: (id: string, stars: Stars) => void;
+  /** Extra line on the clear card (e.g. the daily streak). */
+  clearNote?: string;
 }
 
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
-export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCleared }: Props) {
+export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCleared, clearNote }: Props) {
   const [state, setState] = useState<IceState>(() => initialState(stage));
   const [history, setHistory] = useState<IceState[]>([]);
   const [moves, setMoves] = useState(0);
@@ -255,6 +257,7 @@ export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCle
           selected={selected}
           won={won}
           hint={busy ? null : shownHint}
+          guide={stage.id === 'ice-first-slide' && moves === 0 && !busy && !won ? stage.solution[0] : null}
           penguinRefs={penguinRefs}
           onTap={onTap}
           onSwipe={onSwipe}
@@ -333,7 +336,7 @@ export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCle
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{hasNext ? '도착 성공!' : '얼음 나라 정복!'}</h2>
+            <h2>{hasNext || clearNote ? '도착 성공!' : '얼음 나라 정복!'}</h2>
             <p className="result-sub">
               밀기 {moves}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (
@@ -346,6 +349,12 @@ export function PenguinScreen({ stage, hasNext, bestStars, onBack, onNext, onCle
                 <>
                   <br />
                   힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
+                </>
+              )}
+              {clearNote && (
+                <>
+                  <br />
+                  <strong className="clear-note">{clearNote}</strong>
                 </>
               )}
               {bestStars > earned && (
