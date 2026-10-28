@@ -2,7 +2,7 @@
  * Tiny synthesized sound effects (Web Audio, no asset files). The AudioContext is
  * created lazily on the first sound, which always follows a user gesture.
  */
-export type Sfx = 'place' | 'rotate' | 'erase' | 'deny' | 'depart' | 'chuff' | 'pickup' | 'thanks' | 'arrive' | 'crash' | 'pop' | 'star1' | 'star2' | 'star3';
+export type Sfx = 'place' | 'rotate' | 'erase' | 'deny' | 'depart' | 'chuff' | 'pickup' | 'thanks' | 'slide' | 'bump' | 'splash' | 'igloo' | 'swish' | 'arrive' | 'crash' | 'pop' | 'star1' | 'star2' | 'star3';
 
 const MUTE_KEY = 'rail-tiles:muted';
 
@@ -104,6 +104,25 @@ export function play(sfx: Sfx): void {
     case 'pickup':
       tone(ac, 1046, t, 0.12, { type: 'sine', gain: 0.14 });
       tone(ac, 1568, t + 0.08, 0.2, { type: 'sine', gain: 0.12 });
+      break;
+    case 'slide':
+      // Skates on ice: a soft rising hiss.
+      noise(ac, t, 0.22, { freq: 2600, gain: 0.05 });
+      tone(ac, 420, t, 0.18, { type: 'sine', gain: 0.05, slideTo: 640 });
+      break;
+    case 'bump':
+      tone(ac, 160, t, 0.12, { type: 'sine', gain: 0.18, slideTo: 90 });
+      break;
+    case 'splash':
+      noise(ac, t, 0.5, { freq: 700, gain: 0.16 });
+      tone(ac, 520, t, 0.3, { type: 'sine', gain: 0.08, slideTo: 140 });
+      break;
+    case 'igloo':
+      tone(ac, 660, t, 0.08, { type: 'triangle', gain: 0.12, slideTo: 330 });
+      tone(ac, 330, t + 0.16, 0.12, { type: 'triangle', gain: 0.12, slideTo: 880 });
+      break;
+    case 'swish':
+      tone(ac, 700, t, 0.08, { type: 'sine', gain: 0.07, slideTo: 1000 });
       break;
     case 'thanks':
       // A chirpy little "thank you!": two quick rising blips.

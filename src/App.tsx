@@ -5,11 +5,24 @@ import type { Stage } from './engine/stage';
 import type { Stars } from './engine/stars';
 import { CHAPTERS, STAGES } from './stages/stages';
 import { loadProgress, recordClear, saveProgress } from './storage';
+import { PenguinScreen } from './penguin/PenguinScreen';
+import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
 import { GameScreen } from './ui/GameScreen';
 import { StageSelect } from './ui/StageSelect';
 import { TitleScreen } from './ui/TitleScreen';
+import { type WorldCard, WorldSelect } from './ui/WorldSelect';
 
-type Screen = { name: 'title' } | { name: 'select' } | { name: 'game'; index: number } | { name: 'daily' };
+type Screen =
+  | { name: 'title' }
+  | { name: 'worlds' }
+  | { name: 'select' }
+  | { name: 'game'; index: number }
+  | { name: 'daily' }
+  | { name: 'ice-select' }
+  | { name: 'ice-game'; index: number };
+
+/** The penguin world opens once the train world's last boss is beaten. */
+const ICE_UNLOCK_ID = 'last-delivery';
 
 /** The daily puzzle opens once players have met passengers. */
 const DAILY_UNLOCK_ID = 'first-passenger';
@@ -47,7 +60,62 @@ export function App() {
   const dailyUnlocked = cleared.has(DAILY_UNLOCK_ID);
   const streak = dailyStreak(Object.keys(progress.stars), today);
 
-  if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'select' })} />;
+  if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'worlds' })} />;
+
+  const starsOf = (ids: { id: string }[]) => ids.reduce((sum, s) => sum + (progress.stars[s.id] ?? 0), 0);
+  const iceAllCleared = ICE_STAGES.length > 0 && ICE_STAGES.every((s) => cleared.has(s.id));
+
+  if (screen.name === 'worlds') {
+    const worlds: WorldCard[] = [
+      { id: 'train', title: '기차 월드', blurb: '레일을 깔아 기차를 도착역까지', color: '#E5584F', emblem: 'train', stars: starsOf(STAGES), maxStars: STAGES.length * 3, state: allCleared ? 'conquered' : 'open' },
+      {
+        id: 'ice',
+        title: '펭귄 얼음 나라',
+        blurb: '쓱 밀어서 펭귄을 구멍까지 미끄러뜨려요',
+        color: '#3F8BD9',
+        emblem: 'penguin',
+        stars: starsOf(ICE_STAGES),
+        maxStars: ICE_STAGES.length * 3,
+        state: !cleared.has(ICE_UNLOCK_ID) ? 'locked' : iceAllCleared ? 'conquered' : 'open',
+        lockNote: '기차 월드 마지막 배달(4-10)을 깨면 열려요',
+      },
+      { id: 'machine', title: '기계 월드', blurb: '', color: '#7F8896', emblem: 'gear', stars: 0, maxStars: 0, state: 'soon' },
+      { id: 'volcano', title: '화산 월드', blurb: '', color: '#F0692E', emblem: 'volcano', stars: 0, maxStars: 0, state: 'soon' },
+    ];
+    return <WorldSelect worlds={worlds} onPick={(id) => setScreen(id === 'ice' ? { name: 'ice-select' } : { name: 'select' })} onBack={() => setScreen({ name: 'title' })} />;
+  }
+
+  if (screen.name === 'ice-select') {
+    return (
+      <StageSelect
+        heading="펭귄 얼음 나라"
+        theme="world-ice"
+        stages={ICE_STAGES}
+        chapters={ICE_CHAPTERS}
+        stars={progress.stars}
+        cleared={cleared}
+        allCleared={iceAllCleared}
+        onPick={(index) => setScreen({ name: 'ice-game', index })}
+        onBack={() => setScreen({ name: 'worlds' })}
+      />
+    );
+  }
+
+  if (screen.name === 'ice-game') {
+    const stage = ICE_STAGES[screen.index];
+    const nextIndex = screen.index + 1;
+    return (
+      <PenguinScreen
+        key={stage.id}
+        stage={stage}
+        hasNext={nextIndex < ICE_STAGES.length}
+        bestStars={progress.stars[stage.id] ?? 0}
+        onBack={() => setScreen({ name: 'ice-select' })}
+        onNext={() => setScreen(nextIndex < ICE_STAGES.length ? { name: 'ice-game', index: nextIndex } : { name: 'ice-select' })}
+        onCleared={onCleared}
+      />
+    );
+  }
 
   if (screen.name === 'select') {
     return (
@@ -57,8 +125,9 @@ export function App() {
         stars={progress.stars}
         cleared={cleared}
         allCleared={allCleared}
+        heading="기차 월드"
         onPick={(index) => setScreen({ name: 'game', index })}
-        onBack={() => setScreen({ name: 'title' })}
+        onBack={() => setScreen({ name: 'worlds' })}
         daily={{
           title: dailyStage?.title ?? null,
           stars: dailyStage ? (progress.stars[dailyStage.id] ?? 0) : 0,

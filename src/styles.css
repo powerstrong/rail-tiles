@@ -1403,3 +1403,279 @@ p {
 .chapter .stage-card.done .stage-num {
   background: var(--chapter);
 }
+
+/* ---------- worlds ---------- */
+
+.world-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.world-card {
+  --world: var(--teal);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  border-left: 7px solid var(--world);
+  text-align: left;
+  color: var(--ink);
+  transition: transform 0.12s ease;
+}
+
+.world-card:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.world-card.locked,
+.world-card.soon {
+  background: #efe3cf;
+  box-shadow: none;
+  color: #a99d8c;
+  border-left-color: #d8c8ad;
+}
+
+.world-card.locked .world-emblem,
+.world-card.soon .world-emblem {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.world-emblem {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--world) 16%, white);
+}
+
+.world-emblem svg {
+  width: 46px;
+  height: 46px;
+}
+
+.world-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.world-kicker {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--world);
+}
+
+.world-card.locked .world-kicker,
+.world-card.soon .world-kicker {
+  color: inherit;
+}
+
+.world-title {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.world-blurb {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  word-break: keep-all;
+}
+
+.world-card.locked .world-blurb,
+.world-card.soon .world-blurb {
+  color: inherit;
+}
+
+.world-side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.world-badge {
+  font-size: 13px;
+  font-weight: 900;
+  color: #fff;
+  background: var(--world);
+  border-radius: 999px;
+  padding: 4px 10px;
+  transform: rotate(-6deg);
+}
+
+.world-stars {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+/* ---------- penguin world ---------- */
+
+.world-ice {
+  --bg: #e8f4fb;
+  --card: #fbfeff;
+  --line: #c6e0ee;
+  --teal: #2f77b8;
+  --ink-soft: #5c6b80;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-ice) {
+  background: #e8f4fb;
+}
+
+.world-ice .hint-btn,
+.world-ice .icon-btn,
+.world-ice .tool,
+.world-ice .secondary {
+  box-shadow: 0 3px 0 var(--line);
+}
+
+.ice-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.penguin-pick-row {
+  display: flex;
+  gap: 8px;
+}
+
+.penguin-chip {
+  width: 58px;
+  height: 66px;
+  padding: 4px;
+}
+
+.penguin-chip svg {
+  width: 100%;
+  height: 100%;
+}
+
+.penguin-chip.selected {
+  outline: 4px solid var(--chip);
+  outline-offset: -4px;
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 4px;
+}
+
+.dpad-btn {
+  border: 0;
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: 0 3px 0 var(--line);
+  display: grid;
+  place-items: center;
+  transition: transform 0.1s ease;
+}
+
+.dpad-btn:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.dpad-btn:disabled {
+  opacity: 0.45;
+}
+
+.dpad-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #2f77b8;
+}
+
+.dpad-0 {
+  grid-area: 1 / 2;
+}
+
+.dpad-3 {
+  grid-area: 2 / 1;
+}
+
+.dpad-1 {
+  grid-area: 2 / 3;
+}
+
+.dpad-2 {
+  grid-area: 3 / 2;
+}
+
+.ice-board {
+  touch-action: none;
+}
+
+.hole-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.fish-bob {
+  animation: bob 1.4s ease-in-out infinite;
+}
+
+.current-flow {
+  animation: current-flow 1.2s linear infinite;
+}
+
+@keyframes current-flow {
+  from {
+    transform: translateY(8px);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+.penguin-pick {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-soft 1.2s ease-in-out infinite;
+}
+
+.ice-hint {
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+.penguin-cheer {
+  animation: penguin-hop 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes penguin-hop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-14px);
+  }
+}

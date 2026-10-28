@@ -18,3 +18,20 @@ for (const ch of CHAPTERS) {
     );
   }
 }
+
+// Penguin world (slide puzzles), on its own scale: see src/penguin/audit.ts.
+const { ICE_CHAPTERS, ICE_STAGES } = await import('../src/penguin/stages');
+const { auditIce } = await import('../src/penguin/audit');
+console.log('\n\n=== 펭귄 얼음 나라 ===');
+for (const ch of ICE_CHAPTERS) {
+  const list = ICE_STAGES.slice(ch.start, ch.start + ch.count).filter((s) => !ids.length || ids.includes(s.id));
+  if (!list.length) continue;
+  console.log(`\n챕터 ${ch.number} ${ch.title}`);
+  console.log('  판     이름              밀기  상태수  함정단계  돌아가기  난이도');
+  for (const st of list) {
+    const a = auditIce(st)!;
+    console.log(
+      `  ${st.label!.replace('STAGE ', '').padEnd(5)}  ${st.title.padEnd(12, '　')}  ${String(a.par).padStart(3)}  ${String(a.reachable).padStart(6)}  ${String(a.trapSteps).padStart(6)}  ${String(a.detours).padStart(7)}  ${a.score.toFixed(1).padStart(6)}`,
+    );
+  }
+}

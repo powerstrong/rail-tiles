@@ -1,17 +1,26 @@
 import type { CSSProperties } from 'react';
-import type { Stage } from '../engine/stage';
 import type { Chapter } from '../stages/stages';
 import type { Stars } from '../engine/stars';
 
+/** What the list needs to know about a stage, whichever world it belongs to. */
+export interface StageCard {
+  id: string;
+  title: string;
+}
+
 interface Props {
-  stages: Stage[];
+  stages: StageCard[];
+  /** Screen heading (the world's name). */
+  heading?: string;
+  /** Extra class on the screen, for a world's colour theme. */
+  theme?: string;
   chapters: Chapter[];
   stars: Readonly<Record<string, Stars>>;
   cleared: ReadonlySet<string>;
   allCleared: boolean;
   onPick: (index: number) => void;
   onBack: () => void;
-  daily: DailyCardProps;
+  daily?: DailyCardProps;
 }
 
 interface DailyCardProps {
@@ -61,7 +70,7 @@ function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay
  * A stage opens once the one before it is cleared. Stages already cleared stay open,
  * so stages added in the middle of a chapter later never lock a player's old progress.
  */
-export function isUnlocked(stages: Stage[], cleared: ReadonlySet<string>, index: number): boolean {
+export function isUnlocked(stages: StageCard[], cleared: ReadonlySet<string>, index: number): boolean {
   return index === 0 || cleared.has(stages[index]?.id) || cleared.has(stages[index - 1]?.id);
 }
 
@@ -78,17 +87,17 @@ export function StarRow({ count, className }: { count: number; className?: strin
   );
 }
 
-export function StageSelect({ stages, chapters, stars, cleared, allCleared, onPick, onBack, daily }: Props) {
+export function StageSelect({ stages, heading = '스테이지 선택', theme, chapters, stars, cleared, allCleared, onPick, onBack, daily }: Props) {
   const totalStars = stages.reduce((sum, s) => sum + (stars[s.id] ?? 0), 0);
   return (
-    <main className="select">
+    <main className={`select ${theme ?? ''}`}>
       <header className="select-head">
-        <button className="icon-btn" onClick={onBack} aria-label="타이틀로">
+        <button className="icon-btn" onClick={onBack} aria-label="월드 선택으로">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M15 5 L8 12 L15 19" />
           </svg>
         </button>
-        <h1>스테이지 선택</h1>
+        <h1>{heading}</h1>
         <span className="select-progress" aria-label={`별 ${totalStars}개 / ${stages.length * 3}개`}>
           ★ {totalStars} / {stages.length * 3}
         </span>
@@ -98,7 +107,7 @@ export function StageSelect({ stages, chapters, stars, cleared, allCleared, onPi
           <strong>모든 노선 완성!</strong> {stages.length}개 스테이지를 모두 클리어했어요.
         </p>
       )}
-      <DailyCard {...daily} />
+      {daily && <DailyCard {...daily} />}
       {chapters.map((ch) => {
         const list = stages.slice(ch.start, ch.start + ch.count);
         const got = list.reduce((sum, st) => sum + (stars[st.id] ?? 0), 0);
