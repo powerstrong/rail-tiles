@@ -1,7 +1,7 @@
 import { type Dir, DX, DY } from './dir';
 import type { Rail } from './rail';
 import { type Pos, type Stage, cellAt, cellKey } from './stage';
-import { type FailReason, type TraceStep, enter, initialRiders, initialSwitches, motionKey, riderPass } from './step';
+import { type FailReason, type TraceStep, enter, initialRiders, initialSwitches, isTower, motionKey, riderPass, signalPass } from './step';
 
 export type { FailReason, TraceStep } from './step';
 
@@ -30,6 +30,8 @@ export interface RiderEvent {
 
 export interface Trace {
   steps: TraceStep[];
+  /** Water left after each step (season 2 steam train), or null when the stage has no water limit. */
+  water: number[] | null;
   riderEvents: RiderEvent[];
   success: boolean;
   failure: Failure | null;
@@ -38,7 +40,7 @@ export interface Trace {
 export function railAt(stage: Stage, placed: RailMap, x: number, y: number): Rail | null {
   const cell = cellAt(stage, x, y);
   if (!cell) return null;
-  if (cell.type === 'fixed') return cell.rail;
+  if (cell.type === 'fixed' || cell.type === 'drawbridge') return cell.rail;
   if (cell.type === 'empty') return placed[cellKey(x, y)] ?? null;
   return null;
 }
@@ -57,6 +59,9 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
   const switches = initialSwitches(stage);
   const riders = initialRiders(stage);
   const riderEvents: RiderEvent[] = [];
+  const cap = stage.water;
+  let water = cap ?? 0;
+  const waterLog: number[] | null = cap === null ? null : [water];
   const lookup = (x: number, y: number) => placed[cellKey(x, y)] ?? null;
 
   let x = stage.start.x;
@@ -65,32 +70,44 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
 
   const fail = (reason: FailReason, extra: Partial<Failure> = {}): Trace => ({
     steps,
+    water: waterLog,
     riderEvents,
     success: false,
     failure: { reason, cell: { x: x + DX[heading], y: y + DY[heading] }, from: { x, y }, edge: heading, ...extra },
   });
 
   for (;;) {
-    const key = motionKey(stage, x, y, heading, switches);
+    const key = motionKey(stage, x, y, heading, switches, cap === null ? null : water);
     if (seen.has(key)) return fail('loop', { cell: { x, y } });
     seen.add(key);
 
     const entry = enter(stage, lookup, switches, x, y, heading);
     if (entry.kind === 'fail') return fail(entry.reason);
     if (entry.kind === 'unbuilt') return fail('no_track');
+    // The steam train needs one cell's worth of water for every move.
+    if (cap !== null) {
+      if (water <= 0) return fail('no_water');
+      water -= 1;
+    }
     if (entry.kind === 'goal') {
       steps.push(entry.step);
+      waterLog?.push(water);
       const missed = stage.waypoints.filter((p) => !visited.has(cellKey(p.x, p.y)));
       if (missed.length > 0) {
         const at = { x: entry.step.x, y: entry.step.y };
-        return { steps, riderEvents, success: false, failure: { reason: 'missed_waypoint', cell: at, from: at, missedWaypoints: missed } };
+        return { steps, water: waterLog, riderEvents, success: false, failure: { reason: 'missed_waypoint', cell: at, from: at, missedWaypoints: missed } };
+      }
+      const loose = stage.wagons.filter((p) => !visited.has(cellKey(p.x, p.y)));
+      if (loose.length > 0) {
+        const at = { x: entry.step.x, y: entry.step.y };
+        return { steps, water: waterLog, riderEvents, success: false, failure: { reason: 'missed_wagon', cell: at, from: at, missedWaypoints: loose } };
       }
       const undelivered = stage.riders.filter((r) => riders[r.id] !== 2).map((r) => r.id);
       if (undelivered.length > 0) {
         const at = { x: entry.step.x, y: entry.step.y };
-        return { steps, riderEvents, success: false, failure: { reason: 'undelivered', cell: at, from: at, undelivered } };
+        return { steps, water: waterLog, riderEvents, success: false, failure: { reason: 'undelivered', cell: at, from: at, undelivered } };
       }
-      return { steps, riderEvents, success: true, failure: null };
+      return { steps, water: waterLog, riderEvents, success: true, failure: null };
     }
 
     steps.push(entry.step);
@@ -99,7 +116,11 @@ export function simulate(stage: Stage, placed: RailMap): Trace {
       const ride = riderPass(stage, riders, entry.step.x, entry.step.y);
       if (ride) riderEvents.push({ index: steps.length - 1, ...ride });
       if (entry.step.toggle) switches[entry.step.toggle.key] = entry.step.toggle.to;
+      const signal = signalPass(stage, switches, entry.step.x, entry.step.y);
+      if (signal) steps[steps.length - 1] = { ...entry.step, signal };
+      if (cap !== null && isTower(stage, entry.step.x, entry.step.y)) water = cap;
     }
+    waterLog?.push(water);
     x = entry.x;
     y = entry.y;
     heading = entry.heading;

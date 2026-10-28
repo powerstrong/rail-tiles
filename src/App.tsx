@@ -3,6 +3,8 @@ import { loadDaily } from './daily/loadDaily';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stage } from './engine/stage';
 import type { Stars } from './engine/stars';
+import { S2_CHAPTERS, S2_STAGES } from './stages/season2';
+import { S2_INTROS } from './stages/season2Intros';
 import { CHAPTERS, STAGES } from './stages/stages';
 import { loadProgress, recordClear, saveProgress } from './storage';
 import { loadIceDaily } from './daily/loadIceDaily';
@@ -33,9 +35,13 @@ type Screen =
   | { name: 'ice-daily' }
   | { name: 'mc-select' }
   | { name: 'mc-game'; index: number }
+  | { name: 's2-select' }
+  | { name: 's2-game'; index: number }
   | { name: 'vo-select' }
   | { name: 'vo-game'; index: number };
 
+/** Train world season 2 opens once the train world's last boss is beaten, like the penguin world. */
+const SEASON2_UNLOCK_ID = 'last-delivery';
 /** The penguin world opens once the train world's last boss is beaten. */
 const ICE_UNLOCK_ID = 'last-delivery';
 /** The penguin daily puzzle opens after the snow-pile stage (1-3). */
@@ -107,6 +113,17 @@ export function App() {
     const worlds: WorldCard[] = [
       { id: 'train', title: '기차 월드', blurb: '레일을 깔아 기차를 도착역까지', color: '#E5584F', emblem: 'train', stars: starsOf(STAGES), maxStars: STAGES.length * 3, state: allCleared ? 'conquered' : 'open' },
       {
+        id: 'train2',
+        title: '기차 월드 2',
+        blurb: '차단기, 도개교, 급수탑, 회전판, 화물칸!',
+        color: '#2FA38C',
+        emblem: 'train',
+        stars: starsOf(S2_STAGES),
+        maxStars: S2_STAGES.length * 3,
+        state: !cleared.has(SEASON2_UNLOCK_ID) ? 'locked' : S2_STAGES.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
+        lockNote: '기차 월드 마지막 배달(4-10)을 깨면 열려요',
+      },
+      {
         id: 'ice',
         title: '펭귄 얼음 나라',
         blurb: '쓱 밀어서 펭귄을 구멍까지 미끄러뜨려요',
@@ -144,7 +161,17 @@ export function App() {
       <WorldSelect
         worlds={worlds}
         onPick={(id) =>
-          setScreen(id === 'ice' ? { name: 'ice-select' } : id === 'machine' ? { name: 'mc-select' } : id === 'volcano' ? { name: 'vo-select' } : { name: 'select' })
+          setScreen(
+            id === 'ice'
+              ? { name: 'ice-select' }
+              : id === 'machine'
+                ? { name: 'mc-select' }
+                : id === 'volcano'
+                  ? { name: 'vo-select' }
+                  : id === 'train2'
+                    ? { name: 's2-select' }
+                    : { name: 'select' },
+          )
         }
         onBack={() => setScreen({ name: 'title' })}
       />
@@ -189,6 +216,40 @@ export function App() {
         allCleared={MACHINE_STAGES.every((s) => cleared.has(s.id))}
         onPick={(index) => setScreen({ name: 'mc-game', index })}
         onBack={() => setScreen({ name: 'worlds' })}
+      />
+    );
+  }
+
+  if (screen.name === 's2-select') {
+    return (
+      <StageSelect
+        heading="기차 월드 2"
+        theme="world-train2"
+        stages={S2_STAGES.map((s) => ({ id: s.id, title: s.title, race: s.oneShot }))}
+        chapters={S2_CHAPTERS}
+        stars={progress.stars}
+        cleared={cleared}
+        allCleared={S2_STAGES.every((s) => cleared.has(s.id))}
+        onPick={(index) => setScreen({ name: 's2-game', index })}
+        onBack={() => setScreen({ name: 'worlds' })}
+      />
+    );
+  }
+
+  if (screen.name === 's2-game') {
+    const stage = S2_STAGES[screen.index];
+    const nextIndex = screen.index + 1;
+    return (
+      <GameScreen
+        key={stage.id}
+        stage={stage}
+        hasNext={nextIndex < S2_STAGES.length}
+        allCleared={S2_STAGES.every((s) => s.id === stage.id || cleared.has(s.id))}
+        bestStars={progress.stars[stage.id] ?? 0}
+        intro={S2_INTROS[stage.id]}
+        onBack={() => setScreen({ name: 's2-select' })}
+        onNext={() => setScreen(nextIndex < S2_STAGES.length ? { name: 's2-game', index: nextIndex } : { name: 's2-select' })}
+        onCleared={onCleared}
       />
     );
   }

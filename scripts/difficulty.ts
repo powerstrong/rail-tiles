@@ -19,6 +19,23 @@ for (const ch of CHAPTERS) {
   }
 }
 
+// Train world season 2, on the same scale as the first train world.
+const { S2_CHAPTERS, S2_STAGES } = await import('../src/stages/season2');
+console.log('\n\n=== 기차 월드 2 ===');
+for (const ch of S2_CHAPTERS) {
+  const list = S2_STAGES.slice(ch.start, ch.start + ch.count).filter((s) => !ids.length || ids.includes(s.id));
+  if (!list.length) continue;
+  console.log(`\n챕터 ${ch.number} ${ch.title}`);
+  console.log('  판     이름              par  ★★★/전체  함정(칸)  탐색량   난이도');
+  for (const st of list) {
+    const a = audit(st);
+    const tag = st.boss ? ' [보스]' : st.oneShot ? ' [보너스]' : '';
+    console.log(
+      `  ${st.label!.replace('STAGE ', '').padEnd(5)}  ${st.title.padEnd(12, '　')}  ${String(a.par).padStart(3)}  ${String(a.optimal).padStart(3)}/${String(a.routes).padEnd(4)}  ${String(a.traps).padStart(4)}(${String(a.trapCells).padStart(2)})  ${String(a.effort ?? '>5M').padStart(7)}   ${difficultyScore(a).toFixed(1).padStart(5)}${tag}`,
+    );
+  }
+}
+
 // Penguin world (slide puzzles), on its own scale: see src/penguin/audit.ts.
 const { ICE_CHAPTERS, ICE_STAGES } = await import('../src/penguin/stages');
 const { auditIce } = await import('../src/penguin/audit');

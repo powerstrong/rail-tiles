@@ -10,6 +10,8 @@ import { BridgeArt, DecorationArt, GroundDetail, HomeArt, TunnelArt, TunnelBadge
 import { CELL, RailPieceArt, SwitchArt } from './art/TrackArt';
 import { AlightFx, BoardingFx, Ceremony } from './art/Ceremony';
 import { TrainArt } from './art/TrainArt';
+import { ButtonArt, DrawbridgeArt, GateArt, LeverArt, TowerArt, TurntableArt, WagonCarArt, WagonStopArt } from './art/Season2Art';
+import { channelKey } from '../engine/step';
 import { poseTransform } from './trainRunner';
 
 export type Tool = 'straight' | 'curve' | 'cross' | 'eraser';
@@ -40,6 +42,11 @@ interface BoardProps {
   /** Current branch of every switch (changes while the train runs). */
   switchStates: SwitchStates;
   restPose: Pose;
+  /** Season 2: towers the train has filled up at, wagons coupled on (this run). */
+  towersHit?: ReadonlySet<string>;
+  coupled?: ReadonlySet<string>;
+  /** Season 2: one group per freight wagon, positioned behind the train by the game screen. */
+  wagonRefs?: RefObject<(SVGGElement | null)[]>;
   trainRef: RefObject<SVGGElement>;
   smokeRef: RefObject<SVGGElement>;
   onCellClick: (x: number, y: number) => void;
@@ -86,14 +93,15 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
       tiles.push(
         <g key={cellKey(x, y)} transform={t}>
           <TileBase variant={variant} alt={(x + y) % 2 === 1} />
-          {cell.type === 'empty' && (cell.waypoint ? <StopPad /> : cell.rider ? <StopPad color={RIDER_COLORS[cell.rider.id]} /> : <GroundDetail seed={seed} />)}
+          {cell.type === 'empty' &&
+            (cell.waypoint ? <StopPad /> : cell.rider ? <StopPad color={RIDER_COLORS[cell.rider.id]} /> : cell.mark?.kind === 'wagon' ? <StopPad /> : cell.mark ? null : <GroundDetail seed={seed} />)}
         </g>,
       );
       // Water joins neighbouring water and bridges, so rivers read as one body.
       const waterJoins = (): Dir[] =>
         ALL_DIRS.filter((d) => {
           const n = cellAt(stage, x + DX[d], y + DY[d]);
-          return (n?.type === 'obstacle' && n.deco === 'water') || (n?.type === 'fixed' && n.bridge);
+          return (n?.type === 'obstacle' && n.deco === 'water') || (n?.type === 'fixed' && n.bridge) || n?.type === 'drawbridge';
         });
       if (cell.type === 'obstacle') {
         const joins = cell.deco === 'water' ? waterJoins() : [];
@@ -107,6 +115,12 @@ const StaticLayer = memo(function StaticLayer({ stage }: { stage: Stage }) {
           <g key={cellKey(x, y)} transform={t}>
             <TunnelArt dir={cell.dir} label={cell.label} />
             <TunnelBadge dir={cell.dir} label={cell.label} />
+          </g>,
+        );
+      } else if (cell.type === 'turntable') {
+        scenery.push(
+          <g key={cellKey(x, y)} transform={t}>
+            <TurntableArt turn={cell.turn} />
           </g>,
         );
       } else if (cell.type === 'fixed' && cell.bridge) {
@@ -195,6 +209,31 @@ function FailMarker({ failure, stage, riders }: { failure: Failure; stage: Stage
 
 export function Board(props: BoardProps) {
   const { stage, placed, editable, tool, showGhost, failure, arrived, flash, picked, riders, hint, switchStates, restPose, trainRef, smokeRef, onCellClick, onDrag } = props;
+  const { towersHit, coupled, wagonRefs } = props;
+  const marks = useMemo(
+    () =>
+      stage.cells.flatMap((cell, i) => {
+        const x = i % stage.width;
+        const y = Math.floor(i / stage.width);
+        return cell.type === 'empty' && cell.mark ? [{ x, y, mark: cell.mark }] : [];
+      }),
+    [stage],
+  );
+  const drawbridges = useMemo(
+    () =>
+      stage.cells.flatMap((cell, i) => {
+        const x = i % stage.width;
+        const y = Math.floor(i / stage.width);
+        if (cell.type !== 'drawbridge') return [];
+        const joins = ALL_DIRS.filter((d) => {
+          const n = cellAt(stage, x + DX[d], y + DY[d]);
+          return (n?.type === 'obstacle' && n.deco === 'water') || (n?.type === 'fixed' && n.bridge) || n?.type === 'drawbridge';
+        });
+        return [{ x, y, cell, joins }];
+      }),
+    [stage],
+  );
+  const isOpen = (color: number) => (switchStates[channelKey(color)] ?? stage.channels[color]) === 1;
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const stroke = useRef<Stroke | null>(null);
@@ -295,6 +334,12 @@ export function Board(props: BoardProps) {
         );
       })}
 
+      {drawbridges.map(({ x, y, cell, joins }) => (
+        <g key={`db${x},${y}`} transform={`translate(${centre(x)} ${centre(y)})`} pointerEvents="none">
+          <DrawbridgeArt rot={cell.rail.rot % 2} joins={joins} down={isOpen(cell.color)} color={cell.color} />
+        </g>
+      ))}
+
       <PlacedRails
         placed={placed}
         eraseHover={editable && tool === 'eraser' && hoverKey && placed[hoverKey] ? hoverKey : null}
@@ -317,6 +362,21 @@ export function Board(props: BoardProps) {
           <RailPieceArt kind={preview.kind} />
         </g>
       )}
+
+      {marks.map(({ x, y, mark }) => {
+        const key = cellKey(x, y);
+        const rail = placed[key];
+        const t = `translate(${centre(x)} ${centre(y)})`;
+        return (
+          <g key={`m${key}`} transform={t} pointerEvents="none">
+            {mark.kind === 'gate' && <GateArt color={mark.color} open={isOpen(mark.color)} across={rail?.kind === 'straight' && rail.rot % 2 === 1 ? 1 : 0} />}
+            {mark.kind === 'button' && <ButtonArt color={mark.color} pressed={isOpen(mark.color)} />}
+            {mark.kind === 'lever' && <LeverArt color={mark.color} on={isOpen(mark.color)} />}
+            {mark.kind === 'tower' && <TowerArt filled={towersHit?.has(key) ?? false} />}
+            {mark.kind === 'wagon' && <WagonStopArt coupled={coupled?.has(key) ?? false} />}
+          </g>
+        );
+      })}
 
       {stage.waypoints.map((p) => {
         const key = cellKey(p.x, p.y);
@@ -342,6 +402,19 @@ export function Board(props: BoardProps) {
         );
       })}
 
+
+      {stage.wagons.map((_, i) => (
+        <g
+          key={`car${i}`}
+          ref={(el) => {
+            if (wagonRefs?.current) wagonRefs.current[i] = el;
+          }}
+          display="none"
+          pointerEvents="none"
+        >
+          <WagonCarArt />
+        </g>
+      ))}
 
       <g ref={smokeRef} pointerEvents="none" />
       <g ref={trainRef} transform={poseTransform(restPose, CELL)} opacity={restPose.alpha} pointerEvents="none">

@@ -114,7 +114,7 @@ function Mountain({ seed }: { seed: number }) {
 }
 
 /** Water joins up with neighbouring water cells so ponds read as one body. */
-function Water({ joins }: { joins: Dir[] }) {
+export function Water({ joins }: { joins: Dir[] }) {
   const body = (fill: string, inset: number) => (
     <g fill={fill}>
       <rect x={-40 + inset} y={-40 + inset} width={80 - inset * 2} height={80 - inset * 2} rx={22} />

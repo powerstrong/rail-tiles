@@ -3,8 +3,18 @@ import { RAIL_GLYPHS, type Rail, type RailKind } from './rail';
 
 export type Decoration = 'tree' | 'rock' | 'mountain' | 'water' | 'house';
 
+/**
+ * Season 2 marks on an empty cell (the player still lays track on it):
+ *   button  passing it opens every gate (and lowers every drawbridge) of its colour, for good
+ *   lever   passing it flips its colour: open ↔ closed (drawbridge down ↔ up)
+ *   gate    level-crossing barrier: the train may enter only while its colour is open
+ *   tower   water tower: the steam train refills to full here
+ *   wagon   a freight wagon waiting to be coupled on (must be picked up, like a passenger)
+ */
+export type Mark = { kind: 'button' | 'lever' | 'gate'; color: number } | { kind: 'tower' } | { kind: 'wagon' };
+
 export type Cell =
-  | { type: 'empty'; waypoint: boolean; rider?: RiderMark }
+  | { type: 'empty'; waypoint: boolean; rider?: RiderMark; mark?: Mark }
   | { type: 'obstacle'; deco: Decoration }
   /** `bridge` is purely visual: a fixed straight drawn as a bridge over water. */
   | { type: 'fixed'; rail: Rail; bridge: boolean }
@@ -17,7 +27,11 @@ export type Cell =
    * Entering from the trunk follows the current branch and then flips it;
    * entering from either branch always leaves through the trunk.
    */
-  | { type: 'switch'; trunk: Dir; turn: Dir; initial: SwitchState; label: string };
+  | { type: 'switch'; trunk: Dir; turn: Dir; initial: SwitchState; label: string }
+  /** Drawbridge: a fixed straight over water, passable only while its colour is open (bridge down). */
+  | { type: 'drawbridge'; rail: Rail; color: number }
+  /** Turntable: the train rolls on from any side and leaves turned right (turn 1) or left (turn 3). */
+  | { type: 'turntable'; turn: 1 | 3 };
 
 /** A delivery passenger's pickup or drop-off tile (still an empty cell the player lays track on). */
 export interface RiderMark {
@@ -82,6 +96,15 @@ export interface Stage {
   ghostHint: boolean;
   /** Replaces "STAGE n" in the UI (e.g. the daily puzzle). */
   label?: string;
+  /** Season 2: colours of buttons/levers/gates/drawbridges in use, with their state at the start (1 = open). */
+  channels: Record<number, SwitchState>;
+  /** Season 2: steam train water, in cells it can travel before it must pass a tower (null: no limit). */
+  water: number | null;
+  /** Season 2: freight wagons to couple on before the goal (in reading order). */
+  wagons: Pos[];
+  /** Season 2 bonus stage: a single departure. */
+  oneShot?: boolean;
+  boss?: boolean;
 }
 
 /**
@@ -97,6 +120,11 @@ export interface Stage {
  *   a b c …      tunnel mouths: each lowercase letter appears exactly twice;
  *                `tunnels[letter]` gives the opening side of the first and second
  *                occurrence in reading order (row by row, left to right)
+ * Season 2 (a digit is the colour, 1..3):
+ *   K1  button   L1  lever   D1  gate (barrier on an empty cell)
+ *   ═1 ║1        drawbridge over water (open = down)
+ *   F   water tower (needs `water`)      O   freight wagon
+ *   ↻ ↺          turntable: the train leaves turned right / left
  * `solution` uses the same grid, with rail glyphs on the cells the player fills.
  * It must be a shortest solution: its rail count becomes the stage's par.
  */
@@ -113,6 +141,11 @@ export interface StageDef {
   tunnels?: Record<string, [DirName, DirName]>;
   switches?: Record<string, SwitchDef>;
   ghostHint?: boolean;
+  /** Colours that start open (gates up, drawbridges down). Others start closed. */
+  open?: number[];
+  water?: number;
+  oneShot?: boolean;
+  boss?: boolean;
 }
 
 export const MIN_SIZE = 5;
@@ -157,6 +190,11 @@ export function parseStage(def: StageDef, number: number): Stage {
   const riderAt: Record<string, { pickup?: Pos; drop?: Pos }> = {};
   const mouths: Record<string, { index: number; pos: Pos }[]> = {};
   const switches: string[] = [];
+  const channels: Record<number, SwitchState> = {};
+  const wagons: Pos[] = [];
+  const useColor = (c: number) => {
+    channels[c] = def.open?.includes(c) ? 1 : 0;
+  };
   let start: Pos | null = null;
   let goal: Pos | null = null;
 
@@ -194,6 +232,22 @@ export function parseStage(def: StageDef, number: number): Stage {
         if (turn === trunk || (turn + 2) % 4 === trunk) fail(`switch "${glyph}" must turn sideways from its trunk`);
         switches.push(cellKey(x, y));
         cells.push({ type: 'switch', trunk, turn, initial: sw!.initial === 'turn' ? 1 : 0, label: glyph });
+      } else if (/^[KLD][1-3]$/.test(glyph)) {
+        const color = Number(glyph[1]);
+        useColor(color);
+        cells.push({ type: 'empty', waypoint: false, mark: { kind: glyph[0] === 'K' ? 'button' : glyph[0] === 'L' ? 'lever' : 'gate', color } });
+      } else if (/^[═║][1-3]$/.test(glyph)) {
+        const color = Number(glyph[1]);
+        useColor(color);
+        cells.push({ type: 'drawbridge', rail: { ...BRIDGE_GLYPHS[glyph[0]] }, color });
+      } else if (glyph === 'F') {
+        if (!def.water) fail('a water tower needs `water`');
+        cells.push({ type: 'empty', waypoint: false, mark: { kind: 'tower' } });
+      } else if (glyph === 'O') {
+        wagons.push({ x, y });
+        cells.push({ type: 'empty', waypoint: false, mark: { kind: 'wagon' } });
+      } else if (glyph === '↻' || glyph === '↺') {
+        cells.push({ type: 'turntable', turn: glyph === '↻' ? 1 : 3 });
       } else if (/^[a-z]$/.test(glyph)) {
         (mouths[glyph] ??= []).push({ index: cells.length, pos: { x, y } });
         cells.push({ type: 'empty', waypoint: false }); // replaced once both mouths are known
@@ -276,6 +330,11 @@ export function parseStage(def: StageDef, number: number): Stage {
     solution,
     par: solution.length,
     ghostHint: def.ghostHint ?? false,
+    channels,
+    water: def.water ?? null,
+    wagons,
+    oneShot: def.oneShot,
+    boss: def.boss,
   };
 }
 

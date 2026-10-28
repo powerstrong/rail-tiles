@@ -109,6 +109,7 @@ function neighbourWants(stage: Stage, placed: Placements, x: number, y: number, 
   const cell = cellAt(stage, nx, ny);
   if (cell?.type === 'tunnel') return cell.dir === back;
   if (cell?.type === 'switch') return switchPorts(cell).includes(back);
+  if (cell?.type === 'turntable') return true;
   const rail = railAt(stage, placed, nx, ny);
   return rail !== null && hasPort(rail, back);
 }
@@ -120,6 +121,7 @@ function sideIsOpen(stage: Stage, placed: Placements, x: number, y: number, d: D
   const cell = cellAt(stage, nx, ny);
   if (!cell) return false;
   if (cell.type === 'obstacle') return false;
+  if (cell.type === 'turntable') return true;
   if (cell.type === 'start' || cell.type === 'goal' || cell.type === 'tunnel' || cell.type === 'switch') {
     return neighbourWants(stage, placed, x, y, d);
   }

@@ -1,4 +1,4 @@
-import { type Dir, DX, DY, opposite } from './dir';
+import { type Dir, DX, DY, opposite, rotateCW } from './dir';
 import { type Rail, railExit } from './rail';
 import { type Cell, type Stage, type SwitchState, cellAt, cellKey } from './stage';
 
@@ -15,7 +15,11 @@ export type FailReason =
   | 'start_reentry'
   | 'missed_waypoint'
   | 'undelivered'
-  | 'loop';
+  | 'loop'
+  | 'gate_closed'
+  | 'bridge_up'
+  | 'no_water'
+  | 'missed_wagon';
 
 /**
  * One tile the train travels through.
@@ -27,7 +31,16 @@ export type FailReason =
  */
 export type TraceStep =
   | { kind: 'start'; x: number; y: number; outEdge: Dir }
-  | { kind: 'rail'; x: number; y: number; inEdge: Dir; outEdge: Dir; toggle?: { key: string; to: SwitchState } }
+  | {
+      kind: 'rail';
+      x: number;
+      y: number;
+      inEdge: Dir;
+      outEdge: Dir;
+      toggle?: { key: string; to: SwitchState };
+      /** A button or lever here changed its colour as the train passed (season 2). */
+      signal?: { key: string; to: SwitchState };
+    }
   | { kind: 'tunnel'; x: number; y: number; inEdge: Dir; toX: number; toY: number; outEdge: Dir }
   | { kind: 'goal'; x: number; y: number; inEdge: Dir };
 
@@ -93,8 +106,19 @@ export function enter(
       const toggle = exit.flips ? { key, to: (1 - state) as SwitchState } : undefined;
       return { kind: 'move', x: nx, y: ny, heading: exit.out, step: { kind: 'rail', x: nx, y: ny, inEdge, outEdge: exit.out, toggle } };
     }
+    case 'turntable': {
+      const out = rotateCW(heading, cell.turn);
+      return { kind: 'move', x: nx, y: ny, heading: out, step: { kind: 'rail', x: nx, y: ny, inEdge, outEdge: out } };
+    }
+    case 'drawbridge': {
+      if (switches[channelKey(cell.color)] !== 1) return { kind: 'fail', reason: 'bridge_up' };
+      const out = railExit(cell.rail, inEdge);
+      if (out === null) return { kind: 'fail', reason: 'misaligned' };
+      return { kind: 'move', x: nx, y: ny, heading: out, step: { kind: 'rail', x: nx, y: ny, inEdge, outEdge: out } };
+    }
     case 'fixed':
     case 'empty': {
+      if (cell.type === 'empty' && cell.mark?.kind === 'gate' && switches[channelKey(cell.mark.color)] !== 1) return { kind: 'fail', reason: 'gate_closed' };
       const rail = cell.type === 'fixed' ? cell.rail : railAt(nx, ny);
       if (!rail) return { kind: 'unbuilt', inEdge };
       const out = railExit(rail, inEdge);
@@ -132,9 +156,34 @@ export function riderPass(stage: Stage, progress: RiderProgress, x: number, y: n
   return null;
 }
 
-/** Initial branch of every switch on the stage. */
+/** State key of a season 2 colour (shares the switch state map). */
+export const channelKey = (color: number) => `ch${color}`;
+
+/**
+ * The train has just driven through (x, y): a button there opens its colour, a lever flips it.
+ * Mutates `states`; returns the change, or null. Shared by simulate and the solver.
+ */
+export function signalPass(stage: Stage, states: SwitchStates, x: number, y: number): { key: string; to: SwitchState } | null {
+  const cell = cellAt(stage, x, y);
+  const mark = cell?.type === 'empty' ? cell.mark : undefined;
+  if (!mark || (mark.kind !== 'button' && mark.kind !== 'lever')) return null;
+  const key = channelKey(mark.color);
+  const to: SwitchState = mark.kind === 'button' ? 1 : ((1 - (states[key] ?? 0)) as SwitchState);
+  if (states[key] === to) return null;
+  states[key] = to;
+  return { key, to };
+}
+
+/** Is (x, y) a water tower? */
+export function isTower(stage: Stage, x: number, y: number): boolean {
+  const cell = cellAt(stage, x, y);
+  return cell?.type === 'empty' && cell.mark?.kind === 'tower';
+}
+
+/** Initial branch of every switch on the stage, and every season 2 colour. */
 export function initialSwitches(stage: Stage): SwitchStates {
   const states: SwitchStates = {};
+  for (const [c, v] of Object.entries(stage.channels)) states[channelKey(Number(c))] = v;
   for (const key of stage.switches) {
     const [x, y] = key.split(',').map(Number);
     const cell = cellAt(stage, x, y);
@@ -143,7 +192,10 @@ export function initialSwitches(stage: Stage): SwitchStates {
   return states;
 }
 
-/** Position + heading + every switch: if this repeats, the train is looping forever. */
-export function motionKey(stage: Stage, x: number, y: number, heading: Dir, switches: SwitchStates): string {
-  return `${x},${y},${heading}|${stage.switches.map((k) => switches[k]).join('')}`;
+/** Position + heading + every switch, colour and the water left: if this repeats, the train is looping forever. */
+export function motionKey(stage: Stage, x: number, y: number, heading: Dir, switches: SwitchStates, water: number | null = null): string {
+  const colours = Object.keys(stage.channels)
+    .map((c) => switches[channelKey(Number(c))])
+    .join('');
+  return `${x},${y},${heading}|${stage.switches.map((k) => switches[k]).join('')}|${colours}|${water ?? ''}`;
 }

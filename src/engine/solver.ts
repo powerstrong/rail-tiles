@@ -1,7 +1,7 @@
 import { type Dir, DX, DY, opposite, rotateCW } from './dir';
 import { type Rail, type RailKind, railPorts, rotationCount } from './rail';
 import { type Placement, type Stage, cellAt, cellKey } from './stage';
-import { type SwitchStates, enter, initialRiders, initialSwitches, motionKey, riderPass } from './step';
+import { type SwitchStates, enter, initialRiders, initialSwitches, isTower, motionKey, riderPass, signalPass } from './step';
 
 export interface SolveResult {
   /** Number of distinct winning routes (capped at `limit`). */
@@ -63,7 +63,11 @@ function search(
   const switches: SwitchStates = initialSwitches(stage);
   const seen = new Set<string>();
   const riders = initialRiders(stage);
-  const stopVisits = new Map<string, number>(stage.waypoints.map((p) => [cellKey(p.x, p.y), 0]));
+  // Passengers and freight wagons both just need the train to pass once.
+  const stopVisits = new Map<string, number>([...stage.waypoints, ...stage.wagons].map((p) => [cellKey(p.x, p.y), 0]));
+  const cap = stage.water;
+  let water = cap ?? 0;
+  const thirsty = () => cap !== null && water <= 0;
   let nodes = 0;
   const result: Omit<SolveResult, 'truncated'> & { aborted?: boolean; nodes?: number } = { count: 0, minRails: null, first: null, ...(collect ? { routes: [] } : {}) };
   const lookup = (x: number, y: number) => built.get(cellKey(x, y)) ?? null;
@@ -87,7 +91,10 @@ function search(
     const key = cellKey(x, y);
     const prevSwitch = toggle ? switches[toggle.key] : undefined;
     if (toggle) switches[toggle.key] = toggle.to;
-    const motion = motionKey(stage, x, y, heading, switches);
+    const prevWater = water;
+    if (cap !== null) water = isTower(stage, x, y) ? cap : water - 1;
+    const signal = signalPass(stage, switches, x, y);
+    const motion = motionKey(stage, x, y, heading, switches, cap === null ? null : water);
     if (!seen.has(motion)) {
       seen.add(motion);
       const stop = stopVisits.get(key);
@@ -101,6 +108,8 @@ function search(
       if (stop !== undefined) stopVisits.set(key, stop);
       seen.delete(motion);
     }
+    if (signal) switches[signal.key] = (1 - signal.to) as 0 | 1;
+    water = prevWater;
     if (toggle) switches[toggle.key] = prevSwitch!;
   };
 
@@ -112,6 +121,7 @@ function search(
     }
     const entry = enter(stage, lookup, switches, x, y, heading);
     if (entry.kind === 'fail') return;
+    if (thirsty()) return;
     if (entry.kind === 'goal') return record();
     if (entry.kind === 'move') {
       const toggle = entry.step.kind === 'rail' ? entry.step.toggle : undefined;
@@ -151,7 +161,7 @@ function search(
     if (p.rail.kind === 'cross') crossAxes.set(key, 0);
   }
   const start = stage.start;
-  seen.add(motionKey(stage, start.x, start.y, start.dir, switches));
+  seen.add(motionKey(stage, start.x, start.y, start.dir, switches, cap === null ? null : water));
   if (cellAt(stage, start.x, start.y)) visit(start.x, start.y, start.dir);
   result.nodes = nodes;
   return result;

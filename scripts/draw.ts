@@ -21,6 +21,9 @@ export function draw(stage: Stage, solution: Placement[] | null): string {
       else if (cell.type === 'obstacle') row.push(MAP_GLYPH[cell.deco]);
       else if (cell.type === 'fixed') row.push(cell.bridge ? (cell.rail.rot % 2 ? '═' : '║') : (GLYPH_OF.get(`${cell.rail.kind}:${cell.rail.rot}`) ?? '?'));
       else if (cell.type === 'tunnel' || cell.type === 'switch') row.push(cell.label);
+      else if (cell.type === 'drawbridge') row.push((cell.rail.rot % 2 ? '═' : '║') + cell.color);
+      else if (cell.type === 'turntable') row.push(cell.turn === 1 ? '↻' : '↺');
+      else if (cell.mark) row.push(cell.mark.kind === 'tower' ? 'F' : cell.mark.kind === 'wagon' ? 'O' : (cell.mark.kind === 'button' ? 'K' : cell.mark.kind === 'lever' ? 'L' : 'D') + cell.mark.color);
       else if (cell.rider) row.push(cell.rider.role === 'pickup' ? cell.rider.id : 'XYZ'['ABC'.indexOf(cell.rider.id)]);
       else row.push(cell.waypoint ? 'P' : '·');
     }

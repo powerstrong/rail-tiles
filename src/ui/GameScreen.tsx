@@ -1,6 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type CellPos, type EditorState, createEditor, eraseRail, paintStroke, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
-import { type Pose, traceToPath } from '../engine/geometry';
+import { type Pose, poseAt, traceToPath } from '../engine/geometry';
 import { RAIL_KINDS, type RailKind, normalizeRot } from '../engine/rail';
 import { type FailReason, type Trace, simulate } from '../engine/simulate';
 import { type Placement, type Stage, cellAt, cellKey } from '../engine/stage';
@@ -9,6 +9,7 @@ import { type RiderProgress, type SwitchStates, initialRiders, initialSwitches }
 import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
+import { type Intro, IntroCard } from './IntroCard';
 import { StarRow } from './StageSelect';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
@@ -26,9 +27,15 @@ const FAIL_TEXT: Record<FailReason, string> = {
   missed_waypoint: '아직 태우지 못한 승객이 있어요.',
   undelivered: '목적지에 내려 주지 못한 손님이 있어요.',
   loop: '기차가 같은 길을 끝없이 맴돌아요.',
+  gate_closed: '차단기가 닫혀 있어요. 같은 색 버튼을 먼저 지나가요.',
+  bridge_up: '다리가 올라가 있어요. 같은 색 레버로 내려요.',
+  no_water: '물이 떨어져서 멈췄어요. 급수탑에 들러요.',
+  missed_wagon: '아직 연결하지 못한 화물칸이 있어요.',
 };
 
 const TRAIN_SPEED = 2.6;
+/** Distance (cells) between coupled freight wagons. */
+const CAR_GAP = 0.62;
 /** Seconds the train waits at a passenger stop while they say thanks and hop on. */
 const BOARDING_DWELL = 1.2;
 
@@ -45,6 +52,8 @@ interface Props {
   onCleared: (stageId: string, stars: Stars) => void;
   /** Extra line on the clear card (e.g. the daily streak). */
   clearNote?: string;
+  /** "New thing" card for a stage that brings in a mechanic. */
+  intro?: Intro;
 }
 
 function startPose(stage: Stage): Pose {
@@ -72,7 +81,13 @@ function ToolIcon({ tool }: { tool: Tool }) {
   );
 }
 
-export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared, clearNote }: Props) {
+export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared, clearNote, intro }: Props) {
+  const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
+  const [towersHit, setTowersHit] = useState<ReadonlySet<string>>(() => new Set());
+  const [coupled, setCoupled] = useState<ReadonlySet<string>>(() => new Set());
+  const [waterLeft, setWaterLeft] = useState<number | null>(stage.water);
+  const wagonRefs = useRef<(SVGGElement | null)[]>([]);
+  const hideCars = () => wagonRefs.current.forEach((el) => el?.setAttribute('display', 'none'));
   const [editor, setEditor] = useState(createEditor);
   const [tool, setTool] = useState<Tool>(() => RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
   const [mode, setMode] = useState<Mode>('edit');
@@ -142,6 +157,10 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     setRiders(initialRiders(stage));
     setSwitchStates(initialSwitches(stage));
     setRestPose(startPose(stage));
+    setTowersHit(new Set());
+    setCoupled(new Set());
+    setWaterLeft(stage.water);
+    hideCars();
   }, [stage]);
 
   /** Any edit after a run puts the train back in the station and clears the result. */
@@ -244,9 +263,11 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     const path = traceToPath(trace.steps);
     // The train stops in the middle of each passenger's tile (first visit only) to let them board.
     const waiting = new Set(stage.waypoints.map((p) => cellKey(p.x, p.y)));
-    type Stop = { at: number; key?: string; rider?: { id: string; event: 'board' | 'drop' } };
+    const wagonsLeft = new Set(stage.wagons.map((p) => cellKey(p.x, p.y)));
+    type Stop = { at: number; key?: string; wagon?: boolean; rider?: { id: string; event: 'board' | 'drop' } };
     const pickups: Stop[] = trace.steps.flatMap((step, i) => {
       const key = step.kind === 'rail' ? cellKey(step.x, step.y) : '';
+      if (wagonsLeft.delete(key)) return [{ key, at: path.stepMid[i], wagon: true }];
       if (!waiting.delete(key)) return [];
       return [{ key, at: path.stepMid[i] }];
     });
@@ -254,9 +275,28 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     for (const e of trace.riderEvents) pickups.push({ at: path.stepMid[e.index], rider: { id: e.id, event: e.event } });
     pickups.sort((a, b) => a.at - b.at);
     // Switches flip once the train has cleared them.
-    const flips = trace.steps.flatMap((step, i) =>
-      step.kind === 'rail' && step.toggle ? [{ ...step.toggle, at: path.stepMid[i] + 0.45 }] : [],
-    );
+    const flips = trace.steps
+      .flatMap((step, i) => [
+        ...(step.kind === 'rail' && step.toggle ? [{ ...step.toggle, at: path.stepMid[i] + 0.45, signal: false }] : []),
+        // Buttons and levers act the moment the train rolls over them.
+        ...(step.kind === 'rail' && step.signal ? [{ ...step.signal, at: path.stepMid[i], signal: true }] : []),
+      ])
+      .sort((a, b) => a.at - b.at);
+    // The water gauge drops one cell at a time and refills at towers.
+    const water = trace.water;
+    const levels = water ? trace.steps.map((step, i) => ({ at: path.stepMid[i], level: water[i], tower: i > 0 && water[i] > water[i - 1] && step.kind === 'rail' ? cellKey(step.x, step.y) : null })) : [];
+    let nextLevel = 0;
+    let cars = 0;
+    const placeCars = (dist: number) => {
+      for (let k = 0; k < cars; k++) {
+        const el = wagonRefs.current[k];
+        if (!el) continue;
+        const p = poseAt(path, Math.max(0, dist - CAR_GAP * (k + 1)));
+        el.setAttribute('display', 'inline');
+        el.setAttribute('transform', poseTransform(p, CELL));
+        el.setAttribute('opacity', p.alpha.toFixed(3));
+      }
+    };
     let nextFlip = 0;
     let puffs = 0;
     setResult(null);
@@ -264,6 +304,10 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     setRiders(initialRiders(stage));
     setSwitchStates(initialSwitches(stage));
     setRestPose(startPose(stage));
+    setTowersHit(new Set());
+    setCoupled(new Set());
+    setWaterLeft(stage.water);
+    hideCars();
     setMode('running');
     play('depart');
     cancelRun.current = runTrain(path, {
@@ -272,7 +316,14 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
       stops: pickups.map((p) => p.at),
       dwell: BOARDING_DWELL,
       onStop: (i) => {
-        const { key, rider } = pickups[i];
+        const { key, rider, wagon, at } = pickups[i];
+        if (wagon && key) {
+          play('pop');
+          cars++;
+          placeCars(at);
+          setCoupled((prev) => new Set(prev).add(key));
+          return;
+        }
         play('thanks');
         celebrationTimers.current.push(window.setTimeout(() => play('pickup'), 480));
         if (rider) setRiders((prev) => ({ ...prev, [rider.id]: rider.event === 'board' ? 1 : 2 }));
@@ -289,10 +340,19 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
       },
       onAdvance: (dist) => {
         while (nextFlip < flips.length && flips[nextFlip].at <= dist) {
-          const { key, to } = flips[nextFlip++];
-          play('rotate');
+          const { key, to, signal } = flips[nextFlip++];
+          play(signal ? 'pickup' : 'rotate');
           setSwitchStates((prev) => ({ ...prev, [key]: to }));
         }
+        while (nextLevel < levels.length && levels[nextLevel].at <= dist) {
+          const { level, tower } = levels[nextLevel++];
+          setWaterLeft(level);
+          if (tower) {
+            play('splash');
+            setTowersHit((prev) => new Set(prev).add(tower));
+          }
+        }
+        if (cars) placeCars(dist);
       },
       onDone: (pose) => {
         cancelRun.current = null;
@@ -365,7 +425,11 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           </svg>
         </button>
         <div className="game-title">
-          <span className="stage-no">{stage.label ?? `STAGE ${stage.number}`}</span>
+          <span className="stage-no">
+            {stage.label ?? `STAGE ${stage.number}`}
+            {stage.boss && <span className="tag tag-boss">보스</span>}
+            {stage.oneShot && <span className="tag tag-bonus">보너스</span>}
+          </span>
           <h1>{stage.title}</h1>
         </div>
         <div className="head-actions">
@@ -388,7 +452,13 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
         </div>
       </header>
 
-      <p className="tip">{stage.tip}</p>
+      {stage.oneShot ? (
+        <p className="tip one-shot-tip">
+          <strong>🎫 출발은 딱 한 번!</strong> 잘 살펴보고 출발해요. {stage.tip}
+        </p>
+      ) : (
+        <p className="tip">{stage.tip}</p>
+      )}
 
       <div className="board-wrap">
         <Board
@@ -405,6 +475,9 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           hint={mode === 'edit' ? hint : null}
           switchStates={switchStates}
           restPose={restPose}
+          towersHit={towersHit}
+          coupled={coupled}
+          wagonRefs={wagonRefs}
           trainRef={trainRef}
           smokeRef={smokeRef}
           onCellClick={onCellClick}
@@ -444,11 +517,25 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
                   · 배달 {Object.values(riders).filter((s) => s === 2).length}/{stage.riders.length}
                 </span>
               )}
+              {stage.wagons.length > 0 && (
+                <span className="riders">
+                  {' '}
+                  · 화물칸 {coupled.size}/{stage.wagons.length}
+                </span>
+              )}
+              {waterLeft !== null && (
+                <span className={`riders water ${waterLeft <= 2 ? 'low' : ''}`}>
+                  {' '}
+                  · 💧 {waterLeft}
+                </span>
+              )}
             </span>
           ) : (
             <span>
               {stage.waypoints.length > 0 && <span className="riders">손님 {stage.waypoints.length}명 · </span>}
               {stage.riders.length > 0 && <span className="riders">배달 {stage.riders.length}명 · </span>}
+              {stage.wagons.length > 0 && <span className="riders">화물칸 {stage.wagons.length}개 · </span>}
+              {stage.water !== null && <span className="riders water">💧 물 {stage.water}칸 · </span>}
               레일 <b>{usedCount(editor.placed)}</b>개 ·{' '}
               <span className="par">
                 ★★★ {stage.par} · ★★ {stage.par + TWO_STAR_SLACK}개 이하
@@ -487,6 +574,30 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           출발
         </button>
       </div>
+
+      {stage.oneShot && failure && (
+        <div className="overlay" role="dialog" aria-label="출발 기회 끝">
+          <div className="result-card">
+            <p className="result-kicker">보너스 스테이지</p>
+            <h2>아쉬워요!</h2>
+            <p className="result-sub">
+              {FAIL_TEXT[failure.reason]}
+              <br />
+              출발 기회는 한 번뿐이에요. 다시 도전해 볼까요? (실패해도 다음 판은 열려 있어요)
+            </p>
+            <div className="result-actions">
+              <button className="primary" onClick={restartStage} autoFocus>
+                다시 도전
+              </button>
+              <button className="secondary" onClick={onBack}>
+                스테이지 목록
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
 
       {success && (
         <div className="overlay" role="dialog" aria-label="스테이지 클리어">
