@@ -1723,3 +1723,174 @@ body:has(.world-ice) {
     grid-template-rows: repeat(2, 40px);
   }
 }
+
+/* ---------- boss and bonus stages ---------- */
+
+.tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #fff;
+  vertical-align: middle;
+}
+
+.tag-boss {
+  background: linear-gradient(135deg, #9b5cf0, #6a35c9);
+  box-shadow: 0 2px 0 #4f2596;
+}
+
+.tag-bonus {
+  background: linear-gradient(135deg, #f6c443, #e38d1f);
+  box-shadow: 0 2px 0 #b46a12;
+}
+
+.stage-card .tag {
+  position: absolute;
+  left: 10px;
+  top: -9px;
+  margin: 0;
+}
+
+.stage-card.boss:not(.locked) {
+  background: linear-gradient(160deg, #f6efff, #e8dbff);
+  box-shadow: 0 3px 0 #c9b2f2, 0 10px 24px rgba(106, 53, 201, 0.18);
+}
+
+.stage-card.bonus:not(.locked) {
+  background: linear-gradient(160deg, #fff8e6, #ffe9b8);
+  box-shadow: 0 3px 0 #efc98f, 0 10px 24px rgba(227, 141, 31, 0.18);
+}
+
+/* ---------- machine world ---------- */
+
+.world-machine {
+  --bg: #eef0f6;
+  --card: #fbfcff;
+  --line: #d4d9e6;
+  --teal: #4a5571;
+  --ink-soft: #5d667d;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-machine) {
+  background: #eef0f6;
+}
+
+.machine-board .tappable {
+  cursor: pointer;
+}
+
+.mirror-turn {
+  transition: transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.mirror-hint {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-soft 0.9s ease-in-out infinite;
+}
+
+.bulb-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bulb-glow 1.4s ease-in-out infinite;
+}
+
+@keyframes bulb-glow {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.35;
+  }
+}
+
+.laser-lens {
+  animation: pulse-soft 1.2s ease-in-out infinite;
+}
+
+.door-shutter {
+  transform-box: fill-box;
+  transform-origin: top;
+  transition: transform 0.35s ease;
+}
+
+.beams line {
+  transition: opacity 0.15s ease;
+}
+
+.is-boss .stage-no {
+  color: #6a35c9;
+}
+
+.robot-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #fff8e6, #ffe9b8);
+  box-shadow: 0 3px 0 #efc98f;
+}
+
+.robot-face {
+  width: 54px;
+  height: 58px;
+  flex: none;
+}
+
+.robot-big {
+  width: 96px;
+  height: 104px;
+  margin: 4px auto 0;
+  display: block;
+}
+
+.robot-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  word-break: keep-all;
+}
+
+.battery {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.battery i {
+  flex: 1;
+  height: 14px;
+  max-width: 34px;
+  border-radius: 4px;
+  background: #e5d3b0;
+  transition: background 0.2s ease;
+}
+
+.battery i.on {
+  background: #4cc46a;
+  box-shadow: inset 0 -3px 0 #2f9a4b;
+}
+
+.robot-blink {
+  animation: pulse-soft 0.6s ease-in-out infinite;
+}
+
+.world-machine .board {
+  max-height: max(250px, calc(100dvh - 290px));
+}
+
+.game-head .stage-no {
+  white-space: nowrap;
+}
+
+.game-head .tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  vertical-align: 1px;
+}

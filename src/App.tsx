@@ -8,6 +8,8 @@ import { loadProgress, recordClear, saveProgress } from './storage';
 import { loadIceDaily } from './daily/loadIceDaily';
 import { ICE_DAILY_PREFIX } from './penguin/generate';
 import type { PenguinStage } from './penguin/model';
+import { MachineScreen } from './machine/MachineScreen';
+import { MACHINE_CHAPTERS, MACHINE_STAGES } from './machine/stages';
 import { PenguinScreen } from './penguin/PenguinScreen';
 import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
 import { GameScreen } from './ui/GameScreen';
@@ -23,12 +25,16 @@ type Screen =
   | { name: 'daily' }
   | { name: 'ice-select' }
   | { name: 'ice-game'; index: number }
-  | { name: 'ice-daily' };
+  | { name: 'ice-daily' }
+  | { name: 'mc-select' }
+  | { name: 'mc-game'; index: number };
 
 /** The penguin world opens once the train world's last boss is beaten. */
 const ICE_UNLOCK_ID = 'last-delivery';
 /** The penguin daily puzzle opens after the snow-pile stage (1-3). */
 const ICE_DAILY_UNLOCK_ID = 'ice-snow-pile';
+/** The machine world opens once the penguin world's last boss is beaten. */
+const MACHINE_UNLOCK_ID = 'ice-conquer';
 
 /** The daily puzzle opens once players have met passengers. */
 const DAILY_UNLOCK_ID = 'first-passenger';
@@ -102,10 +108,26 @@ export function App() {
         state: !cleared.has(ICE_UNLOCK_ID) ? 'locked' : iceAllCleared ? 'conquered' : 'open',
         lockNote: '기차 월드 마지막 배달(4-10)을 깨면 열려요',
       },
-      { id: 'machine', title: '기계 월드', blurb: '', color: '#7F8896', emblem: 'gear', stars: 0, maxStars: 0, state: 'soon' },
+      {
+        id: 'machine',
+        title: '로봇 공장',
+        blurb: '거울을 돌려 레이저로 전구를 모두 켜요',
+        color: '#E3AE1F',
+        emblem: 'gear',
+        stars: starsOf(MACHINE_STAGES),
+        maxStars: MACHINE_STAGES.length * 3,
+        state: !cleared.has(MACHINE_UNLOCK_ID) ? 'locked' : MACHINE_STAGES.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
+        lockNote: '펭귄 얼음 나라 마지막 보스(3-10)를 깨면 열려요',
+      },
       { id: 'volcano', title: '화산 월드', blurb: '', color: '#F0692E', emblem: 'volcano', stars: 0, maxStars: 0, state: 'soon' },
     ];
-    return <WorldSelect worlds={worlds} onPick={(id) => setScreen(id === 'ice' ? { name: 'ice-select' } : { name: 'select' })} onBack={() => setScreen({ name: 'title' })} />;
+    return (
+      <WorldSelect
+        worlds={worlds}
+        onPick={(id) => setScreen(id === 'ice' ? { name: 'ice-select' } : id === 'machine' ? { name: 'mc-select' } : { name: 'select' })}
+        onBack={() => setScreen({ name: 'title' })}
+      />
+    );
   }
 
   if (screen.name === 'ice-select') {
@@ -130,6 +152,38 @@ export function App() {
           loadingText: '오늘의 얼음판을 얼리는 중…',
           onPlay: () => setScreen({ name: 'ice-daily' }),
         }}
+      />
+    );
+  }
+
+  if (screen.name === 'mc-select') {
+    return (
+      <StageSelect
+        heading="로봇 공장"
+        theme="world-machine"
+        stages={MACHINE_STAGES}
+        chapters={MACHINE_CHAPTERS}
+        stars={progress.stars}
+        cleared={cleared}
+        allCleared={MACHINE_STAGES.every((s) => cleared.has(s.id))}
+        onPick={(index) => setScreen({ name: 'mc-game', index })}
+        onBack={() => setScreen({ name: 'worlds' })}
+      />
+    );
+  }
+
+  if (screen.name === 'mc-game') {
+    const stage = MACHINE_STAGES[screen.index];
+    const nextIndex = screen.index + 1;
+    return (
+      <MachineScreen
+        key={stage.id}
+        stage={stage}
+        hasNext={nextIndex < MACHINE_STAGES.length}
+        bestStars={progress.stars[stage.id] ?? 0}
+        onBack={() => setScreen({ name: 'mc-select' })}
+        onNext={() => setScreen(nextIndex < MACHINE_STAGES.length ? { name: 'mc-game', index: nextIndex } : { name: 'mc-select' })}
+        onCleared={onCleared}
       />
     );
   }

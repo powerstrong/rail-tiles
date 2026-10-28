@@ -35,3 +35,21 @@ for (const ch of ICE_CHAPTERS) {
     );
   }
 }
+
+// Machine world (laser puzzles): see src/machine/audit.ts.
+const { MACHINE_CHAPTERS, MACHINE_STAGES } = await import('../src/machine/stages');
+const { auditLaser } = await import('../src/machine/audit');
+console.log('\n\n=== 로봇 공장 ===');
+for (const ch of MACHINE_CHAPTERS) {
+  const list = MACHINE_STAGES.slice(ch.start, ch.start + ch.count).filter((s) => !ids.length || ids.includes(s.id));
+  if (!list.length) continue;
+  console.log(`\n챕터 ${ch.number} ${ch.title}`);
+  console.log('  판     이름              누르기  거울  아까운오답  난이도');
+  for (const st of list) {
+    const a = auditLaser(st)!;
+    const tag = st.boss ? ' [보스]' : st.battery !== undefined ? ' [보너스]' : '';
+    console.log(
+      `  ${st.label!.replace('STAGE ', '').padEnd(5)}  ${st.title.padEnd(12, '　')}  ${String(a.par).padStart(4)}  ${String(a.turnable).padStart(4)}  ${String(a.nearMisses).padStart(8)}  ${a.score.toFixed(1).padStart(6)}${tag}`,
+    );
+  }
+}

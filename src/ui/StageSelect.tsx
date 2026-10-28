@@ -6,6 +6,8 @@ import type { Stars } from '../engine/stars';
 export interface StageCard {
   id: string;
   title: string;
+  /** Bonus stages (a robot rescue) are marked; a chapter's last stage is always its boss. */
+  battery?: number;
 }
 
 interface Props {
@@ -71,9 +73,12 @@ function DailyCard({ title, stars, unlocked, unlockAfter, failed, streak, onPlay
 /**
  * A stage opens once the one before it is cleared. Stages already cleared stay open,
  * so stages added in the middle of a chapter later never lock a player's old progress.
+ * A bonus stage never blocks the way on.
  */
 export function isUnlocked(stages: StageCard[], cleared: ReadonlySet<string>, index: number): boolean {
-  return index === 0 || cleared.has(stages[index]?.id) || cleared.has(stages[index - 1]?.id);
+  if (index === 0 || cleared.has(stages[index]?.id) || cleared.has(stages[index - 1]?.id)) return true;
+  // Bonus stages are optional: the stage after one opens once the stage before the bonus is cleared.
+  return stages[index - 1]?.battery !== undefined && index >= 2 && cleared.has(stages[index - 2].id);
 }
 
 /** Three small stars, filled up to `count`. */
@@ -129,16 +134,18 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
                 const i = ch.start + k;
                 const unlocked = isUnlocked(stages, cleared, i);
                 const done = cleared.has(stage.id);
+                const kind = stage.battery !== undefined ? 'bonus' : k === ch.count - 1 ? 'boss' : '';
                 return (
                   <li key={stage.id}>
                     <button
-                      className={`stage-card ${done ? 'done' : ''} ${unlocked ? '' : 'locked'}`}
+                      className={`stage-card ${done ? 'done' : ''} ${unlocked ? '' : 'locked'} ${kind}`}
                       disabled={!unlocked}
                       onClick={() => onPick(i)}
                       aria-label={`챕터 ${ch.number} 스테이지 ${k + 1} ${stage.title}${done ? `, 별 ${stars[stage.id]}개` : unlocked ? '' : ', 잠김'}`}
                     >
                       <span className="stage-num">{k + 1}</span>
                       <span className="stage-name">{stage.title}</span>
+                      {kind && <span className={`tag tag-${kind}`}>{kind === 'boss' ? '보스' : '보너스'}</span>}
                       {unlocked && <StarRow count={stars[stage.id] ?? 0} className="card-stars" />}
                       {!unlocked && (
                         <span className="lock" aria-hidden>
