@@ -2066,3 +2066,291 @@ body:has(.world-volcano) {
   color: #d64545;
   font-weight: 800;
 }
+
+/* ---------- title extras: garage, save, install ---------- */
+
+.title-more {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.title-more .secondary {
+  position: relative;
+  font-size: 15px;
+  padding: 11px 18px;
+}
+
+.new-dot {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e5584f;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 900;
+  box-shadow: 0 2px 0 #b83e37;
+  animation: pulse-soft 1.2s ease-in-out infinite;
+}
+
+.install-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px dashed var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+
+.install-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.install-overlay,
+.install-overlay .result-card {
+  animation-delay: 0.05s;
+}
+
+.install-steps {
+  text-align: left;
+  margin: 10px 0 4px;
+  padding-left: 22px;
+  line-height: 1.8;
+  font-size: 15.5px;
+  word-break: keep-all;
+}
+
+.inline-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: -4px;
+  margin: 0 2px;
+  fill: none;
+  stroke: #2a74a8;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.install-note {
+  font-size: 13px;
+}
+
+/* ---------- garage ---------- */
+
+.garage-showcase {
+  display: block;
+  width: 100%;
+  border-radius: 22px;
+  box-shadow: 0 4px 0 var(--line);
+}
+
+.garage-train {
+  animation: bob 0.5s ease-in-out infinite;
+}
+
+.garage-next {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  box-shadow: 0 3px 0 var(--line);
+  font-size: 14.5px;
+  word-break: keep-all;
+}
+
+.garage-bar {
+  margin-top: 8px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.garage-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f6c443, #e38d1f);
+}
+
+.garage-slot h2 {
+  font-size: 16px;
+  margin: 14px 2px 8px;
+}
+
+.garage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+.garage-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px 6px;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 3px 0 var(--line);
+  font: inherit;
+  cursor: pointer;
+}
+
+.garage-item.on {
+  border-color: var(--amber);
+  background: #fff6e3;
+}
+
+.garage-item.locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.garage-art {
+  width: 72px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+}
+
+.garage-art svg {
+  width: 72px;
+  height: 52px;
+}
+
+.garage-smoke {
+  font-size: 30px;
+}
+
+.garage-lock {
+  font-size: 22px;
+}
+
+.garage-name {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.unlock-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  top: max(12px, env(safe-area-inset-top));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(420px, calc(100% - 24px));
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff8e6, #ffe9b8);
+  box-shadow: 0 4px 0 #efc98f, 0 10px 24px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  word-break: keep-all;
+  animation: card-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.unlock-gift {
+  font-size: 28px;
+}
+
+.puff-shape {
+  animation-name: puff-shape;
+}
+
+@keyframes puff-shape {
+  from {
+    transform: scale(0.6);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(1.5) translate(-2px, -6px);
+    opacity: 0;
+  }
+}
+
+.puff-sparkle {
+  animation-duration: 1.5s;
+}
+
+.aura {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+/* ---------- save screen ---------- */
+
+.save-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: 0 3px 0 var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  word-break: keep-all;
+}
+
+.save-card h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.save-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.save-code {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  font: 12.5px ui-monospace, monospace;
+  word-break: break-all;
+  resize: vertical;
+  background: #fffdf8;
+}
+
+.save-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.save-note {
+  font-weight: 700;
+  color: #2f7f78 !important;
+}
+
+.save-note.bad {
+  color: #d64545 !important;
+}
+
+.save-card + .save-card,
+.garage-next {
+  margin-top: 14px;
+}

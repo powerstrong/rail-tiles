@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { starsFor } from './engine/stars';
-import { emptyProgress, loadProgress, recordClear, saveProgress } from './storage';
+import { emptyProgress, exportCode, loadProgress, mergeProgress, readCode, recordClear, saveProgress } from './storage';
 
 function memory(initial?: string) {
   const data = new Map<string, string>();
@@ -63,5 +63,23 @@ describe('stars', () => {
   it('caps hinted clears at two stars', () => {
     expect(starsFor(9, 9, true)).toBe(2);
     expect(starsFor(12, 9, true)).toBe(1);
+  });
+
+  it('keeps the train look across a save', () => {
+    const store = memory();
+    saveProgress({ ...emptyProgress(), look: { body: 'body-blue' }, lookSeen: 4 }, store);
+    expect(loadProgress(store)).toMatchObject({ look: { body: 'body-blue' }, lookSeen: 4 });
+  });
+
+  it('save codes round-trip and merge keeping the better rating', async () => {
+    const mine = { ...emptyProgress(), stars: { 'first-line': 3 as const, 'ice-first-slide': 1 as const }, look: { body: 'body-pink' } };
+    const code = await exportCode(mine);
+    expect(code.startsWith('RT1.')).toBe(true);
+    const loaded = await readCode(` ${code}\n`);
+    expect(loaded).toEqual({ stars: mine.stars, look: mine.look });
+    const other = { ...emptyProgress(), stars: { 'ice-first-slide': 3 as const, 'mc-first-mirror': 2 as const } };
+    expect(mergeProgress(other, loaded!).stars).toEqual({ 'first-line': 3, 'ice-first-slide': 3, 'mc-first-mirror': 2 });
+    expect(await readCode('hello')).toBe(null);
+    expect(await readCode('RT1.zAAAA')).toBe(null);
   });
 });

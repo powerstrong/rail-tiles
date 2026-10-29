@@ -5,7 +5,9 @@ import { C } from './art/palette';
 import type { Decoration } from '../engine/stage';
 import { DecorationArt, GroundDetail, TileBase, cellHash } from './art/SceneryArt';
 import { CELL, SegmentArt } from './art/TrackArt';
-import { TrainArt } from './art/TrainArt';
+import { CHIMNEY, TrainArt } from './art/TrainArt';
+import { makePuff, useLook } from './look';
+import { InstallButton } from './InstallButton';
 import { poseTransform } from './trainRunner';
 
 /** A closed 4×2 loop (columns 1–4, rows 0–1) the title train circles forever. */
@@ -28,20 +30,31 @@ const PAD = 22;
 const SCENERY = ['M . . . . T', 'T . . . . R', 'W W . T H T'];
 const DECOS: Record<string, Decoration> = { T: 'tree', R: 'rock', M: 'mountain', W: 'water', H: 'house' };
 
-function TitleLoop() {
+/** The little loop of track with the player's train going round, puffing its chosen smoke. */
+export function TitleLoop() {
   const trainRef = useRef<SVGGElement>(null);
+  const smokeRef = useRef<SVGGElement>(null);
+  const { smoke } = useLook();
   useEffect(() => {
     let frame = 0;
+    let puffs = 0;
+    let next = 0;
     const t0 = performance.now();
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const tick = (now: number) => {
       const d = reduced ? 1.2 : (((now - t0) / 1000) * 1.1) % LOOP.length;
-      trainRef.current?.setAttribute('transform', poseTransform(poseAt(LOOP, d), CELL));
+      const pose = poseAt(LOOP, d);
+      trainRef.current?.setAttribute('transform', poseTransform(pose, CELL));
+      if (!reduced && now >= next && smokeRef.current) {
+        next = now + 380;
+        const a = (pose.angle * Math.PI) / 180;
+        smokeRef.current.appendChild(makePuff(smoke, pose.x * CELL + Math.cos(a) * CHIMNEY.x, pose.y * CELL + Math.sin(a) * CHIMNEY.x, puffs++));
+      }
       if (!reduced) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [smoke]);
 
   const rows = SCENERY.map((r) => r.split(' '));
   const isWater = (x: number, y: number) => rows[y]?.[x] === 'W';
@@ -79,6 +92,7 @@ function TitleLoop() {
           ) : null,
         ),
       )}
+      <g ref={smokeRef} />
       <g ref={trainRef}>
         <TrainArt />
       </g>
@@ -86,7 +100,15 @@ function TitleLoop() {
   );
 }
 
-export function TitleScreen({ onPlay }: { onPlay: () => void }) {
+interface TitleProps {
+  onPlay: () => void;
+  onGarage: () => void;
+  onSave: () => void;
+  /** New train looks the player has not seen yet. */
+  newLooks: number;
+}
+
+export function TitleScreen({ onPlay, onGarage, onSave, newLooks }: TitleProps) {
   return (
     <main className="title">
       <div className="title-inner">
@@ -99,6 +121,16 @@ export function TitleScreen({ onPlay }: { onPlay: () => void }) {
         <button className="primary big" onClick={onPlay} autoFocus>
           시작하기
         </button>
+        <div className="title-more">
+          <button className="secondary" onClick={onGarage}>
+            🎨 기차 꾸미기
+            {newLooks > 0 && <span className="new-dot">NEW {newLooks}</span>}
+          </button>
+          <button className="secondary" onClick={onSave}>
+            💾 기록 지키기
+          </button>
+        </div>
+        <InstallButton />
       </div>
     </main>
   );

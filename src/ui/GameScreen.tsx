@@ -10,6 +10,7 @@ import { CELL, RailPieceArt } from './art/TrackArt';
 import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
 import { type Intro, IntroCard } from './IntroCard';
+import { makePuff, useLook } from './look';
 import { StarRow } from './StageSelect';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
@@ -241,18 +242,15 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     if (done) strokeBase.current = null;
   };
 
+  const { smoke } = useLook();
+  const puffCount = useRef(0);
   const spawnPuff = (pose: Pose) => {
     const layer = smokeRef.current;
     if (!layer) return;
     const a = (pose.angle * Math.PI) / 180;
-    const puff = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    puff.setAttribute('cx', (pose.x * CELL + Math.cos(a) * CHIMNEY.x).toFixed(1));
-    puff.setAttribute('cy', (pose.y * CELL + Math.sin(a) * CHIMNEY.x).toFixed(1));
-    puff.setAttribute('r', '7');
-    puff.setAttribute('class', 'puff');
-    puff.addEventListener('animationend', () => puff.remove());
-    layer.appendChild(puff);
+    layer.appendChild(makePuff(smoke, pose.x * CELL + Math.cos(a) * CHIMNEY.x, pose.y * CELL + Math.sin(a) * CHIMNEY.x, puffCount.current++));
   };
+
 
   const start = () => {
     if (running) return;

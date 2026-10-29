@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { loadDaily } from './daily/loadDaily';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stage } from './engine/stage';
@@ -6,7 +6,10 @@ import type { Stars } from './engine/stars';
 import { S2_CHAPTERS, S2_STAGES } from './stages/season2';
 import { S2_INTROS } from './stages/season2Intros';
 import { CHAPTERS, STAGES } from './stages/stages';
-import { loadProgress, recordClear, saveProgress } from './storage';
+import { type Progress, loadProgress, recordClear, saveProgress, totalStars } from './storage';
+import { Garage } from './ui/Garage';
+import { type LookItem, LookContext, STARTER_COUNT, type TrainLook, safeLook, unlockedItems } from './ui/look';
+import { SaveScreen } from './ui/SaveScreen';
 import { loadIceDaily } from './daily/loadIceDaily';
 import { ICE_DAILY_PREFIX } from './penguin/generate';
 import type { PenguinStage } from './penguin/model';
@@ -26,6 +29,8 @@ import { type WorldCard, WorldSelect } from './ui/WorldSelect';
 
 type Screen =
   | { name: 'title' }
+  | { name: 'garage' }
+  | { name: 'save' }
   | { name: 'worlds' }
   | { name: 'select' }
   | { name: 'game'; index: number }
@@ -54,17 +59,52 @@ const VOLCANO_UNLOCK_ID = 'mc-final-boss';
 /** The daily puzzle opens once players have met passengers. */
 const DAILY_UNLOCK_ID = 'first-passenger';
 
+/** Progress, the train look and the "new look unlocked" banner, around every screen. */
 export function App() {
-  const [screen, setScreen] = useState<Screen>({ name: 'title' });
   const [progress, setProgress] = useState(loadProgress);
-  const cleared = useMemo(() => new Set(Object.keys(progress.stars)), [progress]);
-  const allCleared = STAGES.every((s) => cleared.has(s.id));
-
   // Persist outside the state updater (StrictMode may call updaters twice); skip the initial load.
   const loaded = useRef(progress);
   useEffect(() => {
     if (progress !== loaded.current) saveProgress(progress);
   }, [progress]);
+
+  const stars = totalStars(progress);
+  const look = safeLook(progress.look as Partial<TrainLook> | undefined, stars);
+  const unlocked = unlockedItems(stars);
+  const known = useRef(unlocked.length);
+  const [fresh, setFresh] = useState<LookItem[]>([]);
+  useEffect(() => {
+    if (unlocked.length > known.current) setFresh(unlocked.slice(known.current));
+    known.current = Math.max(known.current, unlocked.length);
+  }, [unlocked]);
+  useEffect(() => {
+    if (!fresh.length) return;
+    const t = setTimeout(() => setFresh([]), 6000);
+    return () => clearTimeout(t);
+  }, [fresh]);
+
+  return (
+    <LookContext.Provider value={look}>
+      <Screens progress={progress} setProgress={setProgress} look={look} />
+      {fresh.length > 0 && (
+        <div className="unlock-banner" role="status" onClick={() => setFresh([])}>
+          <span className="unlock-gift">🎁</span>
+          <span>
+            <b>새 꾸미기: {fresh.map((i) => i.name).join(', ')}!</b>
+            <br />
+            처음 화면의 ‘기차 꾸미기’에서 바꿔 보세요.
+          </span>
+        </div>
+      )}
+    </LookContext.Provider>
+  );
+}
+
+function Screens({ progress, setProgress, look }: { progress: Progress; setProgress: Dispatch<SetStateAction<Progress>>; look: TrainLook }) {
+  const [screen, setScreen] = useState<Screen>({ name: 'title' });
+  const cleared = useMemo(() => new Set(Object.keys(progress.stars)), [progress]);
+  const allCleared = STAGES.every((s) => cleared.has(s.id));
+  const stars = totalStars(progress);
 
   const onCleared = (id: string, stars: Stars) => setProgress((p) => recordClear(p, id, stars));
 
@@ -104,7 +144,33 @@ export function App() {
   const iceDailyStage = iceDaily.date === today ? iceDaily.stage : null;
   const iceStreak = dailyStreak(Object.keys(progress.stars), today, ICE_DAILY_PREFIX);
 
-  if (screen.name === 'title') return <TitleScreen onPlay={() => setScreen({ name: 'worlds' })} />;
+  if (screen.name === 'title') {
+    return (
+      <TitleScreen
+        onPlay={() => setScreen({ name: 'worlds' })}
+        onGarage={() => setScreen({ name: 'garage' })}
+        onSave={() => setScreen({ name: 'save' })}
+        newLooks={Math.max(0, unlockedItems(stars).length - (progress.lookSeen ?? STARTER_COUNT))}
+      />
+    );
+  }
+
+  if (screen.name === 'garage') {
+    return (
+      <Garage
+        look={look}
+        stars={stars}
+        seen={progress.lookSeen ?? STARTER_COUNT}
+        onChange={(l) => setProgress((p) => ({ ...p, look: { ...l } }))}
+        onBack={() => {
+          setProgress((p) => ({ ...p, lookSeen: unlockedItems(totalStars(p)).length }));
+          setScreen({ name: 'title' });
+        }}
+      />
+    );
+  }
+
+  if (screen.name === 'save') return <SaveScreen progress={progress} onLoad={setProgress} onBack={() => setScreen({ name: 'title' })} />;
 
   const starsOf = (ids: { id: string }[]) => ids.reduce((sum, s) => sum + (progress.stars[s.id] ?? 0), 0);
   const iceAllCleared = ICE_STAGES.length > 0 && ICE_STAGES.every((s) => cleared.has(s.id));
