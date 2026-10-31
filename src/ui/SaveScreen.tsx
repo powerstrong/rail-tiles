@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type Progress, exportCode, mergeProgress, readCode, totalStars } from '../storage';
+import { type Progress, exportCode, mergeProgress, needsNewerBrowser, readCode, totalStars } from '../storage';
 
 interface Props {
   progress: Progress;
@@ -15,9 +15,13 @@ export function SaveScreen({ progress, onLoad, onBack }: Props) {
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
 
   const make = async () => {
-    const c = await exportCode(progress);
-    setCode(c);
-    setNote(null);
+    try {
+      setCode(await exportCode(progress));
+      setNote(null);
+    } catch {
+      setCode(null);
+      setNote('코드를 만들지 못했어요. 잠시 뒤에 다시 눌러 주세요.');
+    }
   };
   const copy = async () => {
     if (!code) return;
@@ -39,7 +43,12 @@ export function SaveScreen({ progress, onLoad, onBack }: Props) {
   const load = async () => {
     const loaded = await readCode(paste);
     if (!loaded) {
-      setResult({ ok: false, text: '저장 코드가 아니거나 일부가 빠졌어요. 코드를 처음부터 끝까지 붙여 넣어 주세요.' });
+      setResult({
+        ok: false,
+        text: needsNewerBrowser(paste)
+          ? '이 브라우저는 이 코드를 열 수 없어요. 브라우저를 최신으로 업데이트하거나 다른 브라우저(Chrome, Safari)에서 불러와 주세요.'
+          : '저장 코드가 아니거나 일부가 빠졌어요. 코드를 처음부터 끝까지 붙여 넣어 주세요.',
+      });
       return;
     }
     const before = totalStars(progress);
@@ -86,6 +95,7 @@ export function SaveScreen({ progress, onLoad, onBack }: Props) {
             {note && <p className="save-note">{note}</p>}
           </>
         )}
+        {!code && note && <p className="save-note bad">{note}</p>}
       </section>
 
       <section className="save-card">

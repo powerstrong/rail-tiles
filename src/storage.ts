@@ -102,8 +102,19 @@ async function pipe(bytes: Uint8Array, stream: CompressionStream | Decompression
  */
 export async function exportCode(progress: Progress): Promise<string> {
   const json = new TextEncoder().encode(JSON.stringify({ s: progress.stars, l: progress.look ?? {} }));
-  if (typeof CompressionStream !== 'undefined') return `${CODE_PREFIX}z${toBase64Url(await pipe(json, new CompressionStream('deflate-raw')))}`;
+  if (typeof CompressionStream !== 'undefined') {
+    try {
+      return `${CODE_PREFIX}z${toBase64Url(await pipe(json, new CompressionStream('deflate-raw')))}`;
+    } catch {
+      // A browser with CompressionStream but without deflate-raw: the plain code below still works.
+    }
+  }
   return `${CODE_PREFIX}j${toBase64Url(json)}`;
+}
+
+/** A compressed code this browser cannot open (no DecompressionStream): it needs a newer browser, not a new code. */
+export function needsNewerBrowser(code: string): boolean {
+  return code.replace(/\s+/g, '').startsWith(`${CODE_PREFIX}z`) && typeof DecompressionStream === 'undefined';
 }
 
 /** Reads a save code; null when it is not one of ours or is damaged. */

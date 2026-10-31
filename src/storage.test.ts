@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { starsFor } from './engine/stars';
-import { emptyProgress, exportCode, loadProgress, mergeProgress, readCode, recordClear, saveProgress } from './storage';
+import { emptyProgress, exportCode, loadProgress, mergeProgress, needsNewerBrowser, readCode, recordClear, saveProgress } from './storage';
 
 function memory(initial?: string) {
   const data = new Map<string, string>();
@@ -81,5 +81,37 @@ describe('stars', () => {
     expect(mergeProgress(other, loaded!).stars).toEqual({ 'first-line': 3, 'ice-first-slide': 3, 'mc-first-mirror': 2 });
     expect(await readCode('hello')).toBe(null);
     expect(await readCode('RT1.zAAAA')).toBe(null);
+  });
+
+  describe('save codes across browsers', () => {
+    const mine = { ...emptyProgress(), stars: { 'first-line': 3 as const }, look: { body: 'body-pink' } };
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('falls back to a plain code when compression is there but fails', async () => {
+      vi.stubGlobal(
+        'CompressionStream',
+        class {
+          constructor() {
+            throw new TypeError('deflate-raw is not supported');
+          }
+        },
+      );
+      const code = await exportCode(mine);
+      expect(code.startsWith('RT1.j')).toBe(true);
+      expect(await readCode(code)).toEqual({ stars: mine.stars, look: mine.look });
+    });
+
+    it('reads a plain code where decompression is missing, and says when a compressed one needs a newer browser', async () => {
+      const compressed = await exportCode(mine);
+      vi.stubGlobal('CompressionStream', undefined);
+      const plain = await exportCode(mine);
+      vi.stubGlobal('DecompressionStream', undefined);
+      expect(plain.startsWith('RT1.j')).toBe(true);
+      expect(await readCode(plain)).toEqual({ stars: mine.stars, look: mine.look });
+      expect(needsNewerBrowser(plain)).toBe(false);
+      expect(compressed.startsWith('RT1.z')).toBe(true);
+      expect(await readCode(compressed)).toBe(null);
+      expect(needsNewerBrowser(` ${compressed}`)).toBe(true);
+    });
   });
 });
