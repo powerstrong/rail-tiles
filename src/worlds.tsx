@@ -1,6 +1,11 @@
 import type { ComponentType } from 'react';
 import { loadDaily } from './daily/loadDaily';
+import { loadDepotDaily } from './daily/loadDepotDaily';
 import { loadIceDaily } from './daily/loadIceDaily';
+import { DepotScreen } from './depot/DepotScreen';
+import { DEPOT_DAILY_PREFIX } from './depot/generate';
+import { DEPOT_INTROS } from './depot/intros';
+import { DEPOT_CHAPTERS, DEPOT_STAGES } from './depot/stages';
 import { DAILY_PREFIX } from './engine/generate';
 import type { Stars } from './engine/stars';
 import { MACHINE_INTROS } from './machine/intros';
@@ -174,6 +179,29 @@ export const WORLDS: World[] = [
     unlockAfter: 'mc-final-boss',
     lockNote: '로봇 공장 마지막 보스(3-10)를 깨면 열려요',
     Game: VolcanoScreen,
+  }),
+  world({
+    id: 'depot',
+    title: '기차 차고지',
+    blurb: '객차를 밀어서 기관차를 차고 밖으로!',
+    color: '#2E6F8E',
+    emblem: 'depot',
+    theme: 'world-depot',
+    stages: DEPOT_STAGES,
+    chapters: DEPOT_CHAPTERS,
+    intros: DEPOT_INTROS,
+    isBonus: (s) => s.limit !== undefined,
+    unlockAfter: 't2-final-boss',
+    lockNote: '기차 월드 2 마지막 보스(5-10)를 깨면 열려요',
+    Game: DepotScreen,
+    daily: {
+      prefix: DEPOT_DAILY_PREFIX,
+      // After the water tower stage (1-4).
+      unlockAfter: 'dp-water-tower',
+      load: loadDepotDaily,
+      loadingText: '오늘의 차고지를 정리하는 중…',
+      clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 차고지가 열려요`,
+    },
   }),
 ];
 

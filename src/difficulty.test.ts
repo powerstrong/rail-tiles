@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { audit, difficultyScore } from '../scripts/audit';
+import { auditDepot } from './depot/audit';
+import { DEPOT_INTROS } from './depot/intros';
+import { DEPOT_CHAPTERS, DEPOT_STAGES } from './depot/stages';
 import { auditLaser } from './machine/audit';
 import { MACHINE_INTROS } from './machine/intros';
 import { MACHINE_CHAPTERS, MACHINE_STAGES } from './machine/stages';
@@ -99,6 +102,8 @@ curve('penguin', ICE_STAGES, ICE_CHAPTERS, (s) => auditIce(s)!.score, ICE_INTROS
 curve('machine', MACHINE_STAGES, MACHINE_CHAPTERS, (s) => auditLaser(s)!.score, MACHINE_INTROS);
 // Race stages are bonus rounds on their own scale.
 curve('volcano', VOLCANO_STAGES, VOLCANO_CHAPTERS, (s) => auditLava(s)!.score, VOLCANO_INTROS, { skip: (s) => !!s.race });
+// Departure-time bonus stages are on their own scale too.
+curve('depot', DEPOT_STAGES, DEPOT_CHAPTERS, (s) => auditDepot(s)!.score, DEPOT_INTROS, { skip: (s) => s.limit !== undefined });
 // Train world 2 has the same rules in src/stages/season2.test.ts.
 // Train world 1 came before the rules; these are its breaks today (see `npm run difficulty`),
 // each capped at its current size.

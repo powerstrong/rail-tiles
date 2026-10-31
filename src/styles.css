@@ -677,6 +677,8 @@ p {
 .status {
   flex: 1;
   min-height: 46px;
+  /* Break between words, never inside one ("힌 / 트"). */
+  word-break: keep-all;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2353,4 +2355,67 @@ body:has(.world-volcano) {
 .save-card + .save-card,
 .garage-next {
   margin-top: 14px;
+}
+
+/* ---------- depot world ---------- */
+
+.world-depot {
+  --bg: #eef3f4;
+  --card: #fbfdfd;
+  --line: #d5e1e5;
+  --teal: #2e6f8e;
+  --ink-soft: #4f6670;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-depot) {
+  background: #eef3f4;
+}
+
+.world-depot .board {
+  max-height: max(250px, calc(100dvh - 260px));
+  touch-action: none;
+}
+
+.depot-car {
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.45s ease-in;
+}
+
+.depot-car.dragging {
+  transition: none;
+}
+
+.depot-car.gone {
+  transition:
+    transform 0.6s ease-in,
+    opacity 0.6s ease-in;
+  opacity: 0;
+}
+
+.depot-pick {
+  animation: pulse-soft 1.2s ease-in-out infinite;
+}
+
+.depot-hint {
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+.barrier-arm {
+  transition: transform 0.3s ease-out;
+}
+
+.depot-bar {
+  background: linear-gradient(135deg, #eef7fb, #cfe7f1);
+  box-shadow: 0 3px 0 #a9cddd;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .depot-car,
+  .depot-car.gone,
+  .barrier-arm {
+    transition: none;
+  }
 }

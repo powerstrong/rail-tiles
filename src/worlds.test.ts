@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { LOOK_ITEMS } from './ui/look';
 import { isUnlocked } from './ui/StageSelect';
 import { WORLDS, stageCards, worldById } from './worlds';
 
@@ -54,12 +55,23 @@ describe('world registry', () => {
       ice: ['last-delivery', 'ice-snow-pile', 'ice-daily-'],
       machine: ['ice-conquer', null, null],
       volcano: ['mc-final-boss', null, null],
+      depot: ['t2-final-boss', 'dp-water-tower', 'depot-daily-'],
     });
+  });
+
+  it('lets every garage item be unlocked with the stars of the regular stages', () => {
+    const most = WORLDS.reduce((sum, w) => sum + w.stages.length * 3, 0);
+    for (const item of LOOK_ITEMS) expect(item.stars, item.id).toBeLessThanOrEqual(most);
+    // Every slot's items get dearer in order, so a later item never comes before an earlier one.
+    for (const slot of ['body', 'roof', 'smoke', 'deco']) {
+      const stars = LOOK_ITEMS.filter((i) => i.slot === slot).map((i) => i.stars);
+      expect(stars, slot).toEqual([...stars].sort((a, b) => a - b));
+    }
   });
 
   it('marks the bonus stages each world has', () => {
     const bonuses = Object.fromEntries(WORLDS.map((w) => [w.id, stageCards(w).filter((c) => c.bonus).length]));
-    expect(bonuses).toEqual({ train: 0, train2: 5, ice: 0, machine: 3, volcano: 3 });
+    expect(bonuses).toEqual({ train: 0, train2: 5, ice: 0, machine: 3, volcano: 3, depot: 3 });
   });
 
   for (const w of WORLDS) {
