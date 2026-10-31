@@ -1,4 +1,7 @@
 import type { ComponentType } from 'react';
+import { ClockScreen } from './clock/ClockScreen';
+import { CLOCK_INTROS } from './clock/intros';
+import { CLOCK_CHAPTERS, CLOCK_STAGES } from './clock/stages';
 import { loadDaily } from './daily/loadDaily';
 import { loadDepotDaily } from './daily/loadDepotDaily';
 import { loadIceDaily } from './daily/loadIceDaily';
@@ -220,6 +223,21 @@ export const WORLDS: World[] = [
     unlockAfter: 'dp-final-boss',
     lockNote: '기차 차고지 마지막 보스(3-10)를 깨면 열려요',
     Game: SpaceScreen,
+  }),
+  world({
+    id: 'clock',
+    title: '시계탑',
+    blurb: '똑딱! 박자를 맞춰 생쥐를 치즈까지',
+    color: '#C27C2C',
+    emblem: 'clock',
+    theme: 'world-clock',
+    stages: CLOCK_STAGES,
+    chapters: CLOCK_CHAPTERS,
+    intros: CLOCK_INTROS,
+    isBonus: (s) => s.limit !== undefined,
+    unlockAfter: 'sp-final-boss',
+    lockNote: '우주 정거장 마지막 보스(3-10)를 깨면 열려요',
+    Game: ClockScreen,
   }),
 ];
 

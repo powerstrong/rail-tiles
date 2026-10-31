@@ -2558,3 +2558,185 @@ body:has(.world-space) {
     animation: none;
   }
 }
+
+/* ---------- clock tower world ---------- */
+
+.world-clock {
+  --bg: #f7efe2;
+  --card: #fffbf4;
+  --line: #e8d6b8;
+  --teal: #a8641f;
+  --ink-soft: #6e5a48;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-clock) {
+  background: #f7efe2;
+}
+
+.world-clock .board {
+  max-height: max(230px, calc(100dvh - 350px));
+  touch-action: none;
+}
+
+.clock-mouse {
+  transition: transform 0.18s ease-out;
+}
+
+.clock-mouse-body {
+  transition: transform 0.15s ease-out;
+}
+
+.clock-mouse-body.won {
+  animation: capsule-bob 0.5s ease-in-out infinite alternate;
+}
+
+.clock-hand {
+  transition: transform 0.22s ease-in-out;
+}
+
+.clock-block {
+  transition:
+    transform 0.18s ease-out,
+    opacity 0.18s ease-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.clock-block.down {
+  transform: scale(0.6);
+  opacity: 0;
+}
+
+.clock-block-slot {
+  transition: opacity 0.18s ease-out;
+}
+
+.clock-block-slot.up {
+  opacity: 0;
+}
+
+.clock-rise {
+  animation: rise-hint 1s ease-in-out infinite;
+}
+
+@keyframes rise-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+.clock-lever-arm {
+  transition: transform 0.25s ease-out;
+}
+
+.clock-gear {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: swirl 12s linear infinite;
+}
+
+.clock-cheese {
+  animation: capsule-bob 1.2s ease-in-out infinite alternate;
+}
+
+.clock-hint {
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+.clock-stuck {
+  color: #b83f37;
+  font-weight: 800;
+}
+
+.clock-bar {
+  background: linear-gradient(135deg, #fff6e4, #f6deb0);
+  box-shadow: 0 3px 0 #e2c48c;
+}
+
+.clock-next i {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+
+.clock-next-0 i {
+  background: #e5584f;
+  border-radius: 50%;
+}
+
+.clock-next-1 i {
+  background: #3a8fd9;
+}
+
+.clock-dock {
+  justify-content: center;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.clock-dpad .dpad-btn svg {
+  fill: #a8641f;
+}
+
+.clock-rest {
+  height: 106px;
+  width: 78px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 3px 0 var(--line);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  font-weight: 900;
+  font-size: 15px;
+  color: #8a5a33;
+}
+
+.clock-rest svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: #a8641f;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.clock-rest:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.clock-rest:disabled {
+  opacity: 0.45;
+}
+
+.clock-rest.hinted {
+  background: #ffe7a3;
+  box-shadow: 0 3px 0 #e0b145;
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock-mouse,
+  .clock-mouse-body,
+  .clock-hand,
+  .clock-block,
+  .clock-gear,
+  .clock-rise,
+  .clock-cheese {
+    transition: none;
+    animation: none;
+  }
+}
