@@ -6,12 +6,14 @@ import type { Stars } from '../engine/stars';
 export interface StageCard {
   id: string;
   title: string;
-  /** Bonus stages (a robot rescue, a village escape) are marked; a chapter's last stage is always its boss. */
-  battery?: number;
-  race?: boolean;
+  /**
+   * An optional side stage (a robot rescue, a village escape, a one-departure run): tagged as a bonus,
+   * and it never blocks the way on. A chapter's last stage is always its boss.
+   */
+  bonus?: boolean;
 }
 
-const isBonus = (s: StageCard | undefined) => !!s && (s.battery !== undefined || !!s.race);
+const isBonus = (s: StageCard | undefined) => !!s?.bonus;
 
 interface Props {
   stages: StageCard[];
