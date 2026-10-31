@@ -113,5 +113,19 @@ describe('stars', () => {
       expect(await readCode(compressed)).toBe(null);
       expect(needsNewerBrowser(` ${compressed}`)).toBe(true);
     });
+
+    it('says a newer browser is needed when DecompressionStream is there but cannot do deflate-raw', async () => {
+      const compressed = await exportCode(mine);
+      vi.stubGlobal(
+        'DecompressionStream',
+        class {
+          constructor() {
+            throw new TypeError('deflate-raw is not supported');
+          }
+        },
+      );
+      expect(await readCode(compressed)).toBe(null);
+      expect(needsNewerBrowser(compressed)).toBe(true);
+    });
   });
 });

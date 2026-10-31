@@ -5,8 +5,13 @@ import type { Plugin, ResolvedConfig } from 'vite';
 
 /**
  * The offline service worker, written at build time with the exact list of files the build
- * produced. A new deploy gets a new version (and so a new cache), which the browser installs
- * in full before it takes over; old caches are then deleted.
+ * produced. Each deploy is one version with its own cache: the page and the files it loads
+ * always come from the same version, so it can never ask for a script the cache lacks.
+ *
+ * Updates arrive on the next launch: the browser notices the new sw.js, the new version
+ * downloads every file fresh, takes over, and deletes the old cache. A page that is already
+ * open keeps running the code it loaded (its daily puzzle worker falls back to the main thread
+ * if that old file is gone).
  */
 export function renderServiceWorker(files: string[], version: string): string {
   const list = ['./', ...files.map((f) => `./${f}`)];
@@ -14,13 +19,17 @@ export function renderServiceWorker(files: string[], version: string): string {
 const CACHE = 'rail-tiles-${version}';
 const FILES = ${JSON.stringify(list)};
 
-// Everything the game needs, so it opens offline right after the first visit. If any file fails
-// to download, the install fails and the previous version stays in charge.
+// Every file, fetched past the HTTP cache so an old page never lands next to new scripts. If any
+// download fails, the install fails and the previous version stays in charge.
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES)));
+  event.waitUntil(
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(FILES.map((url) => new Request(url, { cache: 'reload' }))))
+      .then(() => self.skipWaiting()),
+  );
 });
 
-// Takes over once no page of the old version is open, so a running game never mixes versions.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
@@ -34,11 +43,9 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   if (req.mode === 'navigate') {
-    // The fresh page when online (so updates arrive), this version's page offline.
+    // This version's page, so it matches the scripts in this cache. The network is only a fallback.
     event.respondWith(
-      fetch(req).catch(() =>
-        caches.open(CACHE).then((cache) => cache.match('./index.html').then((hit) => hit || cache.match('./'))),
-      ),
+      caches.open(CACHE).then((cache) => cache.match('./index.html').then((hit) => hit || fetch(req))),
     );
     return;
   }
@@ -65,7 +72,7 @@ export function serviceWorker(): Plugin {
   return {
     name: 'rail-tiles-service-worker',
     apply: 'build',
-    // After Vite's own plugins, so worker chunks are already in the bundle.
+    // After Vite's own plugins, so worker chunks and the final index.html are in the bundle.
     enforce: 'post',
     configResolved(resolved) {
       config = resolved;
@@ -74,9 +81,13 @@ export function serviceWorker(): Plugin {
       const publicDir = config.publicDir;
       const fromPublic = publicDir ? listFiles(publicDir) : [];
       const files = [...new Set([...Object.keys(bundle), ...fromPublic])].filter((f) => f !== 'sw.js' && !f.endsWith('.map')).sort();
-      // Built names carry content hashes; public files do not, so hash their bytes too.
-      const hash = createHash('sha256').update(files.join('\n'));
-      for (const f of fromPublic) hash.update(readFileSync(join(publicDir, f)));
+      // The version changes whenever any byte of the deploy does, index.html included.
+      const hash = createHash('sha256');
+      for (const name of Object.keys(bundle).sort()) {
+        const out = bundle[name];
+        hash.update(name).update(out.type === 'chunk' ? out.code : out.source);
+      }
+      for (const f of fromPublic) hash.update(f).update(readFileSync(join(publicDir, f)));
       this.emitFile({ type: 'asset', fileName: 'sw.js', source: renderServiceWorker(files, hash.digest('hex').slice(0, 12)) });
     },
   };

@@ -112,9 +112,19 @@ export async function exportCode(progress: Progress): Promise<string> {
   return `${CODE_PREFIX}j${toBase64Url(json)}`;
 }
 
-/** A compressed code this browser cannot open (no DecompressionStream): it needs a newer browser, not a new code. */
+/** Whether this browser can open compressed codes (DecompressionStream with deflate-raw). */
+function canInflate(): boolean {
+  try {
+    new DecompressionStream('deflate-raw');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** A compressed code this browser cannot open: it needs a newer browser, not a new code. */
 export function needsNewerBrowser(code: string): boolean {
-  return code.replace(/\s+/g, '').startsWith(`${CODE_PREFIX}z`) && typeof DecompressionStream === 'undefined';
+  return code.replace(/\s+/g, '').startsWith(`${CODE_PREFIX}z`) && !canInflate();
 }
 
 /** Reads a save code; null when it is not one of ours or is damaged. */
@@ -125,7 +135,7 @@ export async function readCode(code: string): Promise<Pick<Progress, 'stars' | '
     const kind = text[CODE_PREFIX.length];
     let bytes = fromBase64Url(text.slice(CODE_PREFIX.length + 1));
     if (kind === 'z') {
-      if (typeof DecompressionStream === 'undefined') return null;
+      if (!canInflate()) return null;
       bytes = await pipe(bytes, new DecompressionStream('deflate-raw'));
     } else if (kind !== 'j') return null;
     const data = JSON.parse(new TextDecoder().decode(bytes)) as { s?: unknown; l?: unknown };
