@@ -6,7 +6,7 @@ import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { type Blocked, DepotBoard } from './DepotBoard';
 import { type DepotStage, GONE, type Move } from './model';
-import { type DepotState, applyMove, canMove, initialState, isWon, reach, stateKey } from './slide';
+import { type DepotState, type Run, addRun, applyMove, canMove, initialState, isWon, reach, stateKey } from './slide';
 import { hintFrom } from './solver';
 
 interface Props {
@@ -20,12 +20,6 @@ interface Props {
   onCleared: (id: string, stars: Stars) => void;
   /** Extra line on the clear card (e.g. the daily streak). */
   clearNote?: string;
-}
-
-/** One move: a run of drags of the same vehicle, and the yard before it. */
-interface Run {
-  vehicle: number;
-  before: DepotState;
 }
 
 const LEAVE_MS = 650;
@@ -76,11 +70,7 @@ export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
       return;
     }
     const next = applyMove(state, m);
-    let nextRuns: Run[];
-    if (!sameRun) nextRuns = [...runs, { vehicle: m.vehicle, before: state }];
-    // Rolled back to where this run began: it was never a move.
-    else if (stateKey(last.before) === stateKey(next)) nextRuns = runs.slice(0, -1);
-    else nextRuns = runs;
+    const nextRuns = addRun(runs, state, m);
     setRuns(nextRuns);
     setState(next);
     setSelected(m.vehicle);
@@ -130,7 +120,8 @@ export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   };
   const showHint = () => {
     if (busy || won || late) return;
-    const m = hintFrom(stage, state);
+    // Knowing the run in progress, the hint counts moves exactly as the screen does.
+    const m = hintFrom(stage, state, runs[runs.length - 1] ?? null);
     if (!m) return;
     setHinted(true);
     setHint({ move: m, at: key });

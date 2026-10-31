@@ -144,3 +144,57 @@ describe('depot hints', () => {
     }
   }, 60_000);
 });
+
+describe('hints count moves the way the screen does', () => {
+  /** Follows hints from `s` (with `runs` so far) until the yard is won; returns the moves counted. */
+  async function followHints(stage: import('./model').DepotStage, s: number[], runs: import('./slide').Run[]) {
+    const { addRun } = await import('./slide');
+    for (let guard = 0; !isWon(stage, s) && guard < 60; guard++) {
+      const m = hintFrom(stage, s, runs[runs.length - 1] ?? null)!;
+      expect(m, stage.id).not.toBeNull();
+      runs = addRun(runs, s, m);
+      s = applyMove(s, m);
+    }
+    expect(isWon(stage, s)).toBe(true);
+    return runs.length;
+  }
+
+  it('after any one first move, following the hints still wins in exactly par moves', async () => {
+    const { DEPOT_STAGES } = await import('./stages');
+    const { addRun } = await import('./slide');
+    for (const stage of DEPOT_STAGES.filter((st) => st.par <= 9)) {
+      const start = initialState(stage);
+      for (const first of legalMoves(stage, start)) {
+        const runs = addRun([], start, first);
+        expect(await followHints(stage, applyMove(start, first), runs), `${stage.id} after ${moveName(stage, start[first.vehicle], first)}`).toBe(stage.par);
+      }
+    }
+  }, 120_000);
+
+  it('keeps a bonus stage winnable within its limit when the player strays (dp-departure-3, A+1 then B+1)', async () => {
+    const { DEPOT_STAGES } = await import('./stages');
+    const { addRun } = await import('./slide');
+    const stage = DEPOT_STAGES.find((st) => st.id === 'dp-departure-3')!;
+    let s = initialState(stage);
+    let runs: import('./slide').Run[] = [];
+    for (const name of ['A+1', 'B+1']) {
+      const m = parseMove(stage, s, name);
+      expect(canMove(stage, s, m), name).toBe(true);
+      runs = addRun(runs, s, m);
+      s = applyMove(s, m);
+    }
+    expect(await followHints(stage, s, runs)).toBeLessThanOrEqual(stage.limit!);
+  }, 60_000);
+
+  it('counts a run of drags of one vehicle once, and a roll back to its start as no move', async () => {
+    const { addRun } = await import('./slide');
+    const s = parseDepotStage(def(['. . . . .', '. . . . .', 'r r . . .', '. A . . .', '. A . . .']), 1);
+    const start = initialState(s);
+    let runs = addRun([], start, { vehicle: 1, to: 1 });
+    const mid = applyMove(start, { vehicle: 1, to: 1 });
+    runs = addRun(runs, mid, { vehicle: 1, to: 0 });
+    expect(runs.length).toBe(1);
+    runs = addRun(runs, applyMove(mid, { vehicle: 1, to: 0 }), { vehicle: 1, to: 3 });
+    expect(runs.length).toBe(0);
+  });
+});

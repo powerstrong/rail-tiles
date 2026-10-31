@@ -88,3 +88,19 @@ export function applyMove(s: DepotState, m: Move): DepotState {
   next[m.vehicle] = m.to;
   return next;
 }
+
+/** One counted move: a run of drags of the same vehicle, and the yard before it. */
+export interface Run {
+  vehicle: number;
+  before: DepotState;
+}
+
+/**
+ * The runs after move `m` from `s`, the way the screen counts: dragging the vehicle moved last
+ * joins its run (no extra move), and rolling it back to where that run began cancels it.
+ */
+export function addRun(runs: Run[], s: DepotState, m: Move): Run[] {
+  const last = runs[runs.length - 1];
+  if (!last || last.vehicle !== m.vehicle) return [...runs, { vehicle: m.vehicle, before: s }];
+  return stateKey(last.before) === stateKey(applyMove(s, m)) ? runs.slice(0, -1) : runs;
+}

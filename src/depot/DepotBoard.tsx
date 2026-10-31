@@ -106,6 +106,7 @@ export function DepotBoard({ stage, state, look, selected, won, hint, guide, loc
   const w = stage.width * DEPOT_CELL;
   const h = stage.height * DEPOT_CELL;
   const svgRef = useRef<SVGSVGElement>(null);
+  /** The press in progress; x and y are in board units, so a letterboxed board still follows the finger. */
   const press = useRef<{ id: number; v: number; x: number; y: number; cell: number; moved: boolean } | null>(null);
   const [drag, setDrag] = useState<{ v: number; delta: number } | null>(null);
   const occ = occupancy(stage, state);
@@ -133,21 +134,23 @@ export function DepotBoard({ stage, state, look, selected, won, hint, guide, loc
 
   const down = (e: ReactPointerEvent<SVGSVGElement>) => {
     if (locked || press.current) return;
+    const at = toBoard(e);
+    if (!at) return;
     const cell = cellAt(e);
     const v = cell >= 0 ? occ[cell] : -1;
-    press.current = { id: e.pointerId, v, x: e.clientX, y: e.clientY, cell, moved: false };
+    press.current = { id: e.pointerId, v, x: at.x, y: at.y, cell, moved: false };
     try {
       svgRef.current?.setPointerCapture(e.pointerId);
     } catch {
       // Capture only keeps a drag that leaves the board.
     }
   };
-  /** Pointer travel since press `p`, along vehicle `v`'s line, in cells. */
+  /** Pointer travel since press `p`, in cells: along vehicle `v`'s line, or in any direction without one. */
   const along = (e: ReactPointerEvent, p: { x: number; y: number }, v: number) => {
-    const rect = svgRef.current!.getBoundingClientRect();
-    const px = rect.width / (w + PAD * 2);
-    const d = stage.vehicles[v].horizontal ? e.clientX - p.x : e.clientY - p.y;
-    return d / px / DEPOT_CELL;
+    const at = toBoard(e);
+    if (!at) return 0;
+    if (v < 0) return Math.hypot(at.x - p.x, at.y - p.y) / DEPOT_CELL;
+    return (stage.vehicles[v].horizontal ? at.x - p.x : at.y - p.y) / DEPOT_CELL;
   };
   const move = (e: ReactPointerEvent<SVGSVGElement>) => {
     const p = press.current;
@@ -168,7 +171,8 @@ export function DepotBoard({ stage, state, look, selected, won, hint, guide, loc
     if (!p.moved && p.v >= 0 && Math.abs(along(e, p, p.v)) >= 0.3) p.moved = true;
     if (!p.moved) {
       if (p.v >= 0) onSelect(p.v);
-      else if (p.cell >= 0) onTapCell(p.cell);
+      // A swipe that starts on an empty cell is not a tap: it moves nothing.
+      else if (p.cell >= 0 && along(e, p, -1) < 0.3) onTapCell(p.cell);
       return;
     }
     const v = p.v;

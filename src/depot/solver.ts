@@ -1,5 +1,5 @@
-import type { DepotStage, Move } from './model';
-import { type DepotState, applyMove, initialState, isWon, legalMoves, stateKey } from './slide';
+import { type DepotStage, GONE, type Move } from './model';
+import { type DepotState, type Run, applyMove, initialState, isWon, legalMoves, stateKey } from './slide';
 
 export interface DepotGraph {
   /** Every state reachable from the start, by key. */
@@ -117,28 +117,42 @@ export function solveDepot(stage: DepotStage, maxStates?: number): DepotSolution
  * Searches forward and stops at the first win, carrying each layout's first move, so it only
  * looks as far as the answer instead of mapping the whole yard.
  */
-export function hintFrom(stage: DepotStage, state: DepotState, maxStates = 300_000): Move | null {
+export function hintFrom(stage: DepotStage, state: DepotState, run: Run | null = null, maxStates = 300_000): Move | null {
   if (isWon(stage, state)) return null;
+  type Entry = { s: DepotState; first: Move | null };
   const seen = new Set([stateKey(state)]);
-  let frontier: { s: DepotState; first: Move }[] = [];
-  for (const m of legalMoves(stage, state)) {
-    const next = applyMove(state, m);
-    if (isWon(stage, next)) return m;
-    const k = stateKey(next);
-    if (seen.has(k)) continue;
-    seen.add(k);
-    frontier.push({ s: next, first: m });
+  // Layouts by how many moves they add to the count, searched cheapest first.
+  const free: Entry[] = [{ s: state, first: null }];
+  let frontier = free;
+  let carry: Entry[] = [];
+  if (run && state[run.vehicle] !== GONE) {
+    // Moving the vehicle dragged last joins its run (costs nothing); rolling it back to where the
+    // run began cancels that move (one fewer).
+    const back = stateKey(run.before);
+    for (const m of legalMoves(stage, state)) {
+      if (m.vehicle !== run.vehicle) continue;
+      const next = applyMove(state, m);
+      if (isWon(stage, next)) return m;
+      const k = stateKey(next);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      if (k === back) {
+        frontier = [{ s: next, first: m }];
+        carry = free;
+      } else free.push({ s: next, first: m });
+    }
   }
   while (frontier.length && seen.size < maxStates) {
-    const ahead: typeof frontier = [];
+    const ahead = carry;
+    carry = [];
     for (const { s, first } of frontier) {
       for (const m of legalMoves(stage, s)) {
         const next = applyMove(s, m);
-        if (isWon(stage, next)) return first;
+        if (isWon(stage, next)) return first ?? m;
         const k = stateKey(next);
         if (seen.has(k)) continue;
         seen.add(k);
-        ahead.push({ s: next, first });
+        ahead.push({ s: next, first: first ?? m });
       }
     }
     frontier = ahead;
