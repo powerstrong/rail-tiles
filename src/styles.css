@@ -2419,3 +2419,142 @@ body:has(.world-depot) {
     transition: none;
   }
 }
+
+/* ---------- space world ---------- */
+
+.world-space {
+  --bg: #eceefb;
+  --card: #fbfbff;
+  --line: #d3d6f0;
+  --teal: #5b4fd1;
+  --ink-soft: #565c80;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-space) {
+  background: #eceefb;
+}
+
+/* The gravity pad sits under the board: leave it room on short phones. */
+.world-space .board {
+  max-height: max(230px, calc(100dvh - 350px));
+  touch-action: none;
+}
+
+.space-capsule {
+  transition: transform 0.16s ease-out;
+}
+
+.space-capsule.warped {
+  transition: none;
+}
+
+.space-capsule.warped .space-capsule-body {
+  animation: warp-in 0.32s ease-out both;
+}
+
+.space-capsule.won .space-capsule-body {
+  animation: capsule-bob 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes warp-in {
+  from {
+    transform: scale(0.1) rotate(-200deg);
+    opacity: 0.2;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes capsule-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+.space-swirl {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: swirl 4s linear infinite;
+}
+
+@keyframes swirl {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.space-pad-chevrons {
+  animation: pulse-soft 1.1s ease-in-out infinite;
+}
+
+.space-dock-glow {
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+.space-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.space-hint {
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+.space-stuck {
+  color: #c2433c;
+  font-weight: 800;
+}
+
+.space-bar {
+  background: linear-gradient(135deg, #f1efff, #d9d3ff);
+  box-shadow: 0 3px 0 #bdb4f0;
+}
+
+.space-dock {
+  justify-content: center;
+}
+
+.space-dpad {
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(2, 50px);
+  gap: 6px;
+}
+
+.space-dpad .dpad-btn svg {
+  width: 28px;
+  height: 28px;
+  fill: #5b4fd1;
+}
+
+.space-dpad .dpad-btn.hinted {
+  background: #ffe7a3;
+  box-shadow: 0 3px 0 #e0b145;
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .space-capsule,
+  .space-swirl,
+  .space-twinkle,
+  .space-capsule.warped .space-capsule-body,
+  .space-capsule.won .space-capsule-body {
+    transition: none;
+    animation: none;
+  }
+}

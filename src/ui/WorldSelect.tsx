@@ -6,7 +6,7 @@ export interface WorldCard {
   blurb: string;
   /** Accent colour and a small emblem drawn in SVG. */
   color: string;
-  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot';
+  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space';
   stars: number;
   maxStars: number;
   state: 'open' | 'locked' | 'conquered' | 'soon';
@@ -65,6 +65,21 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
           <rect x="17" y="30" width="14" height="11" rx="3" fill="#E5584F" />
           <circle cx="24" cy="34" r="3" fill="#F4E9C8" />
           <rect x="16" y="38" width="16" height="4" rx="1.5" fill="#E0B145" />
+        </svg>
+      );
+    case 'space':
+      return (
+        <svg viewBox="0 0 48 48" aria-hidden>
+          <circle cx="24" cy="24" r="21" fill="#1F2A4D" />
+          <circle cx="11" cy="12" r="1.6" fill="#FFF6D6" />
+          <circle cx="38" cy="10" r="1.2" fill="#FFF6D6" />
+          <circle cx="40" cy="34" r="1.6" fill="#FFF6D6" />
+          <ellipse cx="24" cy="26" rx="19" ry="6" fill="none" stroke="#9B6BF0" strokeWidth="2.5" transform="rotate(-18 24 26)" />
+          <path d="M14 30 L9 37 L17 34 Z M34 30 L39 37 L31 34 Z" fill="#C2433C" />
+          <circle cx="24" cy="25" r="11" fill="#F0625A" />
+          <circle cx="24" cy="23" r="6" fill="#CDEFFF" stroke="#C9D3EA" strokeWidth="2" />
+          <path d="M24 14 V10" stroke="#1E2440" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="24" cy="9" r="2" fill="#7BE0A5" />
         </svg>
       );
   }

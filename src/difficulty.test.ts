@@ -9,6 +9,9 @@ import { MACHINE_CHAPTERS, MACHINE_STAGES } from './machine/stages';
 import { auditIce } from './penguin/audit';
 import { ICE_INTROS } from './penguin/intros';
 import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
+import { auditSpace } from './space/audit';
+import { SPACE_INTROS } from './space/intros';
+import { SPACE_CHAPTERS, SPACE_STAGES } from './space/stages';
 import { CHAPTERS, type Chapter, STAGES } from './stages/stages';
 import { auditLava } from './volcano/audit';
 import { VOLCANO_INTROS } from './volcano/intros';
@@ -104,6 +107,8 @@ curve('machine', MACHINE_STAGES, MACHINE_CHAPTERS, (s) => auditLaser(s)!.score, 
 curve('volcano', VOLCANO_STAGES, VOLCANO_CHAPTERS, (s) => auditLava(s)!.score, VOLCANO_INTROS, { skip: (s) => !!s.race });
 // Departure-time bonus stages are on their own scale too.
 curve('depot', DEPOT_STAGES, DEPOT_CHAPTERS, (s) => auditDepot(s)!.score, DEPOT_INTROS, { skip: (s) => s.limit !== undefined });
+// Out-of-air bonus stages are on their own scale as well.
+curve('space', SPACE_STAGES, SPACE_CHAPTERS, (s) => auditSpace(s)!.score, SPACE_INTROS, { skip: (s) => s.limit !== undefined });
 // Train world 2 has the same rules in src/stages/season2.test.ts.
 // Train world 1 came before the rules; these are its breaks today (see `npm run difficulty`),
 // each capped at its current size.

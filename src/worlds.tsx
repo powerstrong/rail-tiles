@@ -15,6 +15,9 @@ import { ICE_DAILY_PREFIX } from './penguin/generate';
 import { ICE_INTROS } from './penguin/intros';
 import { PenguinScreen } from './penguin/PenguinScreen';
 import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
+import { SPACE_INTROS } from './space/intros';
+import { SpaceScreen } from './space/SpaceScreen';
+import { SPACE_CHAPTERS, SPACE_STAGES } from './space/stages';
 import { S2_CHAPTERS, S2_STAGES } from './stages/season2';
 import { S2_INTROS } from './stages/season2Intros';
 import { CHAPTERS, type Chapter, STAGES } from './stages/stages';
@@ -202,6 +205,21 @@ export const WORLDS: World[] = [
       loadingText: '오늘의 차고지를 정리하는 중…',
       clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 차고지가 열려요`,
     },
+  }),
+  world({
+    id: 'space',
+    title: '우주 정거장',
+    blurb: '중력을 바꿔 캡슐을 모두 도킹시켜요',
+    color: '#5B4FD1',
+    emblem: 'space',
+    theme: 'world-space',
+    stages: SPACE_STAGES,
+    chapters: SPACE_CHAPTERS,
+    intros: SPACE_INTROS,
+    isBonus: (s) => s.limit !== undefined,
+    unlockAfter: 'dp-final-boss',
+    lockNote: '기차 차고지 마지막 보스(3-10)를 깨면 열려요',
+    Game: SpaceScreen,
   }),
 ];
 

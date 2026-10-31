@@ -39,6 +39,7 @@ export const LOOK_ITEMS: LookItem[] = [
   { id: 'body-jewel', slot: 'body', name: '보석', stars: 400, paint: paint('#7FD6F0', '#3FA3C9', '#E8FBFF', ['#E8FBFF', '#9FE3F7', '#C9B8FF', '#7FD6F0', '#FFFFFF']) },
   { id: 'body-brass', slot: 'body', name: '반짝 황동', stars: 560, paint: paint('#C9973A', '#946A1E', '#F2D48A', ['#F6DE9A', '#D4A548', '#A8782A', '#F0CF7A']) },
   { id: 'body-aurora', slot: 'body', name: '오로라', stars: 610, paint: paint('#5FD3B5', '#3A8FA8', '#E9FFF8', ['#9BF6D8', '#5FD3B5', '#6CB3EE', '#B596EC', '#F59AC0']) },
+  { id: 'body-galaxy', slot: 'body', name: '은하수', stars: 690, paint: paint('#5B4FD1', '#3A3196', '#C9C2FF', ['#2E3A7C', '#5B4FD1', '#9B6BF0', '#F59AC0', '#FFF6D6']) },
   // Cab roof
   { id: 'roof-teal', slot: 'roof', name: '청록 지붕', stars: 0, paint: paint('#2F7F78', '#21605A', '#4FA59C') },
   { id: 'roof-navy', slot: 'roof', name: '남색 지붕', stars: 12, paint: paint('#34508A', '#243A66', '#5A78B5') },
@@ -48,6 +49,7 @@ export const LOOK_ITEMS: LookItem[] = [
   { id: 'roof-pink', slot: 'roof', name: '분홍 지붕', stars: 120, paint: paint('#F59AC0', '#D06D98', '#FFC4DC') },
   { id: 'roof-gold', slot: 'roof', name: '금빛 지붕', stars: 260, paint: paint('#E8B93A', '#B88A1A', '#FFE9A0', ['#FFE9A0', '#E8B93A', '#C9921C']) },
   { id: 'roof-depot', slot: 'roof', name: '차고지 청록 지붕', stars: 585, paint: paint('#2E6F8E', '#1F5068', '#5E9DBA') },
+  { id: 'roof-station', slot: 'roof', name: '우주 정거장 은빛 지붕', stars: 640, paint: paint('#B9C3DA', '#7F8BAA', '#EEF2FB', ['#EEF2FB', '#B9C3DA', '#8E9BBC', '#DDE4F4']) },
   // Smoke
   { id: 'smoke-cloud', slot: 'smoke', name: '하얀 연기', stars: 0 },
   { id: 'smoke-heart', slot: 'smoke', name: '하트 연기', stars: 25 },
@@ -56,6 +58,7 @@ export const LOOK_ITEMS: LookItem[] = [
   { id: 'smoke-bubble', slot: 'smoke', name: '비눗방울', stars: 110 },
   { id: 'smoke-rainbow', slot: 'smoke', name: '무지개 연기', stars: 180 },
   { id: 'smoke-sparkle', slot: 'smoke', name: '반짝이 가루', stars: 350 },
+  { id: 'smoke-comet', slot: 'smoke', name: '별똥별', stars: 665 },
   // Decorations
   { id: 'deco-none', slot: 'deco', name: '장식 없음', stars: 0 },
   { id: 'deco-flag', slot: 'deco', name: '깃발', stars: 15 },
@@ -115,7 +118,7 @@ const RAINBOW = ['#FF6B6B', '#FFB347', '#FFE066', '#6BD68A', '#5AB8F0', '#B48BF2
 /** One smoke puff element for the chosen style, centred on (x, y). `n` varies colours. */
 export function makePuff(smoke: string, x: number, y: number, n: number): SVGElement {
   const ns = 'http://www.w3.org/2000/svg';
-  const shape = smoke === 'smoke-heart' ? HEART : smoke === 'smoke-star' || smoke === 'smoke-sparkle' ? STAR : smoke === 'smoke-note' ? NOTE : null;
+  const shape = smoke === 'smoke-heart' ? HEART : smoke === 'smoke-star' || smoke === 'smoke-sparkle' || smoke === 'smoke-comet' ? STAR : smoke === 'smoke-note' ? NOTE : null;
   // The shape sits at the origin of a positioned group, so the CSS puff animation (a transform)
   // never fights the placement.
   const group = document.createElementNS(ns, 'g');
@@ -140,14 +143,16 @@ export function makePuff(smoke: string, x: number, y: number, n: number): SVGEle
             ? RAINBOW[n % RAINBOW.length]
             : smoke === 'smoke-sparkle'
               ? ['#FFE38A', '#FFFFFF', '#FFC94A'][n % 3]
-              : null;
+              : smoke === 'smoke-comet'
+                ? ['#B596EC', '#FFFFFF', '#6CB3EE', '#F59AC0'][n % 4]
+                : null;
   if (fill) el.style.fill = fill;
   if (smoke === 'smoke-bubble') {
     el.style.fill = 'rgba(190, 230, 255, 0.35)';
     el.style.stroke = RAINBOW[n % RAINBOW.length];
     el.style.strokeWidth = '1.6';
   }
-  el.setAttribute('class', `puff${shape ? ' puff-shape' : ''}${smoke === 'smoke-sparkle' ? ' puff-sparkle' : ''}`);
+  el.setAttribute('class', `puff${shape ? ' puff-shape' : ''}${smoke === 'smoke-sparkle' || smoke === 'smoke-comet' ? ' puff-sparkle' : ''}`);
   el.addEventListener('animationend', () => group.remove());
   return group;
 }

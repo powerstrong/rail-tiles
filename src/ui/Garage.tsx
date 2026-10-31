@@ -20,6 +20,7 @@ const SMOKE_ICON: Record<string, string> = {
   'smoke-bubble': '🫧',
   'smoke-rainbow': '🌈',
   'smoke-sparkle': '✨',
+  'smoke-comet': '☄️',
 };
 
 function ItemPreview({ item, look }: { item: LookItem; look: TrainLook }) {

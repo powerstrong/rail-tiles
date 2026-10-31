@@ -56,6 +56,7 @@ describe('world registry', () => {
       machine: ['ice-conquer', null, null],
       volcano: ['mc-final-boss', null, null],
       depot: ['t2-final-boss', 'dp-water-tower', 'depot-daily-'],
+      space: ['dp-final-boss', null, null],
     });
   });
 
@@ -71,7 +72,7 @@ describe('world registry', () => {
 
   it('marks the bonus stages each world has', () => {
     const bonuses = Object.fromEntries(WORLDS.map((w) => [w.id, stageCards(w).filter((c) => c.bonus).length]));
-    expect(bonuses).toEqual({ train: 0, train2: 5, ice: 0, machine: 3, volcano: 3, depot: 3 });
+    expect(bonuses).toEqual({ train: 0, train2: 5, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3 });
   });
 
   for (const w of WORLDS) {
