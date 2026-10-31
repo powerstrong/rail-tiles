@@ -6,7 +6,7 @@ import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { type Blocked, DepotBoard } from './DepotBoard';
 import { type DepotStage, GONE, type Move } from './model';
-import { type DepotState, type Run, addRun, applyMove, canMove, initialState, isWon, reach, stateKey } from './slide';
+import { type DepotState, type Run, addRun, applyMove, canMove, dropRun, initialState, isWon, openRun, reach, stateKey } from './slide';
 import { hintFrom } from './solver';
 
 interface Props {
@@ -61,8 +61,8 @@ export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
       play('bump');
       return;
     }
-    const last = runs[runs.length - 1];
-    const sameRun = !!last && last.vehicle === m.vehicle;
+    const open = openRun(runs);
+    const sameRun = !!open && open.vehicle === m.vehicle;
     if (bonus && !sameRun && runs.length >= limit) {
       // Out of moves: the departure time has passed.
       play('deny');
@@ -102,7 +102,7 @@ export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   const undoMove = () => {
     if (busy || won || bonus || runs.length === 0) return;
     setState(runs[runs.length - 1].before);
-    setRuns((r) => r.slice(0, -1));
+    setRuns(dropRun);
     play('rotate');
   };
   const restart = (keepHint = false) => {
@@ -121,7 +121,7 @@ export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   const showHint = () => {
     if (busy || won || late) return;
     // Knowing the run in progress, the hint counts moves exactly as the screen does.
-    const m = hintFrom(stage, state, runs[runs.length - 1] ?? null);
+    const m = hintFrom(stage, state, openRun(runs));
     if (!m) return;
     setHinted(true);
     setHint({ move: m, at: key });

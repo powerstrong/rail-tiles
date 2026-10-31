@@ -93,14 +93,30 @@ export function applyMove(s: DepotState, m: Move): DepotState {
 export interface Run {
   vehicle: number;
   before: DepotState;
+  /** Set once a later move was cancelled or undone: this run can no longer be carried on. */
+  closed?: boolean;
+}
+
+/** The run a drag of the same vehicle would join for free, if any. */
+export const openRun = (runs: Run[]): Run | null => {
+  const last = runs[runs.length - 1];
+  return last && !last.closed ? last : null;
+};
+
+/** Drops the last run (cancelled or undone) and closes the one before it. */
+export function dropRun(runs: Run[]): Run[] {
+  const rest = runs.slice(0, -1);
+  return rest.length ? [...rest.slice(0, -1), { ...rest[rest.length - 1], closed: true }] : rest;
 }
 
 /**
  * The runs after move `m` from `s`, the way the screen counts: dragging the vehicle moved last
- * joins its run (no extra move), and rolling it back to where that run began cancels it.
+ * joins its run (no extra move), and rolling it back to where that run began cancels it. After a
+ * cancel the run before it is closed, so the only free moves are those of the run in progress;
+ * that keeps the hint's search (one open run at most) exact.
  */
 export function addRun(runs: Run[], s: DepotState, m: Move): Run[] {
-  const last = runs[runs.length - 1];
-  if (!last || last.vehicle !== m.vehicle) return [...runs, { vehicle: m.vehicle, before: s }];
-  return stateKey(last.before) === stateKey(applyMove(s, m)) ? runs.slice(0, -1) : runs;
+  const open = openRun(runs);
+  if (!open || open.vehicle !== m.vehicle) return [...runs, { vehicle: m.vehicle, before: s }];
+  return stateKey(open.before) === stateKey(applyMove(s, m)) ? dropRun(runs) : runs;
 }

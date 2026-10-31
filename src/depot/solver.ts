@@ -113,9 +113,12 @@ export function solveDepot(stage: DepotStage, maxStates?: number): DepotSolution
 }
 
 /**
- * The next move of a shortest win from `state` (the hint), or null if there is none.
- * Searches forward and stops at the first win, carrying each layout's first move, so it only
- * looks as far as the answer instead of mapping the whole yard.
+ * The next move of the cheapest win from `state` (the hint), or null if there is none, counting
+ * moves as the screen does (slide.ts `addRun`) with `run` the open run, if any.
+ * Searches forward by cost and stops at the first win, carrying each layout's first move, so it
+ * only looks as far as the answer instead of mapping the whole yard. Exact because only the open
+ * run can be carried on or cancelled; deeper in the search, two drags of one vehicle in a row are
+ * never needed (one drag reaches the same places) and a cancel only undoes a move.
  */
 export function hintFrom(stage: DepotStage, state: DepotState, run: Run | null = null, maxStates = 300_000): Move | null {
   if (isWon(stage, state)) return null;

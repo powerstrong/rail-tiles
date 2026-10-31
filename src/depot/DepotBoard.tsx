@@ -154,7 +154,12 @@ export function DepotBoard({ stage, state, look, selected, won, hint, guide, loc
   };
   const move = (e: ReactPointerEvent<SVGSVGElement>) => {
     const p = press.current;
-    if (!p || p.id !== e.pointerId || p.v < 0 || locked) return;
+    if (!p || p.id !== e.pointerId || locked) return;
+    if (p.v < 0) {
+      // A press on an empty cell that wanders off is a swipe, even if it comes back: never a tap.
+      if (along(e, p, -1) >= 0.3) p.moved = true;
+      return;
+    }
     const raw = along(e, p, p.v);
     if (!p.moved && Math.abs(raw) < 0.15) return;
     p.moved = true;
@@ -168,13 +173,14 @@ export function DepotBoard({ stage, state, look, selected, won, hint, guide, loc
     setDrag(null);
     if (locked) return;
     // A quick flick may lift off before any move event: judge it by where it ended.
-    if (!p.moved && p.v >= 0 && Math.abs(along(e, p, p.v)) >= 0.3) p.moved = true;
+    if (!p.moved && Math.abs(along(e, p, p.v)) >= 0.3) p.moved = true;
     if (!p.moved) {
       if (p.v >= 0) onSelect(p.v);
-      // A swipe that starts on an empty cell is not a tap: it moves nothing.
-      else if (p.cell >= 0 && along(e, p, -1) < 0.3) onTapCell(p.cell);
+      else if (p.cell >= 0) onTapCell(p.cell);
       return;
     }
+    // A swipe that started on an empty cell moves nothing.
+    if (p.v < 0) return;
     const v = p.v;
     const raw = along(e, p, v);
     const { r, lo, hi, high } = limits(v);

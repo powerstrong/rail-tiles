@@ -146,11 +146,42 @@ describe('depot hints', () => {
 });
 
 describe('hints count moves the way the screen does', () => {
+  type Runs = import('./slide').Run[];
+
+  /** The fewest moves the screen would count to win from `s` with `runs` so far (Dijkstra over yard + open run). */
+  async function cheapestFinish(stage: import('./model').DepotStage, s0: number[], runs0: Runs): Promise<number> {
+    const { addRun, openRun, stateKey } = await import('./slide');
+    const tag = (s: number[], runs: Runs) => {
+      const open = openRun(runs);
+      return `${stateKey(s)}|${open ? `${open.vehicle}:${stateKey(open.before)}` : '-'}`;
+    };
+    const best = new Map<string, number>([[tag(s0, runs0), runs0.length]]);
+    const buckets: { s: number[]; runs: Runs }[][] = [];
+    const push = (cost: number, item: { s: number[]; runs: Runs }) => (buckets[cost] ??= []).push(item);
+    push(runs0.length, { s: s0, runs: runs0 });
+    // A cancel lowers the count, so always take from the cheapest non-empty bucket.
+    for (;;) {
+      const cost = buckets.findIndex((b) => b && b.length > 0);
+      if (cost < 0) return Infinity;
+      const { s, runs } = buckets[cost].pop()!;
+      if (best.get(tag(s, runs))! < cost) continue;
+      if (isWon(stage, s)) return cost;
+      for (const m of legalMoves(stage, s)) {
+        const nextRuns = addRun(runs, s, m);
+        const next = applyMove(s, m);
+        const t = tag(next, nextRuns);
+        if ((best.get(t) ?? Infinity) <= nextRuns.length) continue;
+        best.set(t, nextRuns.length);
+        push(nextRuns.length, { s: next, runs: nextRuns });
+      }
+    }
+  }
+
   /** Follows hints from `s` (with `runs` so far) until the yard is won; returns the moves counted. */
-  async function followHints(stage: import('./model').DepotStage, s: number[], runs: import('./slide').Run[]) {
-    const { addRun } = await import('./slide');
+  async function followHints(stage: import('./model').DepotStage, s: number[], runs: Runs) {
+    const { addRun, openRun } = await import('./slide');
     for (let guard = 0; !isWon(stage, s) && guard < 60; guard++) {
-      const m = hintFrom(stage, s, runs[runs.length - 1] ?? null)!;
+      const m = hintFrom(stage, s, openRun(runs))!;
       expect(m, stage.id).not.toBeNull();
       runs = addRun(runs, s, m);
       s = applyMove(s, m);
@@ -171,12 +202,34 @@ describe('hints count moves the way the screen does', () => {
     }
   }, 120_000);
 
+  it('after random wandering with cancels, following the hints is as cheap as the best finish', async () => {
+    const { DEPOT_STAGES } = await import('./stages');
+    const { addRun } = await import('./slide');
+    const rand = rng(2026);
+    for (const stage of DEPOT_STAGES.filter((st) => st.par <= 6)) {
+      for (let trial = 0; trial < 8; trial++) {
+        let s = initialState(stage);
+        let runs: Runs = [];
+        for (let k = 0; k < 4; k++) {
+          // Mostly random moves, sometimes a roll back of the open run (a cancel).
+          const moves = legalMoves(stage, s).filter((m) => m.to !== GONE);
+          const m = moves[Math.floor(rand() * moves.length)];
+          runs = addRun(runs, s, m);
+          s = applyMove(s, m);
+        }
+        if (isWon(stage, s)) continue;
+        const want = await cheapestFinish(stage, s, runs);
+        expect(await followHints(stage, s, runs), `${stage.id} trial ${trial}`).toBe(want);
+      }
+    }
+  }, 120_000);
+
   it('keeps a bonus stage winnable within its limit when the player strays (dp-departure-3, A+1 then B+1)', async () => {
     const { DEPOT_STAGES } = await import('./stages');
     const { addRun } = await import('./slide');
     const stage = DEPOT_STAGES.find((st) => st.id === 'dp-departure-3')!;
     let s = initialState(stage);
-    let runs: import('./slide').Run[] = [];
+    let runs: Runs = [];
     for (const name of ['A+1', 'B+1']) {
       const m = parseMove(stage, s, name);
       expect(canMove(stage, s, m), name).toBe(true);
@@ -184,17 +237,45 @@ describe('hints count moves the way the screen does', () => {
       s = applyMove(s, m);
     }
     expect(await followHints(stage, s, runs)).toBeLessThanOrEqual(stage.limit!);
+    expect(await followHints(stage, s, runs)).toBe(await cheapestFinish(stage, s, runs));
   }, 60_000);
 
-  it('counts a run of drags of one vehicle once, and a roll back to its start as no move', async () => {
+  it('matches the best finish after a cancel re-exposes an earlier move (dp-two-coaches, C+1 then B+1)', async () => {
+    const { DEPOT_STAGES } = await import('./stages');
     const { addRun } = await import('./slide');
-    const s = parseDepotStage(def(['. . . . .', '. . . . .', 'r r . . .', '. A . . .', '. A . . .']), 1);
-    const start = initialState(s);
-    let runs = addRun([], start, { vehicle: 1, to: 1 });
-    const mid = applyMove(start, { vehicle: 1, to: 1 });
-    runs = addRun(runs, mid, { vehicle: 1, to: 0 });
+    const stage = DEPOT_STAGES.find((st) => st.id === 'dp-two-coaches')!;
+    let s = initialState(stage);
+    let runs: Runs = [];
+    for (const name of ['C+1', 'B+1']) {
+      const m = parseMove(stage, s, name);
+      runs = addRun(runs, s, m);
+      s = applyMove(s, m);
+    }
+    expect(await followHints(stage, s, runs)).toBe(await cheapestFinish(stage, s, runs));
+  });
+
+  it('counts a run of drags once, a roll back to its start as no move, and closes the run before a cancel', async () => {
+    const { addRun, openRun, dropRun } = await import('./slide');
+    // B runs along row 0, A up and down column 3.
+    const s = parseDepotStage(def(['. . B B .', '. . . . .', 'r r . . .', '. . . A .', '. . . A .']), 1);
+    const [A, B] = [1, 2];
+    expect([s.vehicles[A].glyph, s.vehicles[B].glyph]).toEqual(['A', 'B']);
+    let st = initialState(s);
+    let runs: Runs = [];
+    const go = (vehicle: number, to: number) => {
+      runs = addRun(runs, st, { vehicle, to });
+      st = applyMove(st, { vehicle, to });
+    };
+    go(B, 0);
+    go(B, 1); // the same run: still one move
     expect(runs.length).toBe(1);
-    runs = addRun(runs, applyMove(mid, { vehicle: 1, to: 0 }), { vehicle: 1, to: 3 });
-    expect(runs.length).toBe(0);
+    go(A, 1);
+    expect(runs.length).toBe(2);
+    go(A, 3); // back where its run began: cancelled, and B's run is closed now
+    expect(runs.length).toBe(1);
+    expect(openRun(runs)).toBeNull();
+    go(B, 2); // so moving B again is a new move
+    expect(runs.length).toBe(2);
+    expect(dropRun([{ vehicle: 0, before: st }])).toEqual([]);
   });
 });
