@@ -1,0 +1,527 @@
+/* ---------- world arrival scenes (shared moves) ---------- */
+
+/* Moves on SVG groups: the element's own box is the reference, as for the board art. */
+.story-scene g[class^='ss-'],
+.story-scene path[class^='ss-'],
+.story-scene circle[class^='ss-'],
+.story-scene rect[class^='ss-'] {
+  transform-box: fill-box;
+}
+
+.ss-sway {
+  transform-origin: 50% 100%;
+  animation: ss-sway 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes ss-sway {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+
+.ss-blink {
+  animation: ss-blink 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes ss-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* A piece dropped onto the board from just above, like a placed rail. */
+.ss-drop {
+  transform-origin: 50% 50%;
+  animation: ss-drop 0.4s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes ss-drop {
+  from {
+    transform: translateY(-26px) scale(1.25);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.ss-hop {
+  transform-origin: 50% 100%;
+  animation: ss-hop 0.5s ease-in-out 3 alternate both;
+}
+
+@keyframes ss-hop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-12px) scale(1.04, 0.98);
+  }
+}
+
+.ss-mark {
+  transform-origin: 50% 100%;
+  animation: story-pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+.ss-spark {
+  transform-origin: 50% 50%;
+  animation: ss-spark 0.9s ease-out both;
+}
+
+@keyframes ss-spark {
+  from {
+    transform: translateY(0) scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-34px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.ss-wave {
+  transform-origin: 20% 100%;
+  animation: ss-wave 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes ss-wave {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+/* A shake for whatever bumps, rumbles or rattles. */
+.ss-shake {
+  animation: ss-shake 0.45s ease-in-out both;
+}
+
+@keyframes ss-shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-5px, 2px);
+  }
+  40% {
+    transform: translate(5px, -2px);
+  }
+  60% {
+    transform: translate(-4px, 1px);
+  }
+  80% {
+    transform: translate(3px, -1px);
+  }
+}
+
+/* ---------- 펭귄 얼음 나라 ---------- */
+
+.ss-snow {
+  animation: ss-snow 5s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes ss-snow {
+  from {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(8px, 160px);
+  }
+  to {
+    transform: translate(-4px, 320px);
+  }
+}
+
+.ss-glide {
+  transition: transform 0.95s cubic-bezier(0.25, 0.75, 0.35, 1);
+}
+
+.ss-lean {
+  transform-origin: 50% 100%;
+  transform: rotate(var(--lean, -10deg));
+}
+
+.ss-trail {
+  animation: ss-trail 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes ss-trail {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+.ss-fish {
+  animation: ss-fish 1s cubic-bezier(0.3, 0.6, 0.5, 1) both;
+}
+
+@keyframes ss-fish {
+  0% {
+    transform: translate(0, 10px) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(18px, -62px) rotate(-30deg);
+  }
+  100% {
+    transform: translate(34px, -6px) rotate(20deg);
+    opacity: 1;
+  }
+}
+
+/* ---------- 로봇 공장 ---------- */
+
+.ss-belt {
+  animation: ss-belt 2.4s linear infinite;
+}
+
+@keyframes ss-belt {
+  from {
+    transform: translate(0, 22px);
+  }
+  to {
+    transform: translate(60px, 22px);
+  }
+}
+
+.ss-dark {
+  transition: opacity 0.6s ease;
+}
+
+.ss-beam {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ss-beam 0.35s linear forwards;
+}
+
+@keyframes ss-beam {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ss-flicker {
+  animation: ss-flicker 0.85s steps(1, end) both;
+}
+
+@keyframes ss-flicker {
+  0% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* ---------- 화산 섬 ---------- */
+
+.ss-wave-sea {
+  animation: ss-wave-sea 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes ss-wave-sea {
+  from {
+    transform: translateX(-4px);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(4px);
+    opacity: 1;
+  }
+}
+
+.ss-smoke {
+  transform-origin: 50% 50%;
+  animation: ss-smoke 2.1s ease-out infinite;
+}
+
+@keyframes ss-smoke {
+  from {
+    transform: translate(0, 6px) scale(0.5);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(10px, -46px) scale(1.6);
+    opacity: 0;
+  }
+}
+
+.ss-lava {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ss-beam 1.7s cubic-bezier(0.4, 0.2, 0.6, 1) forwards;
+}
+
+/* ---------- 강바람 철도 ---------- */
+
+.ss-flow {
+  animation: ss-flow 1.5s linear infinite;
+}
+
+@keyframes ss-flow {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(120px);
+    opacity: 0;
+  }
+}
+
+.ss-gust {
+  transform-origin: 50% 90%;
+  animation: ss-gust 2.7s ease-in-out infinite;
+}
+
+@keyframes ss-gust {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(7deg) translateX(2px);
+  }
+  55% {
+    transform: rotate(3deg);
+  }
+}
+
+.ss-spin {
+  transform-origin: 50% 50%;
+  animation: ss-spin 3.5s linear infinite;
+}
+
+@keyframes ss-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ss-wind {
+  animation: ss-wind 2.7s ease-in-out infinite;
+}
+
+@keyframes ss-wind {
+  from {
+    transform: translateX(-140px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(600px);
+    opacity: 0;
+  }
+}
+
+.ss-leaf {
+  transition: transform 0.7s cubic-bezier(0.4, 0.1, 0.4, 1.2);
+}
+
+.ss-arm {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transition: transform 0.5s ease;
+}
+
+/* ---------- 기차 차고지 ---------- */
+
+.ss-car {
+  transition: transform 0.55s cubic-bezier(0.4, 0.1, 0.3, 1);
+}
+
+.ss-nudge {
+  animation: ss-nudge 0.4s ease-in-out both;
+}
+
+.ss-nudge-again {
+  animation: ss-nudge-again 0.4s ease-in-out both;
+}
+
+@keyframes ss-nudge-again {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(9px);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes ss-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(9px);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+}
+
+/* ---------- 우주 정거장 ---------- */
+
+.ss-shoot {
+  animation: ss-shoot 5.2s ease-in infinite;
+  opacity: 0;
+}
+
+@keyframes ss-shoot {
+  0% {
+    transform: translate(120px, 10px);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  16% {
+    transform: translate(340px, 86px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(340px, 86px);
+    opacity: 0;
+  }
+}
+
+/* Capsules fall with gravity: slow off the mark, fast at the end. */
+.ss-fall {
+  transition: transform 0.6s cubic-bezier(0.55, 0, 0.85, 0.4);
+}
+
+.ss-float {
+  animation: ss-float 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes ss-float {
+  from {
+    transform: translate(0, 0) rotate(-6deg);
+  }
+  to {
+    transform: translate(0, -12px) rotate(6deg);
+  }
+}
+
+/* ---------- 시계탑 ---------- */
+
+.story-hand {
+  transition: transform 0.9s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+}
+
+.ss-ring {
+  transform-origin: 50% 50%;
+  animation: ss-ring 1.1s ease-out both;
+}
+
+@keyframes ss-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.ss-door {
+  transition: transform 0.35s ease-out;
+}
+
+.ss-cloud {
+  animation: ss-cloud 9s ease-in-out infinite alternate;
+}
+
+@keyframes ss-cloud {
+  from {
+    transform: translateX(-10px);
+  }
+  to {
+    transform: translateX(14px);
+  }
+}
+
+.ss-mouse {
+  transition:
+    transform 0.55s ease-in-out,
+    opacity 0.4s ease 0.3s;
+}
+
+.ss-jump,
+.ss-jump-again {
+  transform-origin: 50% 100%;
+}
+
+.ss-jump {
+  animation: ss-jump 0.55s ease-in-out both;
+}
+
+.ss-jump-again {
+  animation: ss-jump-again 0.55s ease-in-out both;
+}
+
+@keyframes ss-jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-22px);
+  }
+}
+
+@keyframes ss-jump-again {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-22px);
+  }
+}

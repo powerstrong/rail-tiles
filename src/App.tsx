@@ -181,7 +181,6 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         key={world.id}
         place={world.title}
         color={world.color}
-        emblem={world.emblem}
         story={story}
         first={!world.unlockAfter}
         onDone={() => {

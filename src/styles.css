@@ -2837,7 +2837,7 @@ body:has(.world-clock) {
   content: '';
   position: absolute;
   top: -12px;
-  left: 59%;
+  left: clamp(18px, calc(var(--tail, 50%) - 12px), calc(100% - 42px));
   border: 12px solid transparent;
   border-top: 0;
   border-bottom-color: var(--card);
