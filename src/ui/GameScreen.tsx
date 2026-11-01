@@ -394,6 +394,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
 
   const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
   keyHandler.current = (e: KeyboardEvent) => {
+    if (showIntro) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
       e.preventDefault();
       doUndo();

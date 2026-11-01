@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { starsFor } from './engine/stars';
-import { emptyProgress, exportCode, loadProgress, mergeProgress, needsNewerBrowser, readCode, recordClear, saveProgress } from './storage';
+import { absorbSaved, emptyProgress, exportCode, loadProgress, mergeProgress, needsNewerBrowser, readCode, recordClear, saveProgress } from './storage';
 
 function memory(initial?: string) {
   const data = new Map<string, string>();
@@ -49,6 +49,25 @@ describe('progress storage', () => {
     expect(recordClear(p, 'a', 1)).toBe(p);
     expect(recordClear(p, 'a', 2)).toBe(p);
     expect(recordClear(p, 'a', 3).stars.a).toBe(3);
+  });
+
+  it('never saves stars back down when another tab did better meanwhile', () => {
+    const store = memory();
+    // Both tabs start from the same save.
+    saveProgress(recordClear(emptyProgress(), 'a', 1), store);
+    const tabA = loadProgress(store);
+    const tabB = loadProgress(store);
+    saveProgress(recordClear(tabA, 'a', 3), store);
+    saveProgress(recordClear(tabB, 'b', 2), store);
+    expect(loadProgress(store).stars).toEqual({ a: 3, b: 2 });
+  });
+
+  it('takes in what another tab saved, and is a no-op when nothing is new', () => {
+    const mine = { ...emptyProgress(), stars: { a: 3 as const, b: 1 as const }, look: { body: 'body-blue' }, lookSeen: 4 };
+    const theirs = { ...emptyProgress(), stars: { a: 1 as const, b: 2 as const, c: 1 as const }, look: { body: 'body-pink' }, lookSeen: 6 };
+    expect(absorbSaved(mine, theirs)).toEqual({ ...mine, stars: { a: 3, b: 2, c: 1 }, look: { body: 'body-pink' }, lookSeen: 6 });
+    expect(absorbSaved(mine, { ...mine, stars: { a: 2 }, lookSeen: 3, look: { body: 'body-blue' } })).toBe(mine);
+    expect(absorbSaved(emptyProgress(), emptyProgress())).toEqual(emptyProgress());
   });
 });
 

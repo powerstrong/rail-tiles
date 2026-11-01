@@ -64,10 +64,26 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
   const clearTimers = () => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    queue.current = [];
     playingUntil.current = 0;
   };
-  useEffect(() => clearTimers, []);
+  /** Stops everything, waiting presses too (undo, restart, leaving). */
+  const stopAll = () => {
+    clearTimers();
+    queue.current = [];
+  };
+  useEffect(() => stopAll, []);
+  /** Runs the next waiting press once the one before has played out. */
+  const drain = () => {
+    playingUntil.current = 0;
+    const next = queue.current.shift();
+    if (next === undefined) return;
+    runRef.current(next);
+    // A plain gravity press or a bump plays nothing out: give the screen a beat, then the rest.
+    if (queue.current.length > 0 && playingUntil.current === 0) {
+      playingUntil.current = performance.now() + PHASE_MS;
+      timers.current.push(window.setTimeout(drain, PHASE_MS));
+    }
+  };
 
   const go = (d: Dir) => {
     if (busy || won || outOfAir || showIntro) return;
@@ -108,13 +124,7 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
     if (p.frames.length > 1) {
       const wait = (p.frames.length - 1) * PHASE_MS + 60;
       playingUntil.current = performance.now() + wait;
-      timers.current.push(
-        window.setTimeout(() => {
-          playingUntil.current = 0;
-          const next = queue.current.shift();
-          if (next !== undefined) runRef.current(next);
-        }, wait),
-      );
+      timers.current.push(window.setTimeout(drain, wait));
     }
     const next = p.next;
     setHistory((h) => [...h, next]);
@@ -159,7 +169,7 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
 
   const undo = () => {
     if (busy || won || bonus || presses === 0) return;
-    clearTimers();
+    stopAll();
     const prev = history[history.length - 2];
     setHistory((h) => h.slice(0, -1));
     setShown(prev);
@@ -168,7 +178,7 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
   };
   const restart = (keepHint = false) => {
     if (busy && !outOfAir) return;
-    clearTimers();
+    stopAll();
     setHistory([initialState(stage)]);
     setShown(initialState(stage));
     // New elements at the start: nobody glides back across the station.

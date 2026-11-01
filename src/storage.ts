@@ -62,10 +62,28 @@ function extras(data: { look?: unknown; lookSeen?: unknown }): Pick<Progress, 'l
 
 export function saveProgress(progress: Progress, storage: StorageLike | null = defaultStorage()): void {
   try {
-    storage?.setItem(KEY, JSON.stringify(progress));
+    // Another tab may have saved better stars since this one loaded: never write them back down.
+    const saved = loadProgress(storage);
+    const stars = { ...progress.stars };
+    for (const [id, v] of Object.entries(saved.stars)) if ((stars[id] ?? 0) < v) stars[id] = v;
+    storage?.setItem(KEY, JSON.stringify({ ...progress, stars }));
   } catch {
     // Private mode or full storage: progress just won't persist.
   }
+}
+
+/** Storage key, for listening to saves made in other tabs. */
+export const PROGRESS_KEY = KEY;
+
+/**
+ * Takes in what another tab saved: the better rating of each stage, the look chosen there and
+ * the newest "seen" count. Returns the same object when nothing changes.
+ */
+export function absorbSaved(progress: Progress, saved: Progress): Progress {
+  const next: Progress = { ...mergeProgress(progress, saved), look: saved.look ?? progress.look };
+  const seen = Math.max(progress.lookSeen ?? 0, saved.lookSeen ?? 0);
+  if (seen > 0) next.lookSeen = seen;
+  return JSON.stringify(next) === JSON.stringify(progress) ? progress : next;
 }
 
 /** Records a clear, keeping the best star rating. Returns the same object when nothing improves. */

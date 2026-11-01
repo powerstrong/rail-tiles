@@ -143,6 +143,8 @@ export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
 
   const keyRef = useRef<(e: KeyboardEvent) => void>(() => {});
   keyRef.current = (e: KeyboardEvent) => {
+    // A card is open: its buttons take Enter and Space themselves.
+    if (showIntro || won || late) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
       e.preventDefault();
       undo();

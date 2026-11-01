@@ -70,7 +70,7 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
     penguinRefs.current[k]?.setAttribute('transform', `translate(${(x * ICE_CELL).toFixed(1)} ${(y * ICE_CELL).toFixed(1)}) scale(${s.toFixed(3)})`);
 
   const push = (p: Push) => {
-    if (busy || won) return;
+    if (busy || won || showIntro) return;
     const r = slide(stage, state, p);
     if (r.outcome === 'blocked') {
       play('bump');

@@ -58,7 +58,7 @@ export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
   const shownHint = hint && hint.at === key ? hint.move : null;
 
   const commit = (m: Move) => {
-    if (busy || won || late) return;
+    if (busy || won || late || showIntro) return;
     if (!canMove(stage, state, m)) {
       play('bump');
       return;

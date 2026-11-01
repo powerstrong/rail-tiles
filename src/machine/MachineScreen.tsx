@@ -111,7 +111,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
   };
 
   const undo = () => {
-    if (won || drained || bonus || history.length === 0) return;
+    if (won || drained || finishing.current || bonus || history.length === 0) return;
     const prev = history[history.length - 1];
     const changed = prev ^ config;
     setConfig(prev);
@@ -121,6 +121,10 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
     play('rotate');
   };
   const restart = (keepHint: boolean) => {
+    // The last tap is still turning into a result: let the card come first.
+    if (finishing.current && !won && !drained) return;
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
     setConfig(stage.start);
     setSpins(stage.devices.map(() => 0));
     setHistory([]);
@@ -135,7 +139,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
     play('erase');
   };
   const showHint = () => {
-    if (won || drained) return;
+    if (won || drained || finishing.current) return;
     const d = hintLaser(stage, config, wins);
     if (d === null) return;
     setHinted(true);

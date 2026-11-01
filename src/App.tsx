@@ -1,7 +1,7 @@
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stars } from './engine/stars';
-import { type Progress, loadProgress, recordClear, saveProgress, totalStars } from './storage';
+import { PROGRESS_KEY, type Progress, absorbSaved, loadProgress, recordClear, saveProgress, totalStars } from './storage';
 import { Garage } from './ui/Garage';
 import { type LookItem, LookContext, STARTER_COUNT, type TrainLook, safeLook, unlockedItems } from './ui/look';
 import { SaveScreen } from './ui/SaveScreen';
@@ -35,6 +35,14 @@ export function App() {
   useEffect(() => {
     if (progress !== loaded.current) saveProgress(progress);
   }, [progress]);
+  // Stars won in another tab show up here too (and are never saved back down).
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === PROGRESS_KEY) setProgress((p) => absorbSaved(p, loadProgress()));
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const stars = totalStars(progress);
   const look = safeLook(progress.look as Partial<TrainLook> | undefined, stars);
