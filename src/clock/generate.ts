@@ -1,9 +1,9 @@
 import { hashString, rng } from '../depot/generate';
 import type { Dir } from '../engine/dir';
 import { type ClockAudit, auditClock } from './audit';
-import { type ClockStage, type ClockStageDef, type Hand, type Tile, actionName, stageMap } from './model';
+import { ACTIONS, type ClockStage, type ClockStageDef, type Hand, REST, type Tile, actionName, parseClockStage, stageMap } from './model';
 import { explore, parWithoutRest, shortestFrom, solveClock } from './solver';
-import { cellOf, free, handCells } from './tick';
+import { act, cellOf, free, handCells, initialState, isWon } from './tick';
 
 /** What a generated clock tower puzzle should look like. */
 export interface ClockSpec {
@@ -20,6 +20,8 @@ export interface ClockSpec {
   par: [number, number];
   /** The answer must rest at least once (it cannot be done as fast without resting). */
   mustRest?: boolean;
+  /** A player who only walks towards the door (resting when blocked) must not manage ★★★. */
+  beatNaive?: boolean;
   /** Bonus stage: ticks allowed beyond par. */
   slack?: number;
   maxOptimal?: number;
@@ -80,6 +82,36 @@ export function randomTower(rand: () => number, spec: ClockSpec): ClockStage | n
   return stage;
 }
 
+/**
+ * The fewest ticks a naive player can manage: one who always steps closer to the door when
+ * some step does, rests when none does, and only then takes any step at all. Infinity when
+ * that player cannot get there within `cap` ticks. A stage this player wins in par asks for
+ * no real thinking.
+ */
+export function naiveTicks(stage: ClockStage, cap = 40): number {
+  const dist = (c: number) => Math.abs((c % stage.width) - (stage.exit % stage.width)) + Math.abs(Math.floor(c / stage.width) - Math.floor(stage.exit / stage.width));
+  let frontier = [initialState(stage)];
+  const seen = new Set(frontier);
+  for (let depth = 1; depth <= cap && frontier.length; depth++) {
+    const next: number[] = [];
+    for (const s of frontier) {
+      const moves = ACTIONS.map((a) => [a, act(stage, s, a)] as const).filter(([, n]) => n >= 0);
+      const closer = moves.filter(([a, n]) => a !== REST && dist(cellOf(n)) < dist(cellOf(s)));
+      const rest = moves.filter(([a]) => a === REST);
+      const pick = closer.length ? closer : rest.length ? rest : moves;
+      for (const [, n] of pick) {
+        if (isWon(stage, n)) return depth;
+        if (!seen.has(n)) {
+          seen.add(n);
+          next.push(n);
+        }
+      }
+    }
+    frontier = next;
+  }
+  return Infinity;
+}
+
 /** The same tower with the door on `cell`. */
 export const withExit = (stage: ClockStage, cell: number): ClockStage => ({ ...stage, exit: cell, tiles: stage.tiles.map((t, i) => (i === cell ? ({ t: 'exit' } as const) : t)) });
 
@@ -127,6 +159,7 @@ export function searchClock(spec: ClockSpec): ClockCandidate[] {
         if (p !== null && p <= audit.par) continue;
       }
       if (!everythingMatters(stage, audit.par)) continue;
+      if (spec.beatNaive && naiveTicks(stage) <= audit.par) continue;
       stage.par = audit.par;
       stage.solution = shortestFrom(explore(stage), explore(stage).start)!;
       if (spec.slack !== undefined) stage.limit = audit.par + spec.slack;
@@ -156,3 +189,43 @@ export function toDef(stage: ClockStage): ClockStageDef {
 }
 
 export { handCells };
+
+// ---------------------------------------------------------------- daily puzzle
+
+export const CLOCK_DAILY_PREFIX = 'clock-daily-';
+
+type DailyShape = Omit<ClockSpec, 'id' | 'title' | 'tip'>;
+const base: DailyShape = { width: 6, height: 6, walls: [3, 6], par: [8, 12], target: 26, beatNaive: true, maxOptimal: 6 };
+/** One shape per weekday, Sunday first: blocks, hands and levers in turn, everything on Sunday. */
+const DAILY_SHAPES: { shape: DailyShape; what: string }[] = [
+  { shape: { ...base, blocks: [3, 5], hands: [2, 2], levers: 2, par: [10, 15], target: 32 }, what: '블록과 바늘과 레버를 지나' },
+  { shape: { ...base, walls: [4, 7], blocks: [6, 9] }, what: '똑딱 블록 사이로' },
+  { shape: { ...base, hands: [2, 1] }, what: '시계 바늘을 피해' },
+  { shape: { ...base, blocks: [3, 5], hands: [2], par: [9, 13], target: 28 }, what: '블록과 바늘 사이로' },
+  { shape: { ...base, hands: [2, 2], par: [9, 13], target: 28 }, what: '두 바늘을 피해' },
+  { shape: { ...base, hands: [2], levers: 1 }, what: '레버로 바늘을 돌려' },
+  { shape: { ...base, blocks: [2, 4], hands: [2, 1], levers: 2, par: [10, 15], target: 31 }, what: '레버 두 개를 써서' },
+];
+
+/** The clock tower puzzle for a calendar date (YYYY-MM-DD). The same everywhere; built in a worker. */
+export function dailyClockDef(date: string): ClockStageDef {
+  const [, m, d] = date.split('-').map(Number);
+  const { shape, what } = DAILY_SHAPES[new Date(`${date}T12:00:00`).getDay()];
+  for (let round = 0; round < 40; round++) {
+    const found = searchClock({
+      ...shape,
+      id: `${CLOCK_DAILY_PREFIX}${date}`,
+      title: `${m}월 ${d}일 시계탑`,
+      tip: `오늘의 퍼즐 · 생쥐를 ${what} 치즈 문까지!`,
+      seed: hashString(`clock:${date}:${round}`),
+      tries: 80,
+      keep: 1,
+    });
+    if (found.length) return toDef(found[0].stage);
+  }
+  throw new Error(`no clock tower puzzle for ${date}`);
+}
+
+export function dailyClockStage(def: ClockStageDef): ClockStage {
+  return { ...parseClockStage(def, 0), label: '오늘의 퍼즐' };
+}

@@ -83,6 +83,9 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
     });
     const next = p.next;
     setHistory((h) => [...h, next]);
+    // A little chirp when a capsule settles onto its own dock (the win has its own fanfare).
+    const docked = next.some((c, k) => c === stage.docks[k] && state[k] !== stage.docks[k]);
+    if (docked && !isWon(stage, next)) timers.current.push(window.setTimeout(() => play('thanks'), p.frames.length * PHASE_MS));
     if (isWon(stage, next)) {
       setBusy(true);
       const n = presses + 1;

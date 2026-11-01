@@ -68,20 +68,20 @@ const CH1: SpaceStageDef[] = [
     par: 5,
     solution: 'DUUUR',
   },
-  // par 5, score 14.0 (target 14), bits 4.3, layouts 414, traps 0%, shortest answers 4
+  // par 5, score 13.8 (target 14), bits 5.8, layouts 86, traps 0%, shortest answers 4
   {
     id: 'sp-oxygen-1',
     title: '산소가 부족해! 1',
     tip: '산소가 떨어지기 전에 모두 도킹해요. 되돌리기는 없어요!',
     map: [
-      'R . . B .', //
-      '. . . r .',
-      '. . . o b',
-      '. . . o .',
-      '. . o . .',
+      '. b . . .', //
+      'r . . . .',
+      'B . . . #',
+      'R . # o .',
+      '. # . # .',
     ],
     par: 5,
-    solution: 'RRRDD',
+    solution: 'RRUUL',
     limit: 8,
   },
   // par 7, score 19.0 (target 19), bits 9.3, layouts 52, traps 0%, shortest answers 3
@@ -116,20 +116,20 @@ const CH1: SpaceStageDef[] = [
     par: 7,
     solution: 'RLDRLDU',
   },
-  // par 6, score 25.0 (target 25), bits 10.6, layouts 3057, traps 0%, shortest answers 2
+  // par 6, score 25.0 (target 25), bits 10.2, layouts 5028, traps 0%, shortest answers 2
   {
     id: 'sp-three-capsules',
     title: '캡슐 세 대',
     tip: '노란 캡슐까지 세 대! 누가 먼저 벽에 닿을지 생각해요.',
     map: [
-      '. . Y R o', //
-      '. . . r .',
-      '. y # . .',
-      '. b . o o',
-      'B . . # .',
+      '. . B . .', //
+      '. r o b y',
+      '. . o # Y',
+      '. . . # .',
+      '. R . . #',
     ],
     par: 6,
-    solution: 'DLDRDU',
+    solution: 'UUURUD',
   },
   // par 8, score 30.0 (target 30), bits 12.6, layouts 23658, traps 0%, shortest answers 6
   {
@@ -196,20 +196,20 @@ const CH2: SpaceStageDef[] = [
     par: 4,
     solution: 'DUUR',
   },
-  // par 5, score 16.0 (target 16), bits 6.6, layouts 316, traps 0%, shortest answers 6
+  // par 7, score 16.3 (target 16), bits 6.8, layouts 156, traps 0%, shortest answers 8
   {
     id: 'sp-split',
     title: '갈라지는 캡슐',
     tip: '같은 중력인데 다르게 움직이게 만들어 봐요.',
     map: [
-      '# b r < .', //
-      '. B . . .',
-      '^ . ^ . #',
-      '. . o . R',
-      '. . . . .',
+      '. . o . v', //
+      '# # . . b',
+      '. > . R r',
+      '. . . . ^',
+      '. . B . .',
     ],
-    par: 5,
-    solution: 'ULUUU',
+    par: 7,
+    solution: 'UUURURD',
   },
   // par 6, score 20.0 (target 20), bits 8.2, layouts 860, traps 0%, shortest answers 4
   {
@@ -290,21 +290,21 @@ const CH2: SpaceStageDef[] = [
     par: 7,
     solution: 'DULLRRD',
   },
-  // par 8, score 32.0 (target 32), bits 14.6, layouts 7410, traps 0%, shortest answers 2
+  // par 8, score 32.0 (target 32), bits 13.8, layouts 17946, traps 0%, shortest answers 2
   {
     id: 'sp-lab',
     title: '연구소 대소동',
     tip: '부스터 연구소가 북적북적! 차근차근 도킹해요.',
     map: [
-      'o . . . y b', //
-      '. v . . < .',
-      '. . r . . .',
+      '> . y r . b', //
       '. . . . . .',
-      'Y B < . . .',
-      '. R . o . o',
+      '. o . > . #',
+      'Y . # . . .',
+      '. . . . . .',
+      '> . R B . .',
     ],
     par: 8,
-    solution: 'URRRUUUR',
+    solution: 'URUULUUR',
   },
   // par 10, score 39.0 (target 39), bits 19.0, layouts 15937, traps 0%, shortest answers 3
   {
@@ -340,20 +340,20 @@ const CH3: SpaceStageDef[] = [
     par: 3,
     solution: 'DLU',
   },
-  // par 4, score 12.3 (target 12), bits 3.6, layouts 374, traps 0%, shortest answers 4
+  // par 4, score 14.3 (target 12), bits 4.8, layouts 476, traps 0%, shortest answers 3
   {
     id: 'sp-through',
     title: '웜홀 너머',
     tip: '한 캡슐만 웜홀로 보내면 둘 사이가 확 바뀌어요.',
     map: [
-      'r 1 . b 1', //
-      'B . . . .',
-      'R . . . .',
-      'o o . o .',
-      '. o . . .',
+      '. 1 . . .', //
+      '. . B r .',
+      '. . . b .',
+      '. # . . .',
+      '# 1 R . .',
     ],
     par: 4,
-    solution: 'URUL',
+    solution: 'LRRD',
   },
   // par 5, score 16.7 (target 17), bits 5.8, layouts 842, traps 0%, shortest answers 3
   {
@@ -387,37 +387,37 @@ const CH3: SpaceStageDef[] = [
     par: 6,
     solution: 'URURDD',
   },
-  // par 6, score 18.0 (target 18), bits 8.0, layouts 406, traps 0%, shortest answers 12
+  // par 5, score 18.0 (target 18), bits 7.6, layouts 475, traps 0%, shortest answers 4
   {
     id: 'sp-oxygen-3',
     title: '산소가 부족해! 3',
     tip: '웜홀로 산소를 아껴요. 되돌리기는 없어요!',
     map: [
-      '. R . r .', //
-      '. . . 1 .',
-      '. . . o B',
-      '. b o # .',
-      '1 . . . #',
+      '. 1 . . .', //
+      'R . o . o',
+      '. . b . .',
+      'r . . . B',
+      '. 1 . . .',
     ],
-    par: 6,
-    solution: 'URRLUR',
-    limit: 9,
+    par: 5,
+    solution: 'URULL',
+    limit: 8,
   },
-  // par 7, score 24.0 (target 24), bits 10.9, layouts 922, traps 0%, shortest answers 4
+  // par 7, score 24.1 (target 24), bits 11.0, layouts 922, traps 0%, shortest answers 4
   {
     id: 'sp-warp-boost',
     title: '부스터와 웜홀',
     tip: '부스터가 캡슐을 웜홀로 밀어 넣을 수도 있어요.',
     map: [
-      '. 1 . . . .', //
-      '. . B . . .',
-      'r < . . . .',
-      '. . . . o .',
-      '^ o 1 . . #',
-      '. b . . R .',
+      '. B > . . 1', //
+      '. . . r . .',
+      '. # . . < .',
+      '. . # b . R',
+      '. . . . . .',
+      '. . . 1 o .',
     ],
     par: 7,
-    solution: 'ULDLUDD',
+    solution: 'RRRUULL',
   },
   // par 8, score 27.0 (target 27), bits 12.5, layouts 855, traps 0%, shortest answers 2
   {

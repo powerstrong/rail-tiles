@@ -1,10 +1,13 @@
 import type { ComponentType } from 'react';
+import { CLOCK_DAILY_PREFIX } from './clock/generate';
 import { ClockScreen } from './clock/ClockScreen';
 import { CLOCK_INTROS } from './clock/intros';
 import { CLOCK_CHAPTERS, CLOCK_STAGES } from './clock/stages';
+import { loadClockDaily } from './daily/loadClockDaily';
 import { loadDaily } from './daily/loadDaily';
 import { loadDepotDaily } from './daily/loadDepotDaily';
 import { loadIceDaily } from './daily/loadIceDaily';
+import { loadSpaceDaily } from './daily/loadSpaceDaily';
 import { DepotScreen } from './depot/DepotScreen';
 import { DEPOT_DAILY_PREFIX } from './depot/generate';
 import { DEPOT_INTROS } from './depot/intros';
@@ -18,6 +21,7 @@ import { ICE_DAILY_PREFIX } from './penguin/generate';
 import { ICE_INTROS } from './penguin/intros';
 import { PenguinScreen } from './penguin/PenguinScreen';
 import { ICE_CHAPTERS, ICE_STAGES } from './penguin/stages';
+import { SPACE_DAILY_PREFIX } from './space/generate';
 import { SPACE_INTROS } from './space/intros';
 import { SpaceScreen } from './space/SpaceScreen';
 import { SPACE_CHAPTERS, SPACE_STAGES } from './space/stages';
@@ -223,6 +227,14 @@ export const WORLDS: World[] = [
     unlockAfter: 'dp-final-boss',
     lockNote: '기차 차고지 마지막 보스(3-10)를 깨면 열려요',
     Game: SpaceScreen,
+    daily: {
+      prefix: SPACE_DAILY_PREFIX,
+      // Once every gadget has been met (the wormhole stage, 3-1).
+      unlockAfter: 'sp-wormhole',
+      load: loadSpaceDaily,
+      loadingText: '오늘의 정거장을 띄우는 중…',
+      clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 정거장이 열려요`,
+    },
   }),
   world({
     id: 'clock',
@@ -238,6 +250,14 @@ export const WORLDS: World[] = [
     unlockAfter: 'sp-final-boss',
     lockNote: '우주 정거장 마지막 보스(3-10)를 깨면 열려요',
     Game: ClockScreen,
+    daily: {
+      prefix: CLOCK_DAILY_PREFIX,
+      // Once every gadget has been met (the lever stage, 3-1).
+      unlockAfter: 'ck-lever',
+      load: loadClockDaily,
+      loadingText: '오늘의 시계탑 태엽을 감는 중…',
+      clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 시계탑이 열려요`,
+    },
   }),
 ];
 

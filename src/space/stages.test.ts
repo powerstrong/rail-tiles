@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { without } from './generate';
+import { dailySpaceDef, dailySpaceStage, naivePresses, without } from './generate';
 import { after, initialState, isWon, press } from './gravity';
 import { pressName } from './model';
 import { explore, solveSpace } from './solver';
@@ -85,4 +85,29 @@ describe('space stages', () => {
       }
     }
   });
+
+  it('ask for real thinking past the first lessons: moving straight at the docks never earns ★★★', () => {
+    const lessons = ['sp-first-gravity', 'sp-wall-stop', 'sp-two-capsules', 'sp-booster', 'sp-wormhole'];
+    for (const s of SPACE_STAGES) {
+      if (lessons.includes(s.id)) continue;
+      expect(naivePresses(s), s.id).toBeGreaterThan(s.par);
+    }
+  });
+});
+
+describe('space daily puzzle', () => {
+  it('is the same for a date everywhere, wins in its par and needs thinking, every weekday', () => {
+    for (let d = 1; d <= 7; d++) {
+      const date = `2026-11-0${d}`;
+      const def = dailySpaceDef(date);
+      expect(dailySpaceDef(date)).toEqual(def);
+      expect(def.id).toBe(`space-daily-${date}`);
+      const stage = dailySpaceStage(def);
+      expect(solveSpace(stage).par, date).toBe(def.par);
+      let st = initialState(stage);
+      for (const p of stage.solution) st = after(stage, st, p);
+      expect(isWon(stage, st), date).toBe(true);
+      expect(naivePresses(stage), date).toBeGreaterThan(stage.par);
+    }
+  }, 120_000);
 });

@@ -1,8 +1,9 @@
 import type { Dir } from '../engine/dir';
 import { hashString, rng } from '../depot/generate';
 import { type SpaceAudit, auditSpace } from './audit';
-import { type SpaceStage, type SpaceStageDef, type Tile, pressName, stageMap } from './model';
-import { stateKey, stepCell } from './gravity';
+import { type SpaceStage, type SpaceStageDef, type Tile, parseSpaceStage, pressName, stageMap } from './model';
+import { ALL_DIRS } from '../engine/dir';
+import { after, stateKey, stepCell } from './gravity';
 import { distancesTo, mapStates, shortestFrom } from './solver';
 
 /** What a generated gravity puzzle should look like. */
@@ -22,6 +23,8 @@ export interface SpaceSpec {
   par: [number, number];
   /** Bonus stage: presses allowed beyond par. */
   slack?: number;
+  /** A player who only pulls the capsules closer to their docks must not manage ★★★. */
+  beatNaive?: boolean;
   /** At most this many shortest answers (fewer = one clear idea). */
   maxOptimal?: number;
   /** Score to aim for when picking one candidate. */
@@ -94,6 +97,38 @@ export function randomStation(rand: () => number, spec: SpaceSpec): SpaceStage |
   };
 }
 
+/**
+ * The fewest presses a naive player can manage: one who always presses a way that brings the
+ * capsules closer to their docks (all distances added up) when some press does, and only then
+ * presses anything else. Infinity when that player cannot dock them within `cap` presses. A
+ * stage this player wins in par asks for no real thinking.
+ */
+export function naivePresses(stage: SpaceStage, cap = 30): number {
+  const dist = (st: number[]) =>
+    st.reduce((t, c, k) => t + Math.abs((c % stage.width) - (stage.docks[k] % stage.width)) + Math.abs(Math.floor(c / stage.width) - Math.floor(stage.docks[k] / stage.width)), 0);
+  const goal = stateKey(stage.docks);
+  let frontier = [stage.start];
+  const seen = new Set([stateKey(stage.start)]);
+  for (let depth = 1; depth <= cap && frontier.length; depth++) {
+    const next: number[][] = [];
+    for (const s of frontier) {
+      const k = stateKey(s);
+      const moves = ALL_DIRS.map((d) => after(stage, s, d)).filter((n) => stateKey(n) !== k);
+      const closer = moves.filter((n) => dist(n) < dist(s));
+      for (const n of closer.length ? closer : moves) {
+        const nk = stateKey(n);
+        if (nk === goal) return depth;
+        if (!seen.has(nk)) {
+          seen.add(nk);
+          next.push(n);
+        }
+      }
+    }
+    frontier = next;
+  }
+  return Infinity;
+}
+
 /** The same station with its docks on `cells`. */
 export function withDocks(stage: SpaceStage, cells: number[]): SpaceStage {
   const tiles = [...stage.tiles];
@@ -151,6 +186,7 @@ export function searchSpace(spec: SpaceSpec): SpaceCandidate[] {
       const audit = auditSpace(stage, { ...m, toWin });
       if (!audit) continue;
       if (spec.maxOptimal && audit.optimal > spec.maxOptimal) continue;
+      if (spec.beatNaive && naivePresses(stage) <= audit.par) continue;
       stage.par = audit.par;
       stage.solution = shortestFrom({ edges: m.edges, toWin }, m.startKey)!;
       if (spec.slack !== undefined) stage.limit = audit.par + spec.slack;
@@ -188,4 +224,44 @@ export function toDef(stage: SpaceStage): SpaceStageDef {
   };
   if (stage.limit !== undefined) def.limit = stage.limit;
   return def;
+}
+
+// ---------------------------------------------------------------- daily puzzle
+
+export const SPACE_DAILY_PREFIX = 'space-daily-';
+
+type DailyShape = Omit<SpaceSpec, 'id' | 'title' | 'tip'>;
+const two: DailyShape = { width: 6, height: 6, capsules: 2, walls: [4, 7], par: [7, 10], target: 24, beatNaive: true, maxOptimal: 6 };
+/** One shape per weekday, Sunday first: boosters midweek, wormholes at the weekend. */
+const DAILY_SHAPES: { shape: DailyShape; what: string }[] = [
+  { shape: { ...two, walls: [3, 5], pads: [1, 2], holes: 1, par: [8, 11], target: 27 }, what: '부스터와 웜홀을 지나' },
+  { shape: { ...two, width: 5, height: 5, walls: [3, 5], par: [6, 9], target: 20 }, what: '' },
+  { shape: two, what: '' },
+  { shape: { ...two, width: 5, height: 5, walls: [2, 4], pads: [2, 3], par: [6, 9], target: 21 }, what: '부스터를 타고' },
+  { shape: { ...two, walls: [3, 6], pads: [2, 3], target: 25 }, what: '부스터를 타고' },
+  { shape: { ...two, walls: [3, 5], holes: 1, target: 25 }, what: '웜홀을 지나' },
+  { shape: { ...two, walls: [3, 5], holes: 2, par: [8, 11], target: 27 }, what: '웜홀 두 쌍을 지나' },
+];
+
+/** The space puzzle for a calendar date (YYYY-MM-DD). The same everywhere; built in a worker. */
+export function dailySpaceDef(date: string): SpaceStageDef {
+  const [, m, d] = date.split('-').map(Number);
+  const { shape, what } = DAILY_SHAPES[new Date(`${date}T12:00:00`).getDay()];
+  for (let round = 0; round < 40; round++) {
+    const found = searchSpace({
+      ...shape,
+      id: `${SPACE_DAILY_PREFIX}${date}`,
+      title: `${m}월 ${d}일 정거장`,
+      tip: `오늘의 퍼즐 · 두 캡슐을 ${what ? `${what} ` : ''}자기 색 도킹장으로!`,
+      seed: hashString(`space:${date}:${round}`),
+      tries: 40,
+      keep: 1,
+    });
+    if (found.length) return toDef(found[0].stage);
+  }
+  throw new Error(`no space puzzle for ${date}`);
+}
+
+export function dailySpaceStage(def: SpaceStageDef): SpaceStage {
+  return { ...parseSpaceStage(def, 0), label: '오늘의 퍼즐' };
 }

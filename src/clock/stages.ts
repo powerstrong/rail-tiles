@@ -54,68 +54,68 @@ const CH1: ClockStageDef[] = [
     par: 5,
     solution: 'UU.UL',
   },
-  // par 6, score 14.0 (target 14), bits 6.0, states 31, rests 1, traps 0%, shortest answers 12
+  // par 6, score 13.6 (target 14), bits 4.8, states 36, rests 1, traps 0%, shortest answers 4
   {
     id: 'ck-red-blue',
     title: '빨강 파랑',
     tip: '지금 올라와 있는 블록은 다음 똑딱에 내려가요.',
     map: [
-      '. r . . b', //
-      'E . . . #',
-      '. b r # .',
-      'b . # # .',
-      '. . S . #',
+      '. . . # .', //
+      'S # r E .',
+      'b # r . .',
+      '. b . . .',
+      '. # . . #',
     ],
     par: 6,
-    solution: 'LU.UUL',
+    solution: 'URR.DR',
   },
-  // par 6, score 14.1 (target 14), bits 5.7, states 36, rests 1, traps 0%, shortest answers 9
+  // par 6, score 14.4 (target 14), bits 5.3, states 38, rests 1, traps 0%, shortest answers 4
   {
     id: 'ck-midnight-1',
     title: '자정의 종 1',
     tip: '종이 울리기 전에 문까지! 되돌리기는 없어요.',
     map: [
-      'S . . b #', //
-      '# . b . E',
-      '# . b . .',
-      '. . r # .',
-      '# . . . .',
+      '. . . # .', //
+      'S # r b .',
+      '# # E . b',
+      '. . . . b',
+      '. . . . .',
     ],
     par: 6,
-    solution: 'RR.RDR',
+    solution: 'URR.DD',
     limit: 9,
   },
-  // par 8, score 17.0 (target 17), bits 6.8, states 55, rests 1, traps 0%, shortest answers 12
+  // par 7, score 16.8 (target 17), bits 7.2, states 53, rests 1, traps 0%, shortest answers 11
   {
     id: 'ck-block-maze',
     title: '블록 미로',
     tip: '블록이 번갈아 길을 열어 줘요. 박자를 맞춰 가요.',
     map: [
-      '. r E . . .', //
-      '. . # . . .',
-      '. # . . # #',
-      '. b . . # .',
-      '. . . . r .',
-      'S b . # . b',
+      '. . . . r .', //
+      'b # . # r .',
+      '# # . . . .',
+      'S . . # . .',
+      'r . # E . #',
+      '. . . b . .',
     ],
-    par: 8,
-    solution: 'UUUUU.RR',
+    par: 7,
+    solution: 'RDDR.RU',
   },
-  // par 8, score 20.1 (target 20), bits 8.2, states 57, rests 2, traps 0%, shortest answers 6
+  // par 8, score 19.1 (target 20), bits 7.9, states 52, rests 1, traps 0%, shortest answers 5
   {
     id: 'ck-zigzag',
     title: '지그재그 계단',
     tip: '쉬는 것도 한 박자예요. 언제 쉬어야 할까요?',
     map: [
-      'S . r . b #', //
-      'b # . # . .',
-      '. . b . E .',
-      '. . . . . r',
-      '. b . . . .',
-      'r . . . . #',
+      'b . . . . #', //
+      '. b # . . #',
+      '. # b b . .',
+      '. S # . . .',
+      '. # . . . .',
+      '. . b r E r',
     ],
     par: 8,
-    solution: 'R.RR.RDD',
+    solution: 'LDDR.RRR',
   },
   // par 9, score 23.5 (target 23), bits 10.8, states 53, rests 1, traps 0%, shortest answers 4
   {
@@ -201,72 +201,72 @@ const CH2: ClockStageDef[] = [
     par: 5,
     solution: 'ULL.D',
   },
-  // par 5, score 14.0 (target 14), bits 5.7, states 74, rests 1, traps 0%, shortest answers 12
+  // par 6, score 14.1 (target 14), bits 4.8, states 83, rests 1, traps 0%, shortest answers 7
   {
     id: 'ck-wait-hand',
     title: '바늘 기다리기',
     tip: '바늘이 지나갈 때까지 쉬었다 가요.',
     map: [
-      '. . . . #', //
-      '. . . . .',
-      '# H . S #',
-      '. . . . .',
-      '# E . . .',
+      '. . . S .', //
+      '. . . H .',
+      '. . . # .',
+      '. . . E .',
+      '. . . # .',
     ],
-    hands: ['1,2 S 2'],
-    par: 5,
-    solution: 'DDL.L',
+    hands: ['3,1 E 2'],
+    par: 6,
+    solution: 'RDDD.L',
   },
-  // par 6, score 17.0 (target 17), bits 6.8, states 84, rests 1, traps 0%, shortest answers 4
+  // par 6, score 17.1 (target 17), bits 6.6, states 111, rests 1, traps 0%, shortest answers 4
   {
     id: 'ck-two-hands',
     title: '바늘 두 개',
     tip: '두 바늘이 함께 돌아요. 둘 다 피해서!',
     map: [
-      '. . . # . E', //
-      '. . . H . .',
-      '# . # . . .',
-      '. # . . H .',
-      '. . . . S .',
+      '# . . . . #', //
+      '# . . . . .',
       '. . . . . .',
+      '. . S . . .',
+      '. . H H . .',
+      '# . . E . .',
     ],
-    hands: ['3,1 E 2', '4,3 N 1'],
+    hands: ['2,4 S 2', '3,4 E 1'],
     par: 6,
-    solution: 'RUU.UU',
+    solution: 'LDD.RR',
   },
-  // par 7, score 16.0 (target 16), bits 6.8, states 82, rests 1, traps 0%, shortest answers 30
+  // par 6, score 16.0 (target 16), bits 6.3, states 81, rests 1, traps 0%, shortest answers 7
   {
     id: 'ck-midnight-2',
     title: '자정의 종 2',
     tip: '바늘을 피해 종이 울리기 전에 문까지! 되돌리기는 없어요.',
     map: [
-      '. . . S #', //
-      '. # . . .',
-      '. H . . .',
+      '. . . . #', //
+      '. . . . #',
       '. . . . .',
-      '. E . . .',
+      '. S H . E',
+      '. . . . .',
     ],
-    hands: ['1,2 N 2'],
-    par: 7,
-    solution: 'DDDDL.L',
-    limit: 10,
+    hands: ['2,3 N 2'],
+    par: 6,
+    solution: 'URRR.D',
+    limit: 9,
   },
-  // par 7, score 20.0 (target 20), bits 9.3, states 109, rests 0, traps 0%, shortest answers 6
+  // par 7, score 18.8 (target 20), bits 7.2, states 108, rests 1, traps 0%, shortest answers 3
   {
     id: 'ck-hand-blocks',
     title: '바늘과 블록',
     tip: '바늘도 돌고 블록도 올라와요. 박자를 잘 세어 봐요.',
     map: [
-      '. . . r . .', //
-      '. b . . . #',
+      'E # S r . .', //
+      '. . b H . b',
+      'r # # . . .',
+      '# . . . . .',
+      '. . . . . #',
       '. . . . . .',
-      '. . . H . .',
-      'E . . . r S',
-      '# b # # . .',
     ],
-    hands: ['3,3 N 2'],
+    hands: ['3,1 N 2'],
     par: 7,
-    solution: 'DULLLLL',
+    solution: 'RL.DLLU',
   },
   // par 8, score 23.0 (target 23), bits 10.2, states 103, rests 1, traps 0%, shortest answers 3
   {
@@ -285,22 +285,22 @@ const CH2: ClockStageDef[] = [
     par: 8,
     solution: 'RD.DDLLU',
   },
-  // par 9, score 26.1 (target 26), bits 11.8, states 96, rests 2, traps 0%, shortest answers 4
+  // par 9, score 25.9 (target 26), bits 11.8, states 99, rests 1, traps 0%, shortest answers 2
   {
     id: 'ck-sweep',
     title: '쓱싹 바늘',
     tip: '바늘이 쓸고 간 바로 뒤를 따라가요.',
     map: [
-      '# b . . . #', //
-      '. E . . r .',
-      '. . H r . .',
-      'r . . . # .',
-      '. r . # H S',
-      '# . . . . .',
+      '. . . b . #', //
+      '. r . . r .',
+      '# . . H . .',
+      '. S H E . .',
+      '. r # . . #',
+      '. r . . . .',
     ],
-    hands: ['2,2 E 2', '4,4 W 1'],
+    hands: ['2,3 S 2', '3,2 N 1'],
     par: 9,
-    solution: 'UUU.LL.LL',
+    solution: 'DLD.RRRUU',
   },
   // par 10, score 29.1 (target 29), bits 13.8, states 100, rests 1, traps 2%, shortest answers 2
   {
@@ -356,21 +356,21 @@ const CH3: ClockStageDef[] = [
     par: 4,
     solution: '.DDR',
   },
-  // par 5, score 17.6 (target 17), bits 6.6, states 106, rests 1, traps 0%, shortest answers 1
+  // par 5, score 18.8 (target 17), bits 7.8, states 146, rests 1, traps 0%, shortest answers 2
   {
     id: 'ck-lever-back',
     title: '되돌리는 바늘',
     tip: '바늘을 거꾸로 돌려서 길을 열어요.',
     map: [
-      '. . . . .', //
-      '# . . . .',
-      '. # E . L',
-      '# . . H .',
-      '. . . # S',
+      '. . . # .', //
+      '. E H . .',
+      'L # . . .',
+      '. S . . .',
+      '# . . . #',
     ],
-    hands: ['3,3 N 2'],
+    hands: ['2,1 W 2'],
     par: 5,
-    solution: '.UULL',
+    solution: 'L.UUR',
   },
   // par 7, score 20.4 (target 20), bits 8.2, states 234, rests 1, traps 0%, shortest answers 5
   {
@@ -424,22 +424,22 @@ const CH3: ClockStageDef[] = [
     solution: 'DD.RRUR',
     limit: 10,
   },
-  // par 8, score 25.2 (target 25), bits 12.2, states 196, rests 0, traps 1%, shortest answers 4
+  // par 8, score 25.4 (target 25), bits 12.1, states 232, rests 0, traps 0%, shortest answers 3
   {
     id: 'ck-lever-blocks',
     title: '레버와 블록',
     tip: '블록은 레버와 상관없이 번갈아 올라와요.',
     map: [
-      '. . . . . r', //
-      '. L S b r .',
-      '# . . . . .',
-      '. . H . . .',
-      '# . . # . #',
-      '. . # . E .',
+      '. E . r . .', //
+      '. . . . . .',
+      'r . . r . #',
+      '. # H . # .',
+      '. . L S . .',
+      '. . . . . .',
     ],
     hands: ['2,3 W 2'],
     par: 8,
-    solution: 'LRDRRDDD',
+    solution: 'LLLUUUUR',
   },
   // par 11, score 28.1 (target 28), bits 12.2, states 206, rests 1, traps 0%, shortest answers 4
   {
@@ -458,22 +458,22 @@ const CH3: ClockStageDef[] = [
     par: 11,
     solution: 'RDDDLL.UULL',
   },
-  // par 10, score 31.6 (target 31), bits 15.2, states 190, rests 1, traps 1%, shortest answers 2
+  // par 10, score 31.7 (target 31), bits 16.2, states 148, rests 0, traps 0%, shortest answers 2
   {
     id: 'ck-lever-maze',
     title: '레버 미로',
     tip: '레버 두 개, 바늘 두 개, 블록까지! 순서를 잘 정해요.',
     map: [
-      '. . . . S .', //
-      '# # . b L .',
-      '. . . H . .',
-      'b . b . . .',
-      'b # # L H .',
-      'E . . . # .',
+      '. r . L # b', //
+      '. . . # E .',
+      'b H # . b .',
+      '# . S . H .',
+      '. . . . # L',
+      '. . . . . .',
     ],
-    hands: ['3,2 W 2', '4,4 E 1'],
+    hands: ['1,2 S 2', '4,3 S 1'],
     par: 10,
-    solution: 'DD.DLDDLLL',
+    solution: 'DRDRRUUUUL',
   },
   // par 12, score 36.4 (target 34), bits 17.7, states 296, rests 1, traps 0%, shortest answers 2
   {

@@ -155,6 +155,8 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
       go(d as Action);
     } else if (e.key === ' ' || e.key === '.' || e.key === 'Enter') {
       e.preventDefault();
+      // A focused button would otherwise take the same key as a click as well (some browsers).
+      if (document.activeElement instanceof HTMLButtonElement) document.activeElement.blur();
       go(REST);
     }
   };

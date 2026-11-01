@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { everythingMatters } from './generate';
+import { dailyClockDef, dailyClockStage, everythingMatters, naiveTicks } from './generate';
 import { REST, actionName } from './model';
 import { parWithoutRest, solveClock } from './solver';
 import { CLOCK_CHAPTERS, CLOCK_STAGES } from './stages';
@@ -57,4 +57,30 @@ describe('clock stages', () => {
   it('start the mouse on plain floor that is free at tick 0', () => {
     for (const s of CLOCK_STAGES) expect(s.tiles[s.start].t, s.id).toBe('floor');
   });
+
+  it('ask for real thinking past the first lessons: walking straight at the door never earns ★★★', () => {
+    const lessons = ['ck-first-steps', 'ck-tick-tock', 'ck-rest', 'ck-clock-hand', 'ck-long-hand', 'ck-lever'];
+    for (const s of CLOCK_STAGES) {
+      if (lessons.includes(s.id)) continue;
+      expect(naiveTicks(s), s.id).toBeGreaterThan(s.par);
+    }
+  });
+});
+
+describe('clock daily puzzle', () => {
+  it('is the same for a date everywhere, wins in its par and needs thinking, every weekday', () => {
+    for (let d = 1; d <= 7; d++) {
+      const date = `2026-11-0${d}`;
+      const def = dailyClockDef(date);
+      expect(dailyClockDef(date)).toEqual(def);
+      expect(def.id).toBe(`clock-daily-${date}`);
+      const stage = dailyClockStage(def);
+      expect(solveClock(stage).par, date).toBe(def.par);
+      let st = initialState(stage);
+      for (const a of stage.solution) st = act(stage, st, a);
+      expect(isWon(stage, st), date).toBe(true);
+      expect(naiveTicks(stage), date).toBeGreaterThan(stage.par);
+      expect(everythingMatters(stage, stage.par), date).toBe(true);
+    }
+  }, 120_000);
 });

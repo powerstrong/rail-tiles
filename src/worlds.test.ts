@@ -56,8 +56,8 @@ describe('world registry', () => {
       machine: ['ice-conquer', null, null],
       volcano: ['mc-final-boss', null, null],
       depot: ['t2-final-boss', 'dp-water-tower', 'depot-daily-'],
-      space: ['dp-final-boss', null, null],
-      clock: ['sp-final-boss', null, null],
+      space: ['dp-final-boss', 'sp-wormhole', 'space-daily-'],
+      clock: ['sp-final-boss', 'ck-lever', 'clock-daily-'],
     });
   });
 
