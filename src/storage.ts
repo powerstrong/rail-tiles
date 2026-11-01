@@ -11,6 +11,8 @@ export interface Progress {
   look?: Record<string, string>;
   /** How many look items had been unlocked the last time the garage was opened. */
   lookSeen?: number;
+  /** Worlds whose arrival story has been shown. */
+  stories?: string[];
 }
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
@@ -34,7 +36,7 @@ export function loadProgress(storage: StorageLike | null = defaultStorage()): Pr
   try {
     const raw = storage?.getItem(KEY);
     if (!raw) return emptyProgress();
-    const data = JSON.parse(raw) as { schemaVersion?: unknown; cleared?: unknown; stars?: unknown; look?: unknown; lookSeen?: unknown };
+    const data = JSON.parse(raw) as { schemaVersion?: unknown; cleared?: unknown; stars?: unknown; look?: unknown; lookSeen?: unknown; stories?: unknown };
     if (data?.schemaVersion === 1 && Array.isArray(data.cleared)) {
       // v1 only knew "cleared": count each as one star.
       const stars: Record<string, Stars> = {};
@@ -50,15 +52,19 @@ export function loadProgress(storage: StorageLike | null = defaultStorage()): Pr
   }
 }
 
-/** The optional look fields, kept only when they have the right shape. */
-function extras(data: { look?: unknown; lookSeen?: unknown }): Pick<Progress, 'look' | 'lookSeen'> {
-  const out: Pick<Progress, 'look' | 'lookSeen'> = {};
+/** The optional fields, kept only when they have the right shape. */
+function extras(data: { look?: unknown; lookSeen?: unknown; stories?: unknown }): Pick<Progress, 'look' | 'lookSeen' | 'stories'> {
+  const out: Pick<Progress, 'look' | 'lookSeen' | 'stories'> = {};
   if (typeof data.look === 'object' && data.look !== null) {
     out.look = Object.fromEntries(Object.entries(data.look).filter(([k, v]) => typeof k === 'string' && typeof v === 'string'));
   }
   if (typeof data.lookSeen === 'number' && Number.isFinite(data.lookSeen)) out.lookSeen = data.lookSeen;
+  if (Array.isArray(data.stories)) out.stories = data.stories.filter((id): id is string => typeof id === 'string');
   return out;
 }
+
+/** Both lists of seen stories together, in order, each world once. */
+const bothStories = (a?: string[], b?: string[]) => (a || b ? [...new Set([...(a ?? []), ...(b ?? [])])] : undefined);
 
 export function saveProgress(progress: Progress, storage: StorageLike | null = defaultStorage()): void {
   try {
@@ -66,7 +72,7 @@ export function saveProgress(progress: Progress, storage: StorageLike | null = d
     const saved = loadProgress(storage);
     const stars = { ...progress.stars };
     for (const [id, v] of Object.entries(saved.stars)) if ((stars[id] ?? 0) < v) stars[id] = v;
-    storage?.setItem(KEY, JSON.stringify({ ...progress, stars }));
+    storage?.setItem(KEY, JSON.stringify({ ...progress, stars, stories: bothStories(progress.stories, saved.stories) }));
   } catch {
     // Private mode or full storage: progress just won't persist.
   }
@@ -76,11 +82,11 @@ export function saveProgress(progress: Progress, storage: StorageLike | null = d
 export const PROGRESS_KEY = KEY;
 
 /**
- * Takes in what another tab saved: the better rating of each stage, the look chosen there and
- * the newest "seen" count. Returns the same object when nothing changes.
+ * Takes in what another tab saved: the better rating of each stage, the look chosen there, the
+ * newest "seen" count and the stories seen there. Returns the same object when nothing changes.
  */
 export function absorbSaved(progress: Progress, saved: Progress): Progress {
-  const next: Progress = { ...mergeProgress(progress, saved), look: saved.look ?? progress.look };
+  const next: Progress = { ...mergeProgress(progress, saved), look: saved.look ?? progress.look, stories: bothStories(progress.stories, saved.stories) };
   const seen = Math.max(progress.lookSeen ?? 0, saved.lookSeen ?? 0);
   if (seen > 0) next.lookSeen = seen;
   return JSON.stringify(next) === JSON.stringify(progress) ? progress : next;

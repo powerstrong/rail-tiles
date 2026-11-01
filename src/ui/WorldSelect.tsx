@@ -16,7 +16,7 @@ export interface WorldCard {
   from?: string;
 }
 
-function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
+export function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
   switch (kind) {
     case 'train':
       return (

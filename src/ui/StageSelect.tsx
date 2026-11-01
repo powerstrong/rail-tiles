@@ -27,6 +27,8 @@ interface Props {
   allCleared: boolean;
   onPick: (index: number) => void;
   onBack: () => void;
+  /** Replays the world's arrival story. */
+  onStory?: () => void;
   daily?: DailyCardProps;
 }
 
@@ -99,7 +101,7 @@ export function StarRow({ count, className }: { count: number; className?: strin
   );
 }
 
-export function StageSelect({ stages, heading = '스테이지 선택', theme, chapters, stars, cleared, allCleared, onPick, onBack, daily }: Props) {
+export function StageSelect({ stages, heading = '스테이지 선택', theme, chapters, stars, cleared, allCleared, onPick, onBack, onStory, daily }: Props) {
   const totalStars = stages.reduce((sum, s) => sum + (stars[s.id] ?? 0), 0);
   return (
     <main className={`select ${theme ?? ''}`}>
@@ -110,6 +112,11 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
           </svg>
         </button>
         <h1>{heading}</h1>
+        {onStory && (
+          <button className="icon-btn story-replay" onClick={onStory} aria-label="이야기 다시 보기">
+            <span aria-hidden>📖</span>
+          </button>
+        )}
         <span className="select-progress" aria-label={`별 ${totalStars}개 / ${stages.length * 3}개`}>
           ★ {totalStars} / {stages.length * 3}
         </span>

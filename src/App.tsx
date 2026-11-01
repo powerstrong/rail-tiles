@@ -8,6 +8,8 @@ import { SaveScreen } from './ui/SaveScreen';
 import { StageSelect } from './ui/StageSelect';
 import { TitleScreen } from './ui/TitleScreen';
 import { type WorldCard, WorldSelect } from './ui/WorldSelect';
+import { STORIES } from './ui/stories';
+import { WorldStory } from './ui/WorldStory';
 import { WORLDS, type World, type WorldStage, stageCards, worldById } from './worlds';
 
 type Screen =
@@ -16,6 +18,8 @@ type Screen =
   | { name: 'save' }
   | { name: 'worlds' }
   | { name: 'select'; world: string }
+  /** A world's arrival story: on the way in the first time, or replayed from its stage list. */
+  | { name: 'story'; world: string }
   | { name: 'game'; world: string; index: number }
   /** The puzzle is kept here, so it stays put if the date turns over mid-game. */
   | { name: 'daily'; world: string; stage: WorldStage };
@@ -83,6 +87,8 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
   const today = dateKey();
 
   const onCleared = (id: string, stars: Stars) => setProgress((p) => recordClear(p, id, stars));
+  /** The story plays on the way into a world, once, unless the world was already being played. */
+  const storyFirst = (w: World) => !!STORIES[w.id] && !progress.stories?.includes(w.id) && !w.stages.some((s) => progress.stars[s.id]);
   const streakOf = (w: World) => (w.daily ? dailyStreak(cleared, today, w.daily.prefix) : 0);
 
   // Daily puzzles are built in the background: on the world list once a world's daily is open
@@ -155,13 +161,36 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
       lockNote: w.lockNote,
       from: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.title,
     }));
-    return <WorldSelect worlds={cards} onPick={(id) => setScreen({ name: 'select', world: id })} onBack={() => setScreen({ name: 'title' })} />;
+    const pick = (id: string) => {
+      const w = worldById(id);
+      if (w) setScreen(storyFirst(w) ? { name: 'story', world: id } : { name: 'select', world: id });
+    };
+    return <WorldSelect worlds={cards} onPick={pick} onBack={() => setScreen({ name: 'title' })} />;
   }
 
   const world = worldById(screen.world);
   if (!world) return null;
   const toList = () => setScreen({ name: 'select', world: world.id });
   const Game = world.Game;
+
+  if (screen.name === 'story') {
+    const story = STORIES[world.id];
+    if (!story) return null;
+    return (
+      <WorldStory
+        key={world.id}
+        place={world.title}
+        color={world.color}
+        emblem={world.emblem}
+        story={story}
+        first={!world.unlockAfter}
+        onDone={() => {
+          setProgress((p) => (p.stories?.includes(world.id) ? p : { ...p, stories: [...(p.stories ?? []), world.id] }));
+          toList();
+        }}
+      />
+    );
+  }
 
   if (screen.name === 'select') {
     const daily = world.daily;
@@ -178,6 +207,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         allCleared={world.stages.every((s) => cleared.has(s.id))}
         onPick={(index) => setScreen({ name: 'game', world: world.id, index })}
         onBack={() => setScreen({ name: 'worlds' })}
+        onStory={STORIES[world.id] ? () => setScreen({ name: 'story', world: world.id }) : undefined}
         daily={
           daily && {
             title: todays?.stage?.title ?? null,

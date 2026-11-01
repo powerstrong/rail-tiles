@@ -62,6 +62,17 @@ describe('progress storage', () => {
     expect(loadProgress(store).stars).toEqual({ a: 3, b: 2 });
   });
 
+  it('keeps the stories seen, in this tab and in others', () => {
+    const store = memory();
+    saveProgress({ ...emptyProgress(), stories: ['train'] }, store);
+    saveProgress({ ...emptyProgress(), stories: ['ice'] }, store);
+    expect(loadProgress(store).stories).toEqual(['ice', 'train']);
+    expect(loadProgress(memory('{"schemaVersion":2,"stars":{},"stories":["train",3]}')).stories).toEqual(['train']);
+    const mine = { ...emptyProgress(), stories: ['train'] };
+    expect(absorbSaved(mine, { ...emptyProgress(), stories: ['train'] })).toBe(mine);
+    expect(absorbSaved(mine, { ...emptyProgress(), stories: ['ice'] }).stories).toEqual(['train', 'ice']);
+  });
+
   it('takes in what another tab saved, and is a no-op when nothing is new', () => {
     const mine = { ...emptyProgress(), stars: { a: 3 as const, b: 1 as const }, look: { body: 'body-blue' }, lookSeen: 4 };
     const theirs = { ...emptyProgress(), stars: { a: 1 as const, b: 2 as const, c: 1 as const }, look: { body: 'body-pink' }, lookSeen: 6 };
