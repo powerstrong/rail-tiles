@@ -62,6 +62,7 @@ const easeInOut = (k: number) => (k < 0.5 ? 4 * k ** 3 : 1 - (-2 * k + 2) ** 3 /
 export function RideTrain({
   path,
   at,
+  start = 0,
   ms = [ARRIVE_MS],
   hurry = false,
   scale = 1,
@@ -69,6 +70,8 @@ export function RideTrain({
 }: {
   path: readonly Pt[];
   at: number;
+  /** The point it is already standing at when the scene opens (a farewell starts at the station). */
+  start?: number;
   /** Time for each leg: the ride to point 1, to point 2, … */
   ms?: readonly number[];
   hurry?: boolean;
@@ -78,7 +81,7 @@ export function RideTrain({
   const { smoke } = useLook();
   const ref = useRef<SVGGElement>(null);
   const smokeRef = useRef<SVGGElement>(null);
-  const pos = useRef(0);
+  const pos = useRef(start);
   const reach = useRef(onReach);
   reach.current = onReach;
 
@@ -93,9 +96,10 @@ export function RideTrain({
     ref.current?.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${((angle * 180) / Math.PI).toFixed(1)}) scale(${scale})`);
     return { x, y, angle };
   };
-  const [start] = useState(() => {
-    const [ax, ay] = path[0];
-    const [bx, by] = path[1];
+  const [first] = useState(() => {
+    const i = Math.min(start, path.length - 2);
+    const [ax, ay] = path[start];
+    const [bx, by] = path[i + 1];
     return `translate(${ax} ${ay}) rotate(${(Math.atan2(by - ay, bx - ax) * 180) / Math.PI}) scale(${scale})`;
   });
 
@@ -142,7 +146,7 @@ export function RideTrain({
   return (
     <g>
       <g ref={smokeRef} />
-      <g ref={ref} transform={start}>
+      <g ref={ref} transform={first}>
         <TrainArt />
       </g>
     </g>
@@ -296,4 +300,67 @@ export function Rider({ shirt, hair = '#3A3846' }: { shirt: string; hair?: strin
       <circle cx={4.5} cy={-9} r={2} fill="#3A3846" />
     </g>
   );
+}
+
+/** For a farewell, where the train is already standing at the station: tell the story so at once. */
+export function useAlreadyHere(onArrive: () => void) {
+  useEffect(() => onArrive(), []);
+}
+
+/**
+ * A present flying from the friend's hands (`from`) in a high arc and landing on the train
+ * (`to`), where it gives a little sparkle. Drawn at `from`; the arc is a CSS animation.
+ */
+export function Gift({ from, to, delay = 0, children }: { from: Pt; to: Pt; delay?: number; children: ReactNode }) {
+  const style = {
+    animationDelay: `${delay}ms`,
+    ['--dx' as string]: `${to[0] - from[0]}px`,
+    ['--dy' as string]: `${to[1] - from[1]}px`,
+  };
+  return (
+    <g transform={`translate(${from[0]} ${from[1]})`}>
+      <g className="ss-gift" style={style}>
+        {children}
+      </g>
+    </g>
+  );
+}
+
+const CONFETTI = ['#E5584F', '#F4C24F', '#3F8BD9', '#4CAF6A', '#EC6A8E', '#8E6BD1'];
+
+/** Confetti drifting down over the whole scene. */
+export function Confetti({ count = 22 }: { count?: number }) {
+  return (
+    <g>
+      {Array.from({ length: count }, (_, i) => (
+        <rect
+          key={i}
+          x={(i * 149 + 23) % SCENE_W}
+          y={-12}
+          width={7}
+          height={11}
+          rx={2}
+          fill={CONFETTI[i % CONFETTI.length]}
+          className="ss-confetti"
+          style={{ animationDelay: `${(i * 173) % 1600}ms`, animationDuration: `${2200 + ((i * 331) % 1400)}ms` }}
+        />
+      ))}
+    </g>
+  );
+}
+
+/** "안녕!" called out by someone waving the train off. */
+export function Bye({ x, y, color, delay = 0, text = '안녕!' }: { x: number; y: number; color: string; delay?: number; text?: string }) {
+  return <Tag x={x} y={y} text={text} color={color} delay={delay} />;
+}
+
+/** Counts up every `ms` while `on`: for things that keep a beat (party lights, a ticking tower). */
+export function useTicker(on: boolean, ms: number) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!on) return;
+    const t = window.setInterval(() => setN((k) => k + 1), ms);
+    return () => clearInterval(t);
+  }, [on, ms]);
+  return n;
 }

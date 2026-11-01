@@ -8,7 +8,7 @@ import { SaveScreen } from './ui/SaveScreen';
 import { StageSelect } from './ui/StageSelect';
 import { TitleScreen } from './ui/TitleScreen';
 import { type WorldCard, WorldSelect } from './ui/WorldSelect';
-import { STORIES } from './ui/stories';
+import { STORIES, farewellId } from './ui/stories';
 import { WorldStory } from './ui/WorldStory';
 import { WORLDS, type World, type WorldStage, stageCards, worldById } from './worlds';
 
@@ -18,8 +18,8 @@ type Screen =
   | { name: 'save' }
   | { name: 'worlds' }
   | { name: 'select'; world: string }
-  /** A world's arrival story: on the way in the first time, or replayed from its stage list. */
-  | { name: 'story'; world: string }
+  /** A world's arrival story (on the way in the first time) or farewell (once it is all cleared). */
+  | { name: 'story'; world: string; farewell?: boolean }
   | { name: 'game'; world: string; index: number }
   /** The puzzle is kept here, so it stays put if the date turns over mid-game. */
   | { name: 'daily'; world: string; stage: WorldStage };
@@ -89,6 +89,13 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
   const onCleared = (id: string, stars: Stars) => setProgress((p) => recordClear(p, id, stars));
   /** The story plays on the way into a world, once, unless the world was already being played. */
   const storyFirst = (w: World) => !!STORIES[w.id] && !progress.stories?.includes(w.id) && !w.stages.some((s) => progress.stars[s.id]);
+  const conquered = (w: World) => w.stages.every((s) => cleared.has(s.id));
+  /** The farewell plays once a world is all cleared, on the way back to its stage list. */
+  const farewellDue = (w: World) => !!STORIES[w.id] && conquered(w) && !progress.stories?.includes(farewellId(w.id));
+  /** To a world's stage list, by way of its arrival or farewell when one is due. */
+  const enter = (w: World) =>
+    setScreen(storyFirst(w) ? { name: 'story', world: w.id } : farewellDue(w) ? { name: 'story', world: w.id, farewell: true } : { name: 'select', world: w.id });
+  const seen = (id: string) => setProgress((p) => (p.stories?.includes(id) ? p : { ...p, stories: [...(p.stories ?? []), id] }));
   const streakOf = (w: World) => (w.daily ? dailyStreak(cleared, today, w.daily.prefix) : 0);
 
   // Daily puzzles are built in the background: on the world list once a world's daily is open
@@ -163,14 +170,14 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
     }));
     const pick = (id: string) => {
       const w = worldById(id);
-      if (w) setScreen(storyFirst(w) ? { name: 'story', world: id } : { name: 'select', world: id });
+      if (w) enter(w);
     };
     return <WorldSelect worlds={cards} onPick={pick} onBack={() => setScreen({ name: 'title' })} />;
   }
 
   const world = worldById(screen.world);
   if (!world) return null;
-  const toList = () => setScreen({ name: 'select', world: world.id });
+  const toList = () => enter(world);
   const Game = world.Game;
 
   if (screen.name === 'story') {
@@ -178,14 +185,15 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
     if (!story) return null;
     return (
       <WorldStory
-        key={world.id}
+        key={`${world.id}${screen.farewell ? ':bye' : ''}`}
         place={world.title}
         color={world.color}
         story={story}
+        mode={screen.farewell ? 'farewell' : 'arrive'}
         first={!world.unlockAfter}
         onDone={() => {
-          setProgress((p) => (p.stories?.includes(world.id) ? p : { ...p, stories: [...(p.stories ?? []), world.id] }));
-          toList();
+          seen(screen.farewell ? farewellId(world.id) : world.id);
+          setScreen({ name: 'select', world: world.id });
         }}
       />
     );
@@ -207,6 +215,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         onPick={(index) => setScreen({ name: 'game', world: world.id, index })}
         onBack={() => setScreen({ name: 'worlds' })}
         onStory={STORIES[world.id] ? () => setScreen({ name: 'story', world: world.id }) : undefined}
+        onFarewell={STORIES[world.id] && conquered(world) ? () => setScreen({ name: 'story', world: world.id, farewell: true }) : undefined}
         daily={
           daily && {
             title: todays?.stage?.title ?? null,

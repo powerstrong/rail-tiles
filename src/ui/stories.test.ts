@@ -15,5 +15,13 @@ describe('world arrival stories', () => {
       expect(story.lines.length).toBeLessThanOrEqual(3);
       for (const line of story.lines) expect(line.length, line).toBeLessThanOrEqual(34);
     });
+
+    it(`${w.title}: a farewell of three short lines too`, () => {
+      const { farewell } = STORIES[w.id];
+      expect(farewell.lines.length).toBe(3);
+      for (const line of farewell.lines) expect(line.length, line).toBeLessThanOrEqual(34);
+      expect(farewell.tail).toBeGreaterThan(0);
+      expect(farewell.tail).toBeLessThan(100);
+    });
   }
 });

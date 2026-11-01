@@ -1,6 +1,6 @@
 import { DP, WagonArt } from '../../depot/DepotArt';
 import type { Vehicle } from '../../depot/model';
-import { type SceneProps, Mark, Platform, PersonArt, Pop, Rail, RideTrain, SCENE_H, SCENE_W, Sparkle, useCues, useSteps } from './kit';
+import { type SceneProps, Bye, Confetti, Mark, Platform, PersonArt, Pop, Rail, RideTrain, SCENE_H, SCENE_W, Sparkle, Tag, useAlreadyHere, useCues, useSteps } from './kit';
 
 /** The yard: 5 × 4 cells of 48, the train's line is row 1. */
 const YX = 250;
@@ -54,6 +54,59 @@ function Shed() {
   );
 }
 
+/** The gravel ground, the shed, the yard with its gates and line, and the parked wagons. */
+function Yard() {
+  return (
+    <g>
+        <rect width={SCENE_W} height={SCENE_H} rx={24} fill="#E6DDCC" />
+        {Array.from({ length: 40 }, (_, i) => (
+          <circle key={i} cx={(i * 97) % 560} cy={(i * 53) % 300} r={2 + (i % 3)} fill="#D6CAB3" />
+        ))}
+        <Shed />
+
+        {/* The yard floor, its fence, and the gates on the train's line. */}
+        <rect x={YX - 8} y={YY - 8} width={CELL * 5 + 16} height={CELL * 4 + 16} rx={14} fill={DP.frame} />
+        <rect x={YX - 2} y={YY - 2} width={CELL * 5 + 4} height={CELL * 4 + 4} rx={10} fill={DP.floorEdge} />
+        {Array.from({ length: 20 }, (_, i) => (
+          <rect key={i} x={YX + (i % 5) * CELL + 1} y={YY + Math.floor(i / 5) * CELL + 1} width={CELL - 2} height={CELL - 2} rx={6} fill={(i + Math.floor(i / 5)) % 2 ? DP.floorAlt : DP.floor} />
+        ))}
+        {[YX - 8, YX + CELL * 5].map((x) => (
+          <rect key={x} x={x} y={LINE_Y - CELL / 2} width={8} height={CELL} fill={DP.floorEdge} />
+        ))}
+        <Rail a={[-100, LINE_Y]} b={[660, LINE_Y]} tint="#DCD1BC" />
+        {[LINE_Y - CELL / 2 - 6, LINE_Y + CELL / 2 + 6].map((y) => (
+          <g key={y}>
+            <rect x={YX + CELL * 5 - 2} y={y - 6} width={12} height={12} rx={3} fill="#2E3445" />
+            <rect x={YX + CELL * 5} y={y - 4} width={8} height={8} rx={2} fill={DP.brass} />
+          </g>
+        ))}
+        <path d={`M${YX + CELL * 5 + 20} ${LINE_Y - 34} l10 8 l-10 8`} stroke={DP.brass} strokeWidth={5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+
+        {PARKED.map((c, i) => (
+          <Parked key={i} c={c} />
+        ))}
+    </g>
+  );
+}
+
+/** Lower left: spare rails and a lamp. */
+function YardProps() {
+  return (
+    <g>
+        {/* Lower left: spare rails and a lamp. */}
+        <g transform="translate(70 230)">
+          <rect x={-40} y={-6} width={80} height={8} rx={3} fill="#A7ADB6" />
+          <rect x={-34} y={6} width={80} height={8} rx={3} fill="#A7ADB6" />
+          <rect x={-30} y={18} width={80} height={8} rx={3} fill="#C9CED6" />
+        </g>
+        <g transform="translate(176 214)">
+          <rect x={-3} y={-30} width={6} height={56} rx={2} fill="#5D6271" />
+          <circle cy={-34} r={9} fill="#FFE38A" stroke="#5D6271" strokeWidth={3} />
+        </g>
+    </g>
+  );
+}
+
 const TIMES = [[300], [250, 750], [200, 900, 3200]];
 const CUES = [
   [[300, 'depart']],
@@ -77,33 +130,7 @@ export function DepotScene({ beat, arrived, hurry, onArrive }: SceneProps) {
 
   return (
     <g>
-      <rect width={SCENE_W} height={SCENE_H} rx={24} fill="#E6DDCC" />
-      {Array.from({ length: 40 }, (_, i) => (
-        <circle key={i} cx={(i * 97) % 560} cy={(i * 53) % 300} r={2 + (i % 3)} fill="#D6CAB3" />
-      ))}
-      <Shed />
-
-      {/* The yard floor, its fence, and the gates on the train's line. */}
-      <rect x={YX - 8} y={YY - 8} width={CELL * 5 + 16} height={CELL * 4 + 16} rx={14} fill={DP.frame} />
-      <rect x={YX - 2} y={YY - 2} width={CELL * 5 + 4} height={CELL * 4 + 4} rx={10} fill={DP.floorEdge} />
-      {Array.from({ length: 20 }, (_, i) => (
-        <rect key={i} x={YX + (i % 5) * CELL + 1} y={YY + Math.floor(i / 5) * CELL + 1} width={CELL - 2} height={CELL - 2} rx={6} fill={(i + Math.floor(i / 5)) % 2 ? DP.floorAlt : DP.floor} />
-      ))}
-      {[YX - 8, YX + CELL * 5].map((x) => (
-        <rect key={x} x={x} y={LINE_Y - CELL / 2} width={8} height={CELL} fill={DP.floorEdge} />
-      ))}
-      <Rail a={[-100, LINE_Y]} b={[660, LINE_Y]} tint="#DCD1BC" />
-      {[LINE_Y - CELL / 2 - 6, LINE_Y + CELL / 2 + 6].map((y) => (
-        <g key={y}>
-          <rect x={YX + CELL * 5 - 2} y={y - 6} width={12} height={12} rx={3} fill="#2E3445" />
-          <rect x={YX + CELL * 5} y={y - 4} width={8} height={8} rx={2} fill={DP.brass} />
-        </g>
-      ))}
-      <path d={`M${YX + CELL * 5 + 20} ${LINE_Y - 34} l10 8 l-10 8`} stroke={DP.brass} strokeWidth={5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-
-      {PARKED.map((c, i) => (
-        <Parked key={i} c={c} />
-      ))}
+      <Yard />
       <Parked c={BLOCKER} shift={moved ? 1 : 0} className={stuck ? `ss-shake s${step}` : undefined} key={stuck ? `b${step}` : 'b'} />
 
       <Platform x={30} w={196} y={YY - 2} />
@@ -131,16 +158,73 @@ export function DepotScene({ beat, arrived, hurry, onArrive }: SceneProps) {
           )}
         </Pop>
       )}
-      {/* Lower left: spare rails and a lamp. */}
-      <g transform="translate(70 230)">
-        <rect x={-40} y={-6} width={80} height={8} rx={3} fill="#A7ADB6" />
-        <rect x={-34} y={6} width={80} height={8} rx={3} fill="#A7ADB6" />
-        <rect x={-30} y={18} width={80} height={8} rx={3} fill="#C9CED6" />
-      </g>
-      <g transform="translate(176 214)">
-        <rect x={-3} y={-30} width={6} height={56} rx={2} fill="#5D6271" />
-        <circle cy={-34} r={9} fill="#FFE38A" stroke="#5D6271" strokeWidth={3} />
-      </g>
+      <YardProps />
+    </g>
+  );
+}
+
+const STOP_X = 150;
+const BUBBLES = Array.from({ length: 9 }, (_, i) => ({ dx: ((i * 37) % 80) - 40, dy: ((i * 23) % 30) - 15, r: 5 + (i % 3) * 2, delay: i * 110 }));
+const BYE_TIMES = [[300], [150, 1700], [200, 600]];
+const BYE_CUES = [[[300, 'thanks']], [[150, 'slide'], [700, 'slide'], [1700, 'pickup']], [[200, 'rotate'], [600, 'depart'], [1000, 'thanks']]] as const;
+
+/** A signal by the yard's way in: red, then green for go. */
+function Signal({ go }: { go: boolean }) {
+  return (
+    <g transform={`translate(${YX - 26} ${LINE_Y - 52})`}>
+      <rect x={-3} y={0} width={6} height={30} rx={2} fill="#5D6271" />
+      <rect x={-10} y={-26} width={20} height={30} rx={6} fill="#2E3445" />
+      <circle cy={-18} r={6} fill={go ? '#4A3A3A' : '#FF5468'} />
+      <circle cy={-4} r={6} fill={go ? '#7CF29A' : '#3A4A3E'} />
+      {go && <circle cy={-4} r={10} fill="#7CF29A" opacity={0.35} />}
+    </g>
+  );
+}
+
+/**
+ * 기차 차고지 farewell: the yard is tidy, the line through it clear. The foreman scrubs our train
+ * in a cloud of soap bubbles until it shines; the signal turns green with a whistle and the train
+ * runs through the yard and out of the far gate.
+ */
+export function DepotFarewell({ beat, arrived, onArrive }: SceneProps) {
+  useAlreadyHere(onArrive);
+  const key = arrived ? beat : -1;
+  const step = useSteps(key, BYE_TIMES[beat] ?? []);
+  useCues(key, BYE_CUES[beat]);
+  const washing = beat === 1 && step === 1;
+  const go = beat === 2 && step >= 1;
+  const gone = beat === 2 && step >= 2;
+  return (
+    <g>
+      <Yard />
+      <Parked c={BLOCKER} shift={1} />
+      <Platform x={30} w={196} y={YY - 2} />
+      <Signal go={go} />
+      <RideTrain path={[[-90, LINE_Y], [STOP_X, LINE_Y], [620, LINE_Y]]} start={1} at={gone ? 2 : 1} ms={[2300, 2300]} scale={1.25} />
+      {washing &&
+        BUBBLES.map((b, i) => (
+          <circle key={i} cx={STOP_X + b.dx} cy={LINE_Y + b.dy} r={b.r} fill="rgba(220,240,255,0.6)" stroke="#9FD6F2" strokeWidth={2} className="ss-bubble" style={{ animationDelay: `${b.delay}ms` }} />
+        ))}
+      {beat === 1 && step >= 2 && (
+        <>
+          <Sparkle x={STOP_X - 20} y={LINE_Y - 4} color="#FFFFFF" />
+          <Sparkle x={STOP_X + 24} y={LINE_Y} delay={150} />
+          <Tag x={STOP_X} y={LINE_Y + 40} text="반짝반짝!" color="#2E6F8E" />
+        </>
+      )}
+      <Pop x={130} y={YY - 12} s={0.74}>
+        <PersonArt shirt="#E0782E" hat="helmet" hatColor="#F4C24F" cheer={beat !== 1} />
+        {beat === 2 && (
+          <g transform="translate(-28 -14)">
+            <rect x={-12} y={-5} width={14} height={10} rx={4} fill="#B9BFC9" stroke="#7F8896" strokeWidth={2} />
+            <path d="M-18 -14 l-8 -6 M-20 -2 l-10 0 M-18 10 l-8 6" stroke="#7F8896" strokeWidth={3} strokeLinecap="round" className="ss-blink" />
+          </g>
+        )}
+      </Pop>
+      {beat === 1 && step === 1 && <Mark x={190} y={YY - 40} text="♪" color="#2E6F8E" />}
+      {beat === 2 && <Bye x={130} y={20} color="#E0782E" text="잘 가요!" />}
+      <YardProps />
+      <Confetti count={14} />
     </g>
   );
 }

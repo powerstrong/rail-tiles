@@ -525,3 +525,158 @@
     transform: translateY(-22px);
   }
 }
+
+/* ---------- farewells (shared) ---------- */
+
+/* A present: up and over in an arc, onto the train, then tucked away. */
+.ss-gift {
+  animation: ss-gift 1.2s ease-in-out both;
+}
+
+@keyframes ss-gift {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  12% {
+    transform: translate(0, -14px) scale(1.1);
+    opacity: 1;
+  }
+  55% {
+    transform: translate(calc(var(--dx) * 0.55), calc(var(--dy) * 0.3 - 70px)) scale(1);
+  }
+  88% {
+    transform: translate(var(--dx), var(--dy)) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.ss-confetti {
+  animation: ss-confetti 2.8s linear infinite;
+}
+
+@keyframes ss-confetti {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(14px, 160px) rotate(220deg);
+  }
+  to {
+    transform: translate(-6px, 330px) rotate(420deg);
+  }
+}
+
+/* ---------- 강바람 철도 farewell ---------- */
+
+.ss-kite {
+  transform-origin: 50% 100%;
+  animation: ss-kite 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes ss-kite {
+  from {
+    transform: rotate(-14deg) translate(-4px, 4px);
+  }
+  to {
+    transform: rotate(12deg) translate(6px, -6px);
+  }
+}
+
+.ss-pour {
+  transform-origin: 50% 0%;
+  animation: ss-pour 0.3s ease-out both;
+}
+
+@keyframes ss-pour {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.ss-splash {
+  animation: ss-splash 0.5s ease-out infinite;
+}
+
+@keyframes ss-splash {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(0, -14px);
+    opacity: 0;
+  }
+}
+
+/* ---------- 기차 차고지 farewell ---------- */
+
+.ss-bubble {
+  transform-origin: 50% 50%;
+  animation: ss-bubble 1.1s ease-out infinite;
+}
+
+@keyframes ss-bubble {
+  0% {
+    transform: translate(0, 6px) scale(0.3);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(4px, -30px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* ---------- 우주 정거장 farewell ---------- */
+
+.ss-burst {
+  animation: ss-burst 1.5s ease-out infinite;
+}
+
+@keyframes ss-burst {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(0, -26px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, -34px) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.ss-glow-rail {
+  filter: drop-shadow(0 0 6px #9b6bf0);
+}
+
+/* ---------- 시계탑 farewell ---------- */
+
+.ss-munch {
+  transform-origin: 50% 100%;
+  animation: ss-munch 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes ss-munch {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.04, 0.95);
+  }
+}
