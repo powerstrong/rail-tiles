@@ -58,6 +58,11 @@ describe('clock stages', () => {
     for (const s of CLOCK_STAGES) expect(s.tiles[s.start].t, s.id).toBe('floor');
   });
 
+  it('give every boss one key idea to find: at most two shortest answers', () => {
+    for (const s of CLOCK_STAGES.filter((st) => st.boss)) expect(solveClock(s).optimal, s.id).toBeLessThanOrEqual(2);
+    expect(CLOCK_STAGES.filter((st) => st.boss).length).toBe(3);
+  });
+
   it('ask for real thinking past the first lessons: walking straight at the door never earns ★★★', () => {
     const lessons = ['ck-first-steps', 'ck-tick-tock', 'ck-rest', 'ck-clock-hand', 'ck-long-hand', 'ck-lever'];
     for (const s of CLOCK_STAGES) {

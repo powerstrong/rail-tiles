@@ -12,6 +12,8 @@ import { type ClockState, act, blockUp, cellOf, initialState, isWon, reversedOf,
 interface Props {
   stage: ClockStage;
   hasNext: boolean;
+  /** Every other stage of the world is cleared, so clearing this one finishes the world. */
+  allCleared: boolean;
   bestStars: number;
   /** "New thing" card for a stage that brings in a mechanic. */
   intro?: Intro;
@@ -33,7 +35,7 @@ interface Tick {
 
 const DIR_LABEL = ['위로', '오른쪽으로', '아래로', '왼쪽으로'];
 
-export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const bonus = stage.limit !== undefined;
   const limit = stage.limit ?? 0;
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
@@ -187,6 +189,7 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
           <span className="stage-no">
             {stage.label ?? `STAGE ${stage.number}`}
             {bonus && <span className="tag tag-bonus">보너스</span>}
+            {stage.boss && <span className="tag tag-boss">보스</span>}
           </span>
           <h1>{stage.title}</h1>
         </div>
@@ -336,7 +339,7 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{hasNext || clearNote ? '치즈 도착!' : '시계탑 정복!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '시계탑 정복!' : stage.boss ? '보스 격파!' : '치즈 도착!'}</h2>
             <p className="result-sub">
               똑딱 {ticks}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

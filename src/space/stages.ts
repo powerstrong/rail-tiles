@@ -147,21 +147,21 @@ const CH1: SpaceStageDef[] = [
     par: 8,
     solution: 'URRDRRDL',
   },
-  // par 10, score 37.0 (target 37), bits 17.2, layouts 22992, traps 0%, shortest answers 4
+  // par 10, score 36.9 (target 37), bits 16.8, layouts 19542, traps 0%, shortest answers 2
   {
     id: 'sp-boss-1',
     title: '첫 도킹 임무',
     tip: '챕터 1 보스! 세 캡슐을 한 번에 도킹시켜요.',
     map: [
-      '. . . . . .', //
-      'B . Y . . R',
-      '. # o . . .',
-      '. . b . . .',
-      'y . o # . r',
-      '. . . . o .',
+      '. . # . Y .', //
+      '# . . o . R',
+      '. . . y # .',
+      'b r o . . .',
+      '. . . . B .',
+      '. . . . . #',
     ],
     par: 10,
-    solution: 'DLLDRRDDDU',
+    solution: 'DRDDLULLLU',
   },
 ];
 
@@ -306,21 +306,21 @@ const CH2: SpaceStageDef[] = [
     par: 8,
     solution: 'URUULUUR',
   },
-  // par 10, score 39.0 (target 39), bits 19.0, layouts 15937, traps 0%, shortest answers 3
+  // par 10, score 39.1 (target 39), bits 18.3, layouts 14904, traps 0%, shortest answers 1
   {
     id: 'sp-boss-2',
     title: '추진 제어실',
     tip: '챕터 2 보스! 부스터를 모두 내 편으로 만들어요.',
     map: [
-      '. . r > . .', //
-      '. v . . Y #',
-      'b R . . o .',
-      '. . . . y .',
-      '. ^ . . . .',
-      'B . # . . .',
+      '# # b . . .', //
+      '. . o y v .',
+      'Y . v . . .',
+      'R . r . > B',
+      '. . . . . .',
+      '. . . . o .',
     ],
     par: 10,
-    solution: 'RLDDRRLUUU',
+    solution: 'RRURRULULL',
   },
 ];
 
@@ -500,5 +500,5 @@ export const SPACE_CHAPTERS: Chapter[] = CHAPTER_DEFS.reduce<Chapter[]>((acc, c,
 export const SPACE_STAGES: SpaceStage[] = SPACE_STAGE_DEFS.map((def, i) => {
   const stage = parseSpaceStage(def, i + 1);
   const ch = SPACE_CHAPTERS.find((c) => i >= c.start && i < c.start + c.count)!;
-  return { ...stage, label: `STAGE ${ch.number}-${i - ch.start + 1}` };
+  return { ...stage, label: `STAGE ${ch.number}-${i - ch.start + 1}`, boss: i === ch.start + ch.count - 1 };
 });

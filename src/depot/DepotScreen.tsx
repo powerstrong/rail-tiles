@@ -12,6 +12,8 @@ import { hintFrom } from './solver';
 interface Props {
   stage: DepotStage;
   hasNext: boolean;
+  /** Every other stage of the world is cleared, so clearing this one finishes the world. */
+  allCleared: boolean;
   bestStars: number;
   /** "New thing" card for a stage that brings in a mechanic. */
   intro?: Intro;
@@ -24,7 +26,7 @@ interface Props {
 
 const LEAVE_MS = 650;
 
-export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const look = useLook();
   const bonus = stage.limit !== undefined;
   const limit = stage.limit ?? 0;
@@ -326,7 +328,7 @@ export function DepotScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{hasNext || clearNote ? '출발 성공!' : '차고지 정복!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '차고지 정복!' : '출발 성공!'}</h2>
             <p className="result-sub">
               이동 {moves}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

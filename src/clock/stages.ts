@@ -149,22 +149,22 @@ const CH1: ClockStageDef[] = [
     par: 10,
     solution: '.DLDDRDDLL',
   },
-  // par 12, score 35.0 (target 31), bits 17.5, states 71, rests 2, traps 0%, shortest answers 3
+  // par 12, score 35.2 (target 31), bits 17.4, states 69, rests 2, traps 0%, shortest answers 2
   {
     id: 'ck-boss-1',
     title: '첫 번째 종탑',
     tip: '챕터 1 보스! 똑딱 블록 사이로 문까지 가요.',
     map: [
-      '. b # # . . .', //
-      '. b # . . E .',
-      'S b . # r . .',
-      'b . . . # . .',
-      '. . # b . r #',
-      '. . . . . r .',
-      '# . . b . . #',
+      '# b . # b . r', //
+      '# . . . . # .',
+      '. # . . # . S',
+      '. r . . . # b',
+      '. . . . . . b',
+      '. . . E r # r',
+      'r . . b b . #',
     ],
     par: 12,
-    solution: '.RRDRDR.RUUU',
+    solution: 'U.UL.LDLDDDD',
   },
 ];
 
@@ -319,23 +319,23 @@ const CH2: ClockStageDef[] = [
     par: 10,
     solution: 'U.RRRDDDDL',
   },
-  // par 12, score 35.2 (target 34), bits 17.8, states 131, rests 1, traps 1%, shortest answers 3
+  // par 12, score 38.5 (target 34), bits 19.7, states 136, rests 1, traps 0%, shortest answers 1
   {
     id: 'ck-boss-2',
     title: '큰 시계 방',
     tip: '챕터 2 보스! 세 칸짜리 큰 바늘을 조심해요.',
     map: [
-      '. # . . . . .', //
-      'b # # . . . S',
-      'E . . H # . .',
-      '. b . . . # .',
-      '. . . H . b .',
-      '. # . . . . r',
-      '. . . . . . #',
+      '. . . . . S .', //
+      '. . . . # b .',
+      '. # . . . b r',
+      '. . # . r . .',
+      '. b E H . H .',
+      '. # . . . . .',
+      '. # . # . . #',
     ],
-    hands: ['3,2 S 3', '3,4 S 2'],
+    hands: ['5,4 N 3', '3,4 E 2'],
     par: 12,
-    solution: 'DDDLLULL.ULL',
+    solution: 'RDDD.DDLLLLU',
   },
 ];
 
@@ -493,23 +493,23 @@ const CH3: ClockStageDef[] = [
     par: 12,
     solution: 'DRRUUU.UULLD',
   },
-  // par 14, score 40.1 (target 40), bits 19.9, states 270, rests 1, traps 1%, shortest answers 3
+  // par 14, score 44.2 (target 40), bits 22.4, states 266, rests 2, traps 1%, shortest answers 2
   {
     id: 'ck-final-boss',
     title: '자정의 시계탑',
     tip: '마지막 보스! 블록, 바늘, 레버를 모두 써서 문까지 가요.',
     map: [
-      '. L . . . . .', //
-      '. . # . . H b',
-      '. H . . # . .',
-      '. . H . . E r',
-      '. r . . . L .',
-      'S . # # . . b',
-      '. # . . . . .',
+      '. . . . . . .', //
+      '. . . b . E #',
+      '# . . . H # .',
+      '. . L . . . .',
+      '. H H b . . .',
+      '. # b S # . .',
+      '. # . L . b .',
     ],
-    hands: ['1,2 W 3', '5,1 W 2', '2,3 N 2'],
+    hands: ['2,4 W 3', '1,4 E 2', '4,2 N 2'],
     par: 14,
-    solution: 'UUUUURRRD.DDRR',
+    solution: '.DRRU.UULLUURR',
   },
 ];
 
@@ -529,5 +529,5 @@ export const CLOCK_CHAPTERS: Chapter[] = CHAPTER_DEFS.reduce<Chapter[]>((acc, c,
 export const CLOCK_STAGES: ClockStage[] = CLOCK_STAGE_DEFS.map((def, i) => {
   const stage = parseClockStage(def, i + 1);
   const ch = CLOCK_CHAPTERS.find((c) => i >= c.start && i < c.start + c.count)!;
-  return { ...stage, label: `STAGE ${ch.number}-${i - ch.start + 1}` };
+  return { ...stage, label: `STAGE ${ch.number}-${i - ch.start + 1}`, boss: i === ch.start + ch.count - 1 };
 });

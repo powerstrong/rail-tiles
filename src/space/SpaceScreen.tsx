@@ -1,18 +1,21 @@
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
-import type { Dir } from '../engine/dir';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { ALL_DIRS, type Dir } from '../engine/dir';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { type Intro, IntroCard } from '../ui/IntroCard';
 import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
-import { type SpaceState, initialState, isWon, press, stateKey } from './gravity';
+import { type SpaceState, after, initialState, isWon, press, stateKey } from './gravity';
 import type { SpaceStage } from './model';
 import { CapsuleArt } from './SpaceArt';
 import { SpaceBoard } from './SpaceBoard';
-import { explore, hintFrom } from './solver';
+import { hintFrom } from './solver';
+import { useWinMap } from './useWinMap';
 
 interface Props {
   stage: SpaceStage;
   hasNext: boolean;
+  /** Every other stage of the world is cleared, so clearing this one finishes the world. */
+  allCleared: boolean;
   bestStars: number;
   /** "New thing" card for a stage that brings in a mechanic. */
   intro?: Intro;
@@ -27,7 +30,7 @@ interface Props {
 const PHASE_MS = 170;
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
-export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const bonus = stage.limit !== undefined;
   const limit = stage.limit ?? 0;
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
@@ -36,7 +39,9 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   const state = history[history.length - 1];
   const presses = history.length - 1;
   const [shown, setShown] = useState<number[]>(() => initialState(stage));
+  /** Bumps per capsule each time it comes out of a wormhole (replays the pop), and who just did. */
   const [warps, setWarps] = useState<number[]>(() => stage.capsules.map(() => 0));
+  const [warping, setWarping] = useState<boolean[]>(() => stage.capsules.map(() => false));
   const [busy, setBusy] = useState(false);
   const [won, setWon] = useState(false);
   const [outOfAir, setOutOfAir] = useState(false);
@@ -45,21 +50,37 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   const [hint, setHint] = useState<{ dir: Dir; at: string } | null>(null);
   const [muted, setMutedState] = useState(isMuted);
   const timers = useRef<number[]>([]);
+  /** Presses made while a booster or wormhole is still playing out: they wait their turn. */
+  const queue = useRef<Dir[]>([]);
+  const playingUntil = useRef(0);
 
-  // Every layout the capsules can reach, mapped once: says at a glance when they can no longer dock.
-  const graph = useMemo(() => explore(stage), [stage]);
+  // Every layout the capsules can reach, mapped off the main thread once the stage is showing:
+  // hints, and a word when the capsules can no longer dock.
+  const winMap = useWinMap(stage);
   const key = stateKey(state);
-  const stuck = !graph.truncated && !graph.toWin.has(key);
+  const stuck = !!winMap && !winMap.has(key);
   const shownHint = hint && hint.at === key ? hint.dir : null;
 
   const clearTimers = () => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    queue.current = [];
+    playingUntil.current = 0;
   };
   useEffect(() => clearTimers, []);
 
   const go = (d: Dir) => {
     if (busy || won || outOfAir || showIntro) return;
+    if (performance.now() < playingUntil.current) {
+      if (queue.current.length < 2) queue.current.push(d);
+      return;
+    }
+    run(d);
+  };
+  const runRef = useRef(go);
+  runRef.current = go;
+
+  const run = (d: Dir) => {
     const p = press(stage, state, d);
     if (p.frames.length === 0) {
       play('bump');
@@ -70,17 +91,31 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
       setOutOfAir(true);
       return;
     }
-    // Play the press back phase by phase; a new press cuts in and carries on from here.
+    // Play the press back phase by phase. A booster or wormhole takes a moment, and presses made
+    // meanwhile wait for it (a plain gravity press is instant, so quick taps stay quick).
     clearTimers();
     p.frames.forEach((f, i) => {
       const show = () => {
         setShown(f.at);
+        // Only the frame a capsule comes out of a wormhole snaps; every other move glides.
+        setWarping(f.kind === 'warp' ? f.moved : stage.capsules.map(() => false));
         if (f.kind === 'warp') setWarps((w) => w.map((n, k) => (f.moved[k] ? n + 1 : n)));
         play(f.kind === 'gravity' ? 'slide' : f.kind === 'boost' ? 'swish' : 'pop');
       };
       if (i === 0) show();
       else timers.current.push(window.setTimeout(show, i * PHASE_MS));
     });
+    if (p.frames.length > 1) {
+      const wait = (p.frames.length - 1) * PHASE_MS + 60;
+      playingUntil.current = performance.now() + wait;
+      timers.current.push(
+        window.setTimeout(() => {
+          playingUntil.current = 0;
+          const next = queue.current.shift();
+          if (next !== undefined) runRef.current(next);
+        }, wait),
+      );
+    }
     const next = p.next;
     setHistory((h) => [...h, next]);
     // A little chirp when a capsule settles onto its own dock (the win has its own fanfare).
@@ -128,6 +163,7 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
     const prev = history[history.length - 2];
     setHistory((h) => h.slice(0, -1));
     setShown(prev);
+    setWarping(stage.capsules.map(() => false));
     play('rotate');
   };
   const restart = (keepHint = false) => {
@@ -135,6 +171,9 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
     clearTimers();
     setHistory([initialState(stage)]);
     setShown(initialState(stage));
+    // New elements at the start: nobody glides back across the station.
+    setWarps((w) => w.map((n) => n + 1));
+    setWarping(stage.capsules.map(() => false));
     setBusy(false);
     setWon(false);
     setOutOfAir(false);
@@ -146,7 +185,7 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   };
   const showHint = () => {
     if (busy || won || outOfAir || stuck) return;
-    const d = graph.truncated ? hintFrom(stage, state) : nextPress(state);
+    const d = winMap ? nextPress(state) : hintFrom(stage, state);
     if (d === null) return;
     setHinted(true);
     setHint({ dir: d, at: key });
@@ -154,10 +193,9 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
   };
   /** The press that brings the capsules one step closer to docking, from the mapped layouts. */
   const nextPress = (s: SpaceState): Dir | null => {
-    const k = stateKey(s);
-    const dist = graph.toWin.get(k);
-    if (dist === undefined || dist === 0) return null;
-    return graph.edges.get(k)?.find(([, nk]) => graph.toWin.get(nk) === dist - 1)?.[0] ?? null;
+    const dist = winMap?.get(stateKey(s));
+    if (!winMap || dist === undefined || dist === 0) return null;
+    return ALL_DIRS.find((d) => winMap.get(stateKey(after(stage, s, d))) === dist - 1) ?? null;
   };
 
   const keyRef = useRef<(e: KeyboardEvent) => void>(() => {});
@@ -201,6 +239,7 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
           <span className="stage-no">
             {stage.label ?? `STAGE ${stage.number}`}
             {bonus && <span className="tag tag-bonus">보너스</span>}
+            {stage.boss && <span className="tag tag-boss">보스</span>}
           </span>
           <h1>{stage.title}</h1>
         </div>
@@ -253,6 +292,7 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
           stage={stage}
           shown={shown}
           warps={warps}
+          warping={warping}
           won={won}
           hint={busy ? null : shownHint}
           guide={stage.number === 1 && presses === 0 && !won && !showIntro ? stage.solution[0] : null}
@@ -329,7 +369,7 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{hasNext || clearNote ? '도킹 성공!' : '우주 정거장 정복!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '우주 정거장 정복!' : stage.boss ? '보스 격파!' : '도킹 성공!'}</h2>
             <p className="result-sub">
               중력 {presses}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

@@ -32,6 +32,12 @@ describe('world registry', () => {
     expect(new Set(prefixes).size).toBe(prefixes.length);
   });
 
+  it('never makes a world harder to open than it was: the space station once followed the depot', () => {
+    // Moving an unlock earlier is safe only if every stage that used to open it needs the new one first.
+    const depot = worldById('depot')!;
+    expect(worldById('space')!.unlockAfter).toBe(depot.unlockAfter);
+  });
+
   it('lets every world be opened by playing from the start', () => {
     const open = new Set(WORLDS.filter((w) => !w.unlockAfter).map((w) => w.id));
     for (let grew = true; grew; ) {
@@ -56,7 +62,7 @@ describe('world registry', () => {
       machine: ['ice-conquer', null, null],
       volcano: ['mc-final-boss', null, null],
       depot: ['t2-final-boss', 'dp-water-tower', 'depot-daily-'],
-      space: ['dp-final-boss', 'sp-wormhole', 'space-daily-'],
+      space: ['t2-final-boss', 'sp-wormhole', 'space-daily-'],
       clock: ['sp-final-boss', 'ck-lever', 'clock-daily-'],
     });
   });

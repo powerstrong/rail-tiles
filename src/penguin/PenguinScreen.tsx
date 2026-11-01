@@ -14,6 +14,8 @@ import { hintFrom } from './solver';
 interface Props {
   stage: PenguinStage;
   hasNext: boolean;
+  /** Every other stage of the world is cleared, so clearing this one finishes the world. */
+  allCleared: boolean;
   bestStars: number;
   /** "New thing" card for a stage that brings in a mechanic. */
   intro?: Intro;
@@ -26,7 +28,7 @@ interface Props {
 
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
-export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const [state, setState] = useState<IceState>(() => initialState(stage));
   const [history, setHistory] = useState<IceState[]>([]);
@@ -340,7 +342,7 @@ export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{hasNext || clearNote ? '도착 성공!' : '얼음 나라 정복!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '얼음 나라 정복!' : '도착 성공!'}</h2>
             <p className="result-sub">
               밀기 {moves}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

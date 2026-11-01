@@ -224,8 +224,10 @@ export const WORLDS: World[] = [
     chapters: SPACE_CHAPTERS,
     intros: SPACE_INTROS,
     isBonus: (s) => s.limit !== undefined,
-    unlockAfter: 'dp-final-boss',
-    lockNote: '기차 차고지 마지막 보스(3-10)를 깨면 열려요',
+    // Opened with the depot (it used to follow it): every player who had cleared dp-final-boss
+    // has cleared this stage too, so no one loses the world.
+    unlockAfter: 't2-final-boss',
+    lockNote: '기차 월드 2 마지막 보스(5-10)를 깨면 열려요',
     Game: SpaceScreen,
     daily: {
       prefix: SPACE_DAILY_PREFIX,

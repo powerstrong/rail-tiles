@@ -19,7 +19,7 @@ export const specs: ClockSpec[] = (
     { id: 'ck-zigzag', beatNaive: true, width: 6, height: 6, walls: [4, 7], blocks: [5, 8], par: [8, 12], target: 20, mustRest: true, maxOptimal: 6 },
     { id: 'ck-double-rest', beatNaive: true, width: 6, height: 6, walls: [4, 7], blocks: [6, 9], par: [9, 13], target: 23, mustRest: true, maxOptimal: 4 },
     { id: 'ck-stairs', beatNaive: true, width: 6, height: 6, walls: [4, 7], blocks: [7, 10], par: [10, 15], target: 26, maxOptimal: 4 },
-    { id: 'ck-boss-1', beatNaive: true, width: 7, height: 7, walls: [6, 9], blocks: [9, 13], par: [12, 18], target: 31, maxOptimal: 3 },
+    { id: 'ck-boss-1', beatNaive: true, width: 7, height: 7, walls: [6, 9], blocks: [9, 13], par: [12, 18], target: 31, maxOptimal: 2 },
     // Chapter 2: clock hands.
     { id: 'ck-clock-hand', width: 5, height: 5, walls: [2, 4], hands: [1], par: [4, 6], target: 8 },
     { id: 'ck-long-hand', width: 5, height: 5, walls: [2, 4], hands: [2], par: [4, 7], target: 11 },
@@ -30,7 +30,7 @@ export const specs: ClockSpec[] = (
     { id: 'ck-gears', beatNaive: true, width: 6, height: 6, walls: [3, 5], hands: [2, 2], par: [8, 12], target: 23, maxOptimal: 4 },
     { id: 'ck-sweep', beatNaive: true, width: 6, height: 6, walls: [3, 5], blocks: [3, 5], hands: [2, 1], par: [9, 13], target: 26, maxOptimal: 4 },
     { id: 'ck-clockwork', beatNaive: true, width: 6, height: 6, walls: [3, 5], blocks: [3, 5], hands: [2, 2], par: [10, 15], target: 29, maxOptimal: 4 },
-    { id: 'ck-boss-2', beatNaive: true, width: 7, height: 7, walls: [4, 7], blocks: [4, 6], hands: [3, 2], par: [12, 18], target: 34, maxOptimal: 3 },
+    { id: 'ck-boss-2', beatNaive: true, width: 7, height: 7, walls: [4, 7], blocks: [4, 6], hands: [3, 2], par: [12, 18], target: 34, maxOptimal: 2 },
     // Chapter 3: levers that turn the hands back, then everything together.
     { id: 'ck-lever', tries: 3000, width: 5, height: 5, walls: [2, 4], hands: [2], levers: 1, par: [4, 8], target: 14 },
     { id: 'ck-lever-back', beatNaive: true, tries: 3000, width: 5, height: 5, walls: [2, 4], hands: [2], levers: 1, par: [5, 9], target: 17 },
@@ -41,6 +41,6 @@ export const specs: ClockSpec[] = (
     { id: 'ck-two-hands-lever', beatNaive: true, tries: 3000, width: 6, height: 6, walls: [3, 5], hands: [2, 2], levers: 1, par: [9, 14], target: 28, maxOptimal: 4 },
     { id: 'ck-lever-maze', beatNaive: true, tries: 3000, width: 6, height: 6, walls: [3, 5], blocks: [2, 4], hands: [2, 1], levers: 2, par: [10, 15], target: 31, maxOptimal: 4 },
     { id: 'ck-big-clock', beatNaive: true, tries: 3000, width: 7, height: 7, walls: [4, 7], blocks: [3, 5], hands: [3, 2], levers: 2, par: [12, 18], target: 34, maxOptimal: 3 },
-    { id: 'ck-final-boss', beatNaive: true, width: 7, height: 7, walls: [4, 7], blocks: [3, 6], hands: [3, 2, 2], levers: 2, par: [14, 22], target: 40, maxOptimal: 3, tries: 1500 },
+    { id: 'ck-final-boss', beatNaive: true, width: 7, height: 7, walls: [4, 7], blocks: [3, 6], hands: [3, 2, 2], levers: 2, par: [14, 22], target: 40, maxOptimal: 2, tries: 1500 },
   ] as S[]
 ).map((s) => ({ title: s.id, tip: '', ...s }));

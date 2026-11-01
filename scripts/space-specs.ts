@@ -20,7 +20,7 @@ export const specs: SpaceSpec[] = (
     { id: 'sp-crossing', beatNaive: true, width: 6, height: 6, capsules: 2, walls: [4, 7], par: [7, 10], target: 23, maxOptimal: 4 },
     { id: 'sp-three-capsules', beatNaive: true, width: 5, height: 5, capsules: 3, walls: [3, 5], par: [6, 10], target: 25, ...T3 },
     { id: 'sp-queue', beatNaive: true, width: 6, height: 6, capsules: 3, walls: [4, 7], par: [8, 12], target: 30, ...T3 },
-    { id: 'sp-boss-1', beatNaive: true, width: 6, height: 6, capsules: 3, walls: [4, 7], par: [10, 14], target: 37, maxOptimal: 6, ...T3 },
+    { id: 'sp-boss-1', beatNaive: true, width: 6, height: 6, capsules: 3, walls: [4, 7], par: [10, 14], target: 37, maxOptimal: 2, ...T3 },
     // Chapter 2: booster pads.
     { id: 'sp-booster', width: 5, height: 5, capsules: 1, walls: [2, 4], pads: [1, 2], par: [3, 6], target: 8, tries: 2000 },
     { id: 'sp-booster-two', beatNaive: true, width: 5, height: 5, capsules: 2, walls: [2, 4], pads: [1, 1], par: [4, 6], target: 12 },
@@ -31,7 +31,7 @@ export const specs: SpaceSpec[] = (
     { id: 'sp-relay', beatNaive: true, width: 6, height: 6, capsules: 2, walls: [3, 6], pads: [3, 4], par: [8, 11], target: 26, maxOptimal: 4 },
     { id: 'sp-booster-three', beatNaive: true, width: 5, height: 5, capsules: 3, walls: [2, 4], pads: [1, 2], par: [6, 10], target: 28, ...T3 },
     { id: 'sp-lab', beatNaive: true, width: 6, height: 6, capsules: 3, walls: [3, 6], pads: [2, 3], par: [8, 12], target: 32, ...T3 },
-    { id: 'sp-boss-2', beatNaive: true, width: 6, height: 6, capsules: 3, walls: [3, 6], pads: [2, 4], par: [10, 14], target: 39, maxOptimal: 6, ...T3 },
+    { id: 'sp-boss-2', beatNaive: true, width: 6, height: 6, capsules: 3, walls: [3, 6], pads: [2, 4], par: [10, 14], target: 39, maxOptimal: 2, ...T3 },
     // Chapter 3: wormholes, then everything together.
     { id: 'sp-wormhole', width: 5, height: 5, capsules: 1, walls: [2, 4], holes: 1, par: [3, 4], target: 7 },
     { id: 'sp-through', beatNaive: true, width: 5, height: 5, capsules: 2, walls: [2, 4], holes: 1, par: [4, 6], target: 12 },

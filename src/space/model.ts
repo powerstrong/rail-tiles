@@ -44,6 +44,8 @@ export interface SpaceStage {
   title: string;
   tip: string;
   label?: string;
+  /** The last stage of a chapter. */
+  boss?: boolean;
   width: number;
   height: number;
   tiles: Tile[];

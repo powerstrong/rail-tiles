@@ -64,8 +64,10 @@ interface Props {
   stage: SpaceStage;
   /** Where each capsule is drawn right now (it glides between frames). */
   shown: number[];
-  /** Bumps per capsule each time it comes out of a wormhole, to replay the pop. */
+  /** Bumps per capsule each time it comes out of a wormhole: a fresh element, so it never glides there. */
   warps: number[];
+  /** Capsules coming out of a wormhole in the frame on screen (they pop in instead of gliding). */
+  warping: boolean[];
   won: boolean;
   /** The press a hint suggests. */
   hint: Dir | null;
@@ -77,7 +79,7 @@ interface Props {
 
 const ARROW = 'M0 -60 L34 -18 H14 V40 H-14 V-18 H-34 Z';
 
-export function SpaceBoard({ stage, shown, warps, won, hint, guide, locked, onPress }: Props) {
+export function SpaceBoard({ stage, shown, warps, warping, won, hint, guide, locked, onPress }: Props) {
   const w = stage.width * SPACE_CELL;
   const h = stage.height * SPACE_CELL;
   const svgRef = useRef<SVGSVGElement>(null);
@@ -140,7 +142,7 @@ export function SpaceBoard({ stage, shown, warps, won, hint, guide, locked, onPr
       {stage.capsules.map((cap, k) => (
         <g
           key={`c${k}-${warps[k]}`}
-          className={`space-capsule ${warps[k] ? 'warped' : ''} ${won ? 'won' : ''}`}
+          className={`space-capsule ${warping[k] ? 'warped' : ''} ${won ? 'won' : ''}`}
           style={{ transform: `translate(${((shown[k] % stage.width) + 0.5) * SPACE_CELL}px, ${(Math.floor(shown[k] / stage.width) + 0.5) * SPACE_CELL}px)` } as CSSProperties}
           pointerEvents="none"
         >

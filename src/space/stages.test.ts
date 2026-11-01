@@ -86,6 +86,11 @@ describe('space stages', () => {
     }
   });
 
+  it('give every boss one key idea to find: at most two shortest answers', () => {
+    for (const s of SPACE_STAGES.filter((st) => st.boss)) expect(solveSpace(s).optimal, s.id).toBeLessThanOrEqual(2);
+    expect(SPACE_STAGES.filter((st) => st.boss).length).toBe(3);
+  });
+
   it('ask for real thinking past the first lessons: moving straight at the docks never earns ★★★', () => {
     const lessons = ['sp-first-gravity', 'sp-wall-stop', 'sp-two-capsules', 'sp-booster', 'sp-wormhole'];
     for (const s of SPACE_STAGES) {
