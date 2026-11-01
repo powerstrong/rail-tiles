@@ -311,7 +311,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{bonus ? '로봇 구출 성공!' : stage.boss ? '보스 격파!' : hasNext ? '불이 켜졌어요!' : '로봇 공장 정복!'}</h2>
+            <h2>{bonus ? '로봇 구출 성공!' : stage.boss ? '보스 격파!' : hasNext ? '불이 켜졌어요!' : '로봇 공장 여행 완료!'}</h2>
             <p className="result-sub">
               누르기 {taps}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

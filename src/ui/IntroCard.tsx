@@ -10,9 +10,9 @@ export interface Intro {
 /** "New thing!" card shown when a stage first brings in a mechanic. */
 export function IntroCard({ intro, onClose }: { intro: Intro; onClose: () => void }) {
   return (
-    <div className="overlay intro-overlay" role="dialog" aria-label={`새 기믹: ${intro.title}`} onClick={onClose}>
+    <div className="overlay intro-overlay" role="dialog" aria-label={`새로 나왔어요: ${intro.title}`} onClick={onClose}>
       <div className="result-card intro-card" onClick={(e) => e.stopPropagation()}>
-        <p className="result-kicker">새 기믹!</p>
+        <p className="result-kicker">새로 나왔어요!</p>
         <svg viewBox="-60 -60 120 120" className="intro-art" aria-hidden>
           {intro.art}
         </svg>

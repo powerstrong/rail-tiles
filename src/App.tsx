@@ -153,6 +153,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
       maxStars: w.stages.length * 3,
       state: w.unlockAfter && !cleared.has(w.unlockAfter) ? 'locked' : w.stages.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
       lockNote: w.lockNote,
+      from: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.title,
     }));
     return <WorldSelect worlds={cards} onPick={(id) => setScreen({ name: 'select', world: id })} onBack={() => setScreen({ name: 'title' })} />;
   }

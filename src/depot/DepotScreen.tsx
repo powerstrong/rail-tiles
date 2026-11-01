@@ -328,7 +328,7 @@ export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{!hasNext && allCleared && !clearNote ? '차고지 정복!' : '출발 성공!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '차고지 여행 완료!' : '출발 성공!'}</h2>
             <p className="result-sub">
               이동 {moves}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

@@ -104,7 +104,7 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
   return (
     <main className={`select ${theme ?? ''}`}>
       <header className="select-head">
-        <button className="icon-btn" onClick={onBack} aria-label="월드 선택으로">
+        <button className="icon-btn" onClick={onBack} aria-label="여행지 목록으로">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M15 5 L8 12 L15 19" />
           </svg>

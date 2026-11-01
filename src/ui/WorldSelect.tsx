@@ -12,6 +12,8 @@ export interface WorldCard {
   state: 'open' | 'locked' | 'conquered' | 'soon';
   /** Shown on a locked card. */
   lockNote?: string;
+  /** The world this one opens after (its stop on the route); none for the first. */
+  from?: string;
 }
 
 function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
@@ -111,10 +113,10 @@ export function WorldSelect({ worlds, onPick, onBack }: Props) {
             <path d="M15 5 L8 12 L15 19" />
           </svg>
         </button>
-        <h1>월드 선택</h1>
+        <h1>다음 정거장은?</h1>
       </header>
       <ol className="world-list">
-        {worlds.map((w, i) => {
+        {worlds.map((w) => {
           const playable = w.state === 'open' || w.state === 'conquered';
           return (
             <li key={w.id}>
@@ -123,18 +125,19 @@ export function WorldSelect({ worlds, onPick, onBack }: Props) {
                 style={{ '--world': w.color } as CSSProperties}
                 disabled={!playable}
                 onClick={() => onPick(w.id)}
-                aria-label={`${w.title}${w.state === 'conquered' ? ', 정복 완료' : w.state === 'locked' ? ', 잠김' : w.state === 'soon' ? ', 준비 중' : ''}`}
+                aria-label={`${w.title}${w.state === 'conquered' ? ', 여행 완료' : w.state === 'locked' ? ', 잠김' : w.state === 'soon' ? ', 준비 중' : ''}`}
               >
                 <span className="world-emblem">
                   <Emblem kind={w.emblem} />
                 </span>
                 <span className="world-text">
-                  <span className="world-kicker">월드 {i + 1}</span>
+                  <span className="world-kicker">{w.from ? `${w.from} 다음` : '출발역'}</span>
                   <span className="world-title">{w.title}</span>
-                  <span className="world-blurb">{w.state === 'locked' ? w.lockNote : w.state === 'soon' ? '곧 열려요!' : w.blurb}</span>
+                  <span className="world-blurb">{w.state === 'soon' ? '곧 열려요!' : w.blurb}</span>
+                  {w.state === 'locked' && w.lockNote && <span className="world-lock">🔒 {w.lockNote}</span>}
                 </span>
                 <span className="world-side">
-                  {w.state === 'conquered' && <span className="world-badge">정복!</span>}
+                  {w.state === 'conquered' && <span className="world-badge">여행 완료!</span>}
                   {playable && (
                     <span className="world-stars">
                       ★ {w.stars} / {w.maxStars}

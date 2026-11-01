@@ -342,7 +342,7 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{!hasNext && allCleared && !clearNote ? '얼음 나라 정복!' : '도착 성공!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '얼음 나라 여행 완료!' : '도착 성공!'}</h2>
             <p className="result-sub">
               밀기 {moves}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

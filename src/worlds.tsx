@@ -108,7 +108,7 @@ const world = <S extends WorldStage>(w: World<S>) => w as unknown as World;
 export const WORLDS: World[] = [
   world({
     id: 'train',
-    title: '기차 월드',
+    title: '들꽃 기차 마을',
     blurb: '레일을 깔아 기차를 도착역까지',
     color: '#E5584F',
     emblem: 'train',
@@ -124,21 +124,6 @@ export const WORLDS: World[] = [
     },
   }),
   world({
-    id: 'train2',
-    title: '기차 월드 2',
-    blurb: '차단기, 도개교, 급수탑, 회전판, 화물칸!',
-    color: '#2FA38C',
-    emblem: 'train',
-    theme: 'world-train2',
-    stages: S2_STAGES,
-    chapters: S2_CHAPTERS,
-    intros: S2_INTROS,
-    isBonus: (s) => !!s.oneShot,
-    unlockAfter: 'last-delivery',
-    lockNote: '기차 월드 마지막 배달(4-10)을 깨면 열려요',
-    Game: GameScreen,
-  }),
-  world({
     id: 'ice',
     title: '펭귄 얼음 나라',
     blurb: '쓱 밀어서 펭귄을 구멍까지 미끄러뜨려요',
@@ -148,8 +133,9 @@ export const WORLDS: World[] = [
     stages: ICE_STAGES,
     chapters: ICE_CHAPTERS,
     intros: ICE_INTROS,
-    unlockAfter: 'last-delivery',
-    lockNote: '기차 월드 마지막 배달(4-10)을 깨면 열려요',
+    // After the train world's first chapter (it used to wait for 4-10, which comes after it).
+    unlockAfter: 'last-run',
+    lockNote: '들꽃 기차 마을 1장 마지막 판(1-10)을 깨면 열려요',
     Game: PenguinScreen,
     daily: {
       prefix: ICE_DAILY_PREFIX,
@@ -191,6 +177,21 @@ export const WORLDS: World[] = [
     Game: VolcanoScreen,
   }),
   world({
+    id: 'train2',
+    title: '강바람 철도',
+    blurb: '차단기, 도개교, 급수탑, 회전판, 화물칸!',
+    color: '#2FA38C',
+    emblem: 'train',
+    theme: 'world-train2',
+    stages: S2_STAGES,
+    chapters: S2_CHAPTERS,
+    intros: S2_INTROS,
+    isBonus: (s) => !!s.oneShot,
+    unlockAfter: 'last-delivery',
+    lockNote: '들꽃 기차 마을 마지막 배달(4-10)을 깨면 열려요',
+    Game: GameScreen,
+  }),
+  world({
     id: 'depot',
     title: '기차 차고지',
     blurb: '객차를 밀어서 기관차를 차고 밖으로!',
@@ -202,7 +203,7 @@ export const WORLDS: World[] = [
     intros: DEPOT_INTROS,
     isBonus: (s) => s.limit !== undefined,
     unlockAfter: 't2-final-boss',
-    lockNote: '기차 월드 2 마지막 보스(5-10)를 깨면 열려요',
+    lockNote: '강바람 철도 마지막 보스(5-10)를 깨면 열려요',
     Game: DepotScreen,
     daily: {
       prefix: DEPOT_DAILY_PREFIX,
@@ -227,7 +228,7 @@ export const WORLDS: World[] = [
     // Opened with the depot (it used to follow it): every player who had cleared dp-final-boss
     // has cleared this stage too, so no one loses the world.
     unlockAfter: 't2-final-boss',
-    lockNote: '기차 월드 2 마지막 보스(5-10)를 깨면 열려요',
+    lockNote: '강바람 철도 마지막 보스(5-10)를 깨면 열려요',
     Game: SpaceScreen,
     daily: {
       prefix: SPACE_DAILY_PREFIX,

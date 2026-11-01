@@ -38,6 +38,17 @@ describe('world registry', () => {
     expect(worldById('space')!.unlockAfter).toBe(depot.unlockAfter);
   });
 
+  it('opens the penguin world earlier than it used to, never later', () => {
+    // It used to follow the train world's 4-10; 1-10 must come before that in the same world,
+    // and the train world has no bonus stages to skip it by.
+    const train = worldById('train')!;
+    const at = (id: string) => train.stages.findIndex((s) => s.id === id);
+    expect(ownerOf(worldById('ice')!.unlockAfter)?.id).toBe('train');
+    expect(at(worldById('ice')!.unlockAfter!)).toBeGreaterThanOrEqual(0);
+    expect(at(worldById('ice')!.unlockAfter!)).toBeLessThan(at('last-delivery'));
+    expect(stageCards(train).some((c) => c.bonus)).toBe(false);
+  });
+
   it('lets every world be opened by playing from the start', () => {
     const open = new Set(WORLDS.filter((w) => !w.unlockAfter).map((w) => w.id));
     for (let grew = true; grew; ) {
@@ -58,7 +69,7 @@ describe('world registry', () => {
     expect(rules).toEqual({
       train: [null, 'first-passenger', 'daily-'],
       train2: ['last-delivery', null, null],
-      ice: ['last-delivery', 'ice-snow-pile', 'ice-daily-'],
+      ice: ['last-run', 'ice-snow-pile', 'ice-daily-'],
       machine: ['ice-conquer', null, null],
       volcano: ['mc-final-boss', null, null],
       depot: ['t2-final-boss', 'dp-water-tower', 'depot-daily-'],

@@ -112,7 +112,7 @@ export function TitleScreen({ onPlay, onGarage, onSave, newLooks }: TitleProps) 
   return (
     <main className="title">
       <div className="title-inner">
-        <p className="title-kicker">기찻길 퍼즐</p>
+        <p className="title-kicker">내 기차로 떠나는 퍼즐 여행</p>
         <h1 className="logo">
           Rail<span>Tiles</span>
         </h1>

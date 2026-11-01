@@ -383,7 +383,7 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{race ? '마을 대피 성공!' : stage.boss ? '보스 격파!' : hasNext ? '마을을 지켰어요!' : '화산 섬 정복!'}</h2>
+            <h2>{race ? '마을 대피 성공!' : stage.boss ? '보스 격파!' : hasNext ? '마을을 지켰어요!' : '화산 섬 여행 완료!'}</h2>
             <p className="result-sub">
               돌 {used}개 · ★★★ {stage.par}개 · ★★ {stage.par + TWO_STAR_SLACK}개
               {earned < 3 && !hinted && (

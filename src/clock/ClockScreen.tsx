@@ -341,7 +341,7 @@ export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
             </button>
             <p className="result-kicker">{stage.label}</p>
             <StarRow count={earned} className="result-stars" />
-            <h2>{!hasNext && allCleared && !clearNote ? '시계탑 정복!' : stage.boss ? '보스 격파!' : '치즈 도착!'}</h2>
+            <h2>{!hasNext && allCleared && !clearNote ? '시계탑 여행 완료!' : stage.boss ? '보스 격파!' : '치즈 도착!'}</h2>
             <p className="result-sub">
               똑딱 {ticks}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
               {earned < 3 && !hinted && (

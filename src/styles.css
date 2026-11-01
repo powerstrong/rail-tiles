@@ -1445,10 +1445,15 @@ p {
   border-left-color: #d8c8ad;
 }
 
-.world-card.locked .world-emblem,
 .world-card.soon .world-emblem {
   filter: grayscale(1);
   opacity: 0.55;
+}
+
+/* A locked world still shows what waits there, just a little faded. */
+.world-card.locked .world-emblem {
+  filter: grayscale(0.5);
+  opacity: 0.8;
 }
 
 .world-emblem {
@@ -1500,6 +1505,14 @@ p {
 .world-card.locked .world-blurb,
 .world-card.soon .world-blurb {
   color: inherit;
+}
+
+.world-lock {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #8f8270;
+  word-break: keep-all;
 }
 
 .world-side {

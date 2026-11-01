@@ -1226,7 +1226,7 @@ const CH5: StageDef[] = [
   {
     id: 't2-final-boss',
     title: '기차 대장 정복',
-    tip: '화물칸, 차단기, 급수탑! 기차 월드 2 마지막 보스예요.',
+    tip: '화물칸, 차단기, 급수탑! 강바람 철도 마지막 보스예요.',
     boss: true,
     water: 14,
     start: 'E',
