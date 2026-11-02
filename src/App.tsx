@@ -10,7 +10,7 @@ import { TitleScreen } from './ui/TitleScreen';
 import { type WorldCard, WorldSelect } from './ui/WorldSelect';
 import { STORIES, farewellId } from './ui/stories';
 import { WorldStory } from './ui/WorldStory';
-import { WORLDS, type World, type WorldStage, stageCards, worldById } from './worlds';
+import { WORLDS, type World, type WorldStage, openedNote, stageCards, untouched, worldById } from './worlds';
 
 type Screen =
   | { name: 'title' }
@@ -88,7 +88,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
 
   const onCleared = (id: string, stars: Stars) => setProgress((p) => recordClear(p, id, stars));
   /** The story plays on the way into a world, once, unless the world was already being played. */
-  const storyFirst = (w: World) => !!STORIES[w.id] && !progress.stories?.includes(w.id) && !w.stages.some((s) => progress.stars[s.id]);
+  const storyFirst = (w: World) => !!STORIES[w.id] && untouched(w, progress);
   const conquered = (w: World) => w.stages.every((s) => cleared.has(s.id));
   /** The farewell plays once a world is all cleared, on the way back to its stage list. */
   const farewellDue = (w: World) => !!STORIES[w.id] && conquered(w) && !progress.stories?.includes(farewellId(w.id));
@@ -156,18 +156,23 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
   if (screen.name === 'save') return <SaveScreen progress={progress} onLoad={setProgress} onBack={() => setScreen({ name: 'title' })} />;
 
   if (screen.name === 'worlds') {
-    const cards: WorldCard[] = WORLDS.map((w) => ({
-      id: w.id,
-      title: w.title,
-      blurb: w.blurb,
-      color: w.color,
-      emblem: w.emblem,
-      stars: w.stages.reduce((sum, s) => sum + (progress.stars[s.id] ?? 0), 0),
-      maxStars: w.stages.length * 3,
-      state: w.unlockAfter && !cleared.has(w.unlockAfter) ? 'locked' : w.stages.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
-      lockNote: w.lockNote,
-      from: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.title,
-    }));
+    const cards: WorldCard[] = WORLDS.map((w) => {
+      const locked = !!w.unlockAfter && !cleared.has(w.unlockAfter);
+      return {
+        id: w.id,
+        title: w.title,
+        blurb: w.blurb,
+        color: w.color,
+        emblem: w.emblem,
+        stars: w.stages.reduce((sum, s) => sum + (progress.stars[s.id] ?? 0), 0),
+        maxStars: w.stages.length * 3,
+        state: locked ? 'locked' : w.stages.every((s) => cleared.has(s.id)) ? 'conquered' : 'open',
+        // Opened along the way and not visited yet (the first world is simply where everyone starts).
+        fresh: !!w.unlockAfter && !locked && untouched(w, progress),
+        lockNote: w.lockNote,
+        from: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.title,
+      };
+    });
     const pick = (id: string) => {
       const w = worldById(id);
       if (w) enter(w);
@@ -265,6 +270,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
       // "Next" is only offered after a clear, which unlocks the following stage.
       onNext={() => (hasNext ? setScreen({ name: 'game', world: world.id, index: next }) : toList())}
       onCleared={onCleared}
+      clearNote={openedNote(stage.id, progress)}
     />
   );
 }

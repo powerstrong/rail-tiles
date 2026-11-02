@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LOOK_ITEMS } from './ui/look';
 import { isUnlocked } from './ui/StageSelect';
-import { WORLDS, type World, stageCards, worldById } from './worlds';
+import { WORLDS, type World, openedNote, stageCards, worldById } from './worlds';
 
 const ownerOf = (stageId: string | undefined) => WORLDS.find((w) => w.stages.some((s) => s.id === stageId));
 
@@ -49,6 +49,18 @@ describe('world registry', () => {
       return toOpen(owner) + stageCards(owner).slice(0, i + 1).filter((c, k) => k === i || !c.bonus).length;
     };
     for (const w of WORLDS) expect(toOpen(w), w.title).toBeLessThanOrEqual(30);
+  });
+
+  it('names the worlds a stage opens on its clear card, until the player has been there', () => {
+    const fresh = { stars: {}, stories: [] };
+    expect(openedNote('last-run', fresh)).toBe('🚂 새 정거장이 열렸어요! 펭귄 얼음 나라 · 강바람 철도');
+    // Seen the arrival story, or played a stage there: no longer new.
+    expect(openedNote('last-run', { stars: {}, stories: ['ice'] })).toBe('🚂 새 정거장이 열렸어요! 강바람 철도');
+    const ice1 = worldById('ice')!.stages[0].id;
+    expect(openedNote('last-run', { stars: { [ice1]: 1 }, stories: [] })).toBe('🚂 새 정거장이 열렸어요! 강바람 철도');
+    expect(openedNote('last-run', { stars: { [ice1]: 1 }, stories: ['train2'] })).toBeUndefined();
+    // A stage that opens no world.
+    expect(openedNote('first-passenger', fresh)).toBeUndefined();
   });
 
   it('never opens a world later than it used to (players opened worlds by the old rules)', () => {

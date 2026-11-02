@@ -14,6 +14,7 @@ import { DEPOT_INTROS } from './depot/intros';
 import { DEPOT_CHAPTERS, DEPOT_STAGES } from './depot/stages';
 import { DAILY_PREFIX } from './engine/generate';
 import type { Stars } from './engine/stars';
+import type { Progress } from './storage';
 import { MACHINE_INTROS } from './machine/intros';
 import { MachineScreen } from './machine/MachineScreen';
 import { MACHINE_CHAPTERS, MACHINE_STAGES } from './machine/stages';
@@ -269,3 +270,13 @@ export const worldById = (id: string): World | undefined => WORLDS.find((w) => w
 
 /** The stage list's view of a world's stages. */
 export const stageCards = (w: World): StageCard[] => w.stages.map((s) => ({ id: s.id, title: s.title, bonus: !!w.isBonus?.(s) }));
+
+/** A world the player has never played: no stars there, and its arrival story not seen. */
+export const untouched = (w: World, progress: Pick<Progress, 'stars' | 'stories'>): boolean =>
+  !progress.stories?.includes(w.id) && !w.stages.some((s) => progress.stars[s.id]);
+
+/** The clear card's line when a stage opens worlds the player has not been to yet. */
+export function openedNote(stageId: string, progress: Pick<Progress, 'stars' | 'stories'>): string | undefined {
+  const opened = WORLDS.filter((w) => w.unlockAfter === stageId && untouched(w, progress));
+  return opened.length ? `🚂 새 정거장이 열렸어요! ${opened.map((w) => w.title).join(' · ')}` : undefined;
+}

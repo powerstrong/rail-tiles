@@ -10,6 +10,8 @@ export interface WorldCard {
   stars: number;
   maxStars: number;
   state: 'open' | 'locked' | 'conquered' | 'soon';
+  /** Opened along the way and never played yet: gets a NEW badge. */
+  fresh?: boolean;
   /** Shown on a locked card. */
   lockNote?: string;
   /** The world this one opens after (its stop on the route); none for the first. */
@@ -125,8 +127,13 @@ export function WorldSelect({ worlds, onPick, onBack }: Props) {
                 style={{ '--world': w.color } as CSSProperties}
                 disabled={!playable}
                 onClick={() => onPick(w.id)}
-                aria-label={`${w.title}${w.state === 'conquered' ? ', 여행 완료' : w.state === 'locked' ? ', 잠김' : w.state === 'soon' ? ', 준비 중' : ''}`}
+                aria-label={`${w.title}${w.state === 'conquered' ? ', 여행 완료' : w.state === 'locked' ? ', 잠김' : w.state === 'soon' ? ', 준비 중' : w.fresh ? ', 새로 열림' : ''}`}
               >
+                {w.fresh && (
+                  <span className="new-dot" aria-hidden>
+                    NEW
+                  </span>
+                )}
                 <span className="world-emblem">
                   <Emblem kind={w.emblem} />
                 </span>

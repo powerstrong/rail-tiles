@@ -19,6 +19,8 @@ interface Props {
   onBack: () => void;
   onNext: () => void;
   onCleared: (id: string, stars: Stars) => void;
+  /** Extra line on the clear card (e.g. a world this stage opened). */
+  clearNote?: string;
 }
 
 const hash = (n: number) => {
@@ -51,7 +53,7 @@ const Ground = memo(function Ground({ stage }: { stage: VolcanoStage }) {
 
 type Phase = 'build' | 'flow' | 'fail' | 'won';
 
-export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared }: Props) {
+export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const race = !!stage.race;
   const solutions = useMemo(() => (race ? [] : solveLava(stage).solutions), [stage, race]);
   const [stones, setStones] = useState<Set<number>>(() => new Set());
@@ -396,6 +398,12 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
                 <>
                   <br />
                   힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
+                </>
+              )}
+              {clearNote && (
+                <>
+                  <br />
+                  <strong className="clear-note">{clearNote}</strong>
                 </>
               )}
               {bestStars > earned && (

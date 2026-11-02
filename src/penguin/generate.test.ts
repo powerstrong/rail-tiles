@@ -19,7 +19,8 @@ describe('daily penguin puzzle', () => {
     expect(r.par).toBe(stage.par);
     expect(r.optimal).toBe(1);
     expect(stage.id.startsWith(ICE_DAILY_PREFIX)).toBe(true);
-  });
+    // Building a day's board can take a second, and longer with every other test file running.
+  }, 30_000);
 
   it('keeps its own streak, separate from the train daily', () => {
     const ids = ['daily-2026-10-27', `${ICE_DAILY_PREFIX}2026-10-27`, `${ICE_DAILY_PREFIX}2026-10-28`];

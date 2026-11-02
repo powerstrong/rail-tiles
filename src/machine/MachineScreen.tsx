@@ -20,6 +20,8 @@ interface Props {
   onBack: () => void;
   onNext: () => void;
   onCleared: (id: string, stars: Stars) => void;
+  /** Extra line on the clear card (e.g. a world this stage opened). */
+  clearNote?: string;
 }
 
 const Floor = memo(function Floor({ stage }: { stage: MachineStage }) {
@@ -44,7 +46,7 @@ const Floor = memo(function Floor({ stage }: { stage: MachineStage }) {
   );
 });
 
-export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared }: Props) {
+export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const wins = useMemo(() => solveLaser(stage).wins, [stage]);
   const [config, setConfig] = useState(stage.start);
@@ -324,6 +326,12 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
                 <>
                   <br />
                   힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
+                </>
+              )}
+              {clearNote && (
+                <>
+                  <br />
+                  <strong className="clear-note">{clearNote}</strong>
                 </>
               )}
               {bestStars > earned && (
