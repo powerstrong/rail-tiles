@@ -119,19 +119,22 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
             <span aria-hidden>📖</span>
           </button>
         )}
-        {onFarewell && (
-          <button className="icon-btn story-replay" onClick={onFarewell} aria-label="작별 장면 다시 보기">
-            <span aria-hidden>👋</span>
-          </button>
-        )}
         <span className="select-progress" aria-label={`별 ${totalStars}개 / ${stages.length * 3}개`}>
           ★ {totalStars} / {stages.length * 3}
         </span>
       </header>
       {allCleared && (
-        <p className="all-clear" role="status">
-          <strong>모든 노선 완성!</strong> {stages.length}개 스테이지를 모두 클리어했어요.
-        </p>
+        <div className="all-clear">
+          <p role="status">
+            <strong>모든 노선 완성!</strong> {stages.length}개 스테이지를 모두 클리어했어요.
+          </p>
+          {/* Here rather than in the header, which has no room for it beside a long world name on a phone. */}
+          {onFarewell && (
+            <button className="all-clear-bye" onClick={onFarewell} aria-label="작별 장면 다시 보기">
+              <span aria-hidden>👋</span> 작별 인사
+            </button>
+          )}
+        </div>
       )}
       {daily && <DailyCard {...daily} />}
       {chapters.map((ch) => {

@@ -203,6 +203,7 @@ p {
   flex: 1;
   font-size: 22px;
   font-weight: 900;
+  word-break: keep-all;
 }
 
 .select-progress {
@@ -224,10 +225,34 @@ p {
   line-height: 1.4;
   box-shadow: 0 4px 0 #24645f;
   animation: pop-in 0.35s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.all-clear p {
+  flex: 1;
 }
 
 .all-clear strong {
   margin-right: 6px;
+}
+
+.all-clear-bye {
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: transform 0.1s ease;
+}
+
+.all-clear-bye:active {
+  transform: translateY(1px);
 }
 
 .daily-card {
