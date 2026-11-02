@@ -93,7 +93,8 @@ export interface World<S extends WorldStage = WorldStage> {
   isBonus?: (stage: S) => boolean;
   /**
    * Stage (of an earlier world) whose clear opens this world; open from the start without one.
-   * Players' unlocks hang on it, so keep it even when chapters are added after that stage.
+   * It is the last stage of that world's first chapter, so a new player can reach any world
+   * within a few chapters. Players' unlocks hang on it: never move it later.
    */
   unlockAfter?: string;
   /** Shown on the locked card. */
@@ -133,9 +134,8 @@ export const WORLDS: World[] = [
     stages: ICE_STAGES,
     chapters: ICE_CHAPTERS,
     intros: ICE_INTROS,
-    // After the train world's first chapter (it used to wait for 4-10, which comes after it).
     unlockAfter: 'last-run',
-    lockNote: '들꽃 기차 마을 1장 마지막 판(1-10)을 깨면 열려요',
+    lockNote: '들꽃 기차 마을 1장 보스(1-10)를 깨면 열려요',
     Game: PenguinScreen,
     daily: {
       prefix: ICE_DAILY_PREFIX,
@@ -157,8 +157,8 @@ export const WORLDS: World[] = [
     chapters: MACHINE_CHAPTERS,
     intros: MACHINE_INTROS,
     isBonus: (s) => s.battery !== undefined,
-    unlockAfter: 'ice-conquer',
-    lockNote: '펭귄 얼음 나라 마지막 보스(3-10)를 깨면 열려요',
+    unlockAfter: 'ice-big-adventure',
+    lockNote: '펭귄 얼음 나라 1장 보스(1-10)를 깨면 열려요',
     Game: MachineScreen,
   }),
   world({
@@ -172,8 +172,8 @@ export const WORLDS: World[] = [
     chapters: VOLCANO_CHAPTERS,
     intros: VOLCANO_INTROS,
     isBonus: (s) => !!s.race,
-    unlockAfter: 'mc-final-boss',
-    lockNote: '로봇 공장 마지막 보스(3-10)를 깨면 열려요',
+    unlockAfter: 'mc-boss-1',
+    lockNote: '로봇 공장 1장 보스(1-10)를 깨면 열려요',
     Game: VolcanoScreen,
   }),
   world({
@@ -187,8 +187,10 @@ export const WORLDS: World[] = [
     chapters: S2_CHAPTERS,
     intros: S2_INTROS,
     isBonus: (s) => !!s.oneShot,
-    unlockAfter: 'last-delivery',
-    lockNote: '들꽃 기차 마을 마지막 배달(4-10)을 깨면 열려요',
+    // Its boards use only what the train world's first chapter teaches (rails and passengers):
+    // no tunnels, switches or coloured deliveries.
+    unlockAfter: 'last-run',
+    lockNote: '들꽃 기차 마을 1장 보스(1-10)를 깨면 열려요',
     Game: GameScreen,
   }),
   world({
@@ -202,8 +204,8 @@ export const WORLDS: World[] = [
     chapters: DEPOT_CHAPTERS,
     intros: DEPOT_INTROS,
     isBonus: (s) => s.limit !== undefined,
-    unlockAfter: 't2-final-boss',
-    lockNote: '강바람 철도 마지막 보스(5-10)를 깨면 열려요',
+    unlockAfter: 't2-boss-1',
+    lockNote: '강바람 철도 1장 보스(1-10)를 깨면 열려요',
     Game: DepotScreen,
     daily: {
       prefix: DEPOT_DAILY_PREFIX,
@@ -225,10 +227,9 @@ export const WORLDS: World[] = [
     chapters: SPACE_CHAPTERS,
     intros: SPACE_INTROS,
     isBonus: (s) => s.limit !== undefined,
-    // Opened with the depot (it used to follow it): every player who had cleared dp-final-boss
-    // has cleared this stage too, so no one loses the world.
-    unlockAfter: 't2-final-boss',
-    lockNote: '강바람 철도 마지막 보스(5-10)를 깨면 열려요',
+    // Opened with the depot (it used to follow it).
+    unlockAfter: 't2-boss-1',
+    lockNote: '강바람 철도 1장 보스(1-10)를 깨면 열려요',
     Game: SpaceScreen,
     daily: {
       prefix: SPACE_DAILY_PREFIX,
@@ -250,8 +251,8 @@ export const WORLDS: World[] = [
     chapters: CLOCK_CHAPTERS,
     intros: CLOCK_INTROS,
     isBonus: (s) => s.limit !== undefined,
-    unlockAfter: 'sp-final-boss',
-    lockNote: '우주 정거장 마지막 보스(3-10)를 깨면 열려요',
+    unlockAfter: 'sp-boss-1',
+    lockNote: '우주 정거장 1장 보스(1-10)를 깨면 열려요',
     Game: ClockScreen,
     daily: {
       prefix: CLOCK_DAILY_PREFIX,

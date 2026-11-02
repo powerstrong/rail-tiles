@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LOOK_ITEMS } from './ui/look';
 import { isUnlocked } from './ui/StageSelect';
-import { WORLDS, stageCards, worldById } from './worlds';
+import { WORLDS, type World, stageCards, worldById } from './worlds';
 
 const ownerOf = (stageId: string | undefined) => WORLDS.find((w) => w.stages.some((s) => s.id === stageId));
 
@@ -32,21 +32,48 @@ describe('world registry', () => {
     expect(new Set(prefixes).size).toBe(prefixes.length);
   });
 
-  it('never makes a world harder to open than it was: the space station once followed the depot', () => {
-    // Moving an unlock earlier is safe only if every stage that used to open it needs the new one first.
-    const depot = worldById('depot')!;
-    expect(worldById('space')!.unlockAfter).toBe(depot.unlockAfter);
+  it('opens every world after the boss of the first chapter of the world before it', () => {
+    for (const w of WORLDS) {
+      if (!w.unlockAfter) continue;
+      const before = ownerOf(w.unlockAfter)!;
+      expect(w.unlockAfter, w.title).toBe(before.stages[before.chapters[0].count - 1].id);
+    }
   });
 
-  it('opens the penguin world earlier than it used to, never later', () => {
-    // It used to follow the train world's 4-10; 1-10 must come before that in the same world,
-    // and the train world has no bonus stages to skip it by.
-    const train = worldById('train')!;
-    const at = (id: string) => train.stages.findIndex((s) => s.id === id);
-    expect(ownerOf(worldById('ice')!.unlockAfter)?.id).toBe('train');
-    expect(at(worldById('ice')!.unlockAfter!)).toBeGreaterThanOrEqual(0);
-    expect(at(worldById('ice')!.unlockAfter!)).toBeLessThan(at('last-delivery'));
-    expect(stageCards(train).some((c) => c.bonus)).toBe(false);
+  it('lets a new player reach any world within 30 stages', () => {
+    // The stages up to the gate (bonuses can be skipped), plus whatever opens the gate's own world.
+    const toOpen = (w: World): number => {
+      if (!w.unlockAfter) return 0;
+      const owner = ownerOf(w.unlockAfter)!;
+      const i = owner.stages.findIndex((s) => s.id === w.unlockAfter);
+      return toOpen(owner) + stageCards(owner).slice(0, i + 1).filter((c, k) => k === i || !c.bonus).length;
+    };
+    for (const w of WORLDS) expect(toOpen(w), w.title).toBeLessThanOrEqual(30);
+  });
+
+  it('never opens a world later than it used to (players opened worlds by the old rules)', () => {
+    /** Every player who has cleared stage `a` has cleared stage `b` too. */
+    const implies = (a: string, b: string): boolean => {
+      const w = ownerOf(a);
+      if (!w) return false;
+      const at = (id: string) => w.stages.findIndex((s) => s.id === id);
+      // Stages open in order, and only bonus stages can be skipped on the way.
+      if (at(b) >= 0 && at(b) <= at(a) && !stageCards(w)[at(b)].bonus) return true;
+      return !!w.unlockAfter && implies(w.unlockAfter, b);
+    };
+    const formerGates: Record<string, string[]> = {
+      ice: ['last-delivery'],
+      machine: ['ice-conquer'],
+      volcano: ['mc-final-boss'],
+      train2: ['last-delivery'],
+      depot: ['t2-final-boss'],
+      // It once followed the depot.
+      space: ['dp-final-boss', 't2-final-boss'],
+      clock: ['sp-final-boss'],
+    };
+    for (const [id, gates] of Object.entries(formerGates)) {
+      for (const old of gates) expect(implies(old, worldById(id)!.unlockAfter!), `${id} after ${old}`).toBe(true);
+    }
   });
 
   it('lets every world be opened by playing from the start', () => {
@@ -68,13 +95,13 @@ describe('world registry', () => {
     const rules = Object.fromEntries(WORLDS.map((w) => [w.id, [w.unlockAfter ?? null, w.daily?.unlockAfter ?? null, w.daily?.prefix ?? null]]));
     expect(rules).toEqual({
       train: [null, 'first-passenger', 'daily-'],
-      train2: ['last-delivery', null, null],
+      train2: ['last-run', null, null],
       ice: ['last-run', 'ice-snow-pile', 'ice-daily-'],
-      machine: ['ice-conquer', null, null],
-      volcano: ['mc-final-boss', null, null],
-      depot: ['t2-final-boss', 'dp-water-tower', 'depot-daily-'],
-      space: ['t2-final-boss', 'sp-wormhole', 'space-daily-'],
-      clock: ['sp-final-boss', 'ck-lever', 'clock-daily-'],
+      machine: ['ice-big-adventure', null, null],
+      volcano: ['mc-boss-1', null, null],
+      depot: ['t2-boss-1', 'dp-water-tower', 'depot-daily-'],
+      space: ['t2-boss-1', 'sp-wormhole', 'space-daily-'],
+      clock: ['sp-boss-1', 'ck-lever', 'clock-daily-'],
     });
   });
 
