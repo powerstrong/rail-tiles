@@ -14,6 +14,7 @@ import { makePuff, useLook } from './look';
 import { StarRow } from './StageSelect';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
+import { useFitBoard } from './useFitBoard';
 
 const KIND_LABEL: Record<RailKind, string> = { straight: '직선', curve: '곡선', cross: '교차' };
 
@@ -83,6 +84,7 @@ function ToolIcon({ tool }: { tool: Tool }) {
 }
 
 export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared, clearNote, intro }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const [towersHit, setTowersHit] = useState<ReadonlySet<string>>(() => new Set());
   const [coupled, setCoupled] = useState<ReadonlySet<string>>(() => new Set());
@@ -416,7 +418,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const success = result?.success ?? false;
 
   return (
-    <div className="game">
+    <div className="game" ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>

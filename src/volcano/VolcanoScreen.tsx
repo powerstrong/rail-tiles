@@ -6,6 +6,7 @@ import { isMuted, play, setMuted } from '../ui/sound';
 import { type RaceState, flow, hintLava, isHot, placeable, raceStart, raceStep, solveLava, solveRace, spreadOnce } from './lava';
 import { NO_LIMIT, type VolcanoStage, cellName } from './model';
 import { CraterArt, EggArt, GrassTile, HotTile, HouseArt, LavaArt, RockArt, SeaArt, StoneArt, VO, VillagerArt } from './VolcanoArt';
+import { useFitBoard } from '../ui/useFitBoard';
 
 const CELL = 100;
 const PAD = 20;
@@ -54,6 +55,7 @@ const Ground = memo(function Ground({ stage }: { stage: VolcanoStage }) {
 type Phase = 'build' | 'flow' | 'fail' | 'won';
 
 export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const race = !!stage.race;
   const solutions = useMemo(() => (race ? [] : solveLava(stage).solutions), [stage, race]);
   const [stones, setStones] = useState<Set<number>>(() => new Set());
@@ -233,7 +235,7 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
   const shownHint = hint && (hint.remove ? shownStones.has(hint.cell) : !shownStones.has(hint.cell)) ? hint : null;
 
   return (
-    <div className={`game world-volcano ${stage.boss ? 'is-boss' : ''} ${race ? 'is-bonus' : ''}`}>
+    <div className={`game world-volcano ${stage.boss ? 'is-boss' : ''} ${race ? 'is-bonus' : ''}`} ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>

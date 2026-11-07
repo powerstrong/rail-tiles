@@ -10,6 +10,7 @@ import { CapsuleArt } from './SpaceArt';
 import { SpaceBoard } from './SpaceBoard';
 import { hintFrom } from './solver';
 import { useWinMap } from './useWinMap';
+import { useFitBoard } from '../ui/useFitBoard';
 
 interface Props {
   stage: SpaceStage;
@@ -31,6 +32,7 @@ const PHASE_MS = 170;
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
 export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const bonus = stage.limit !== undefined;
   const limit = stage.limit ?? 0;
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
@@ -238,7 +240,7 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
   const locked = busy || won || outOfAir;
 
   return (
-    <div className="game world-space">
+    <div className="game world-space" ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>

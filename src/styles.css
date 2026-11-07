@@ -565,8 +565,9 @@ p {
   display: block;
   width: 100%;
   height: auto;
-  /* Leave room for header, tip, status line and dock so the whole game fits one screen. */
-  max-height: max(260px, calc(100dvh - 300px));
+  /* Leave room for header, tip, status line and dock so the whole game fits one screen
+     (--reserve is measured by useFitBoard; the number is only the first-paint guess). */
+  max-height: max(200px, calc(100dvh - var(--reserve, 300px)));
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -1665,7 +1666,7 @@ body:has(.world-ice) {
 
 /* The arrow pad is taller than the train tool dock: leave it room on short phones. */
 .world-ice .board {
-  max-height: max(230px, calc(100dvh - 330px));
+  max-height: max(200px, calc(100dvh - var(--reserve, 330px)));
 }
 
 .ice-board {
@@ -1922,7 +1923,7 @@ body:has(.world-machine) {
 }
 
 .world-machine .board {
-  max-height: max(250px, calc(100dvh - 290px));
+  max-height: max(200px, calc(100dvh - var(--reserve, 290px)));
 }
 
 .game-head .stage-no {
@@ -1953,7 +1954,7 @@ body:has(.world-volcano) {
 }
 
 .world-volcano .board {
-  max-height: max(240px, calc(100dvh - 330px));
+  max-height: max(200px, calc(100dvh - var(--reserve, 330px)));
 }
 
 .volcano-board .tappable {
@@ -2413,7 +2414,7 @@ body:has(.world-depot) {
 }
 
 .world-depot .board {
-  max-height: max(250px, calc(100dvh - 260px));
+  max-height: max(200px, calc(100dvh - var(--reserve, 260px)));
   touch-action: none;
 }
 
@@ -2477,7 +2478,7 @@ body:has(.world-space) {
 
 /* The gravity pad sits under the board: leave it room on short phones. */
 .world-space .board {
-  max-height: max(230px, calc(100dvh - 350px));
+  max-height: max(200px, calc(100dvh - var(--reserve, 350px)));
   touch-action: none;
 }
 
@@ -2615,7 +2616,7 @@ body:has(.world-clock) {
 }
 
 .world-clock .board {
-  max-height: max(230px, calc(100dvh - 350px));
+  max-height: max(200px, calc(100dvh - var(--reserve, 350px)));
   touch-action: none;
 }
 

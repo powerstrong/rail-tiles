@@ -10,6 +10,7 @@ import { ICE_CELL, IceBoard } from './IceBoard';
 import type { PenguinStage, Push } from './model';
 import { type IceState, initialState, isWon, slide } from './slide';
 import { hintFrom } from './solver';
+import { useFitBoard } from '../ui/useFitBoard';
 
 interface Props {
   stage: PenguinStage;
@@ -29,6 +30,7 @@ interface Props {
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
 export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const [state, setState] = useState<IceState>(() => initialState(stage));
   const [history, setHistory] = useState<IceState[]>([]);
@@ -221,7 +223,7 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
   };
 
   return (
-    <div className="game world-ice">
+    <div className="game world-ice" ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>

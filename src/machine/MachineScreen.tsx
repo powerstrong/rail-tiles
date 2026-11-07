@@ -7,6 +7,7 @@ import { light } from './beam';
 import { BEAM, BulbArt, DoorArt, FilterArt, FloorTile, LaserArt, MC, MirrorArt, RobotArt, SensorArt, WallArt } from './MachineArt';
 import type { MachineStage } from './model';
 import { hintLaser, solveLaser } from './solver';
+import { useFitBoard } from '../ui/useFitBoard';
 
 const CELL = 100;
 const PAD = 20;
@@ -47,6 +48,7 @@ const Floor = memo(function Floor({ stage }: { stage: MachineStage }) {
 });
 
 export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const wins = useMemo(() => solveLaser(stage).wins, [stage]);
   const [config, setConfig] = useState(stage.start);
@@ -159,7 +161,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
   const left = battery - taps;
 
   return (
-    <div className={`game world-machine ${stage.boss ? 'is-boss' : ''} ${bonus ? 'is-bonus' : ''}`}>
+    <div className={`game world-machine ${stage.boss ? 'is-boss' : ''} ${bonus ? 'is-bonus' : ''}`} ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>

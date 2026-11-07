@@ -8,6 +8,7 @@ import { ClockFace } from './ClockArt';
 import { type Action, type ClockStage, REST } from './model';
 import { explore, nextAction } from './solver';
 import { type ClockState, act, blockUp, cellOf, initialState, isWon, reversedOf, turnOf, whyNot } from './tick';
+import { useFitBoard } from '../ui/useFitBoard';
 
 interface Props {
   stage: ClockStage;
@@ -36,6 +37,7 @@ interface Tick {
 const DIR_LABEL = ['위로', '오른쪽으로', '아래로', '왼쪽으로'];
 
 export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const bonus = stage.limit !== undefined;
   const limit = stage.limit ?? 0;
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
@@ -180,7 +182,7 @@ export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
   const nextTurn = (turnOf(now.s) + (reversedOf(now.s) ? 3 : 1)) & 3;
 
   return (
-    <div className="game world-clock">
+    <div className="game world-clock" ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>

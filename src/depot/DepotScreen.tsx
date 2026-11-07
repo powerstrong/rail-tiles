@@ -8,6 +8,7 @@ import { type Blocked, DepotBoard } from './DepotBoard';
 import { type DepotStage, GONE, type Move } from './model';
 import { type DepotState, type Run, addRun, applyMove, canMove, dropRun, initialState, isWon, openRun, reach, stateKey } from './slide';
 import { hintFrom } from './solver';
+import { useFitBoard } from '../ui/useFitBoard';
 
 interface Props {
   stage: DepotStage;
@@ -27,6 +28,7 @@ interface Props {
 const LEAVE_MS = 650;
 
 export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+  const gameRef = useFitBoard<HTMLDivElement>();
   const look = useLook();
   const bonus = stage.limit !== undefined;
   const limit = stage.limit ?? 0;
@@ -199,7 +201,7 @@ export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
   const left = limit - moves;
 
   return (
-    <div className="game world-depot">
+    <div className="game world-depot" ref={gameRef}>
       <header className="game-head">
         <button className="icon-btn" onClick={onBack} aria-label="스테이지 목록">
           <svg viewBox="0 0 24 24" aria-hidden>
