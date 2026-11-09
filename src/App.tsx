@@ -93,7 +93,8 @@ export function App() {
 function Screens({ progress, setProgress, look }: { progress: Progress; setProgress: Dispatch<SetStateAction<Progress>>; look: TrainLook }) {
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
   /** The place picked on the route map: where the train waits when the map opens. */
-  const [focus, setFocus] = useState<string>(() => progress.last?.world ?? 'train');
+  // A world that no longer exists (or nothing played yet): start at the first station.
+  const [focus, setFocus] = useState<string>(() => (progress.last && worldById(progress.last.world) ? progress.last.world : 'train'));
   const layout = useMemo(() => layoutRoutes(WORLDS.map((w) => ({ id: w.id, parent: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.id }))), []);
   const resume = continueTarget(progress);
   const cleared = useMemo(() => new Set(Object.keys(progress.stars)), [progress]);

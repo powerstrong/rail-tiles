@@ -1,13 +1,8 @@
 import type { ComponentType } from 'react';
-import { CargoScreen } from './cargo/CargoScreen';
-import { CARGO_DAILY_PREFIX } from './cargo/generate';
-import { CARGO_INTROS } from './cargo/intros';
-import { CARGO_CHAPTERS, CARGO_STAGES } from './cargo/stages';
 import { CLOCK_DAILY_PREFIX } from './clock/generate';
 import { ClockScreen } from './clock/ClockScreen';
 import { CLOCK_INTROS } from './clock/intros';
 import { CLOCK_CHAPTERS, CLOCK_STAGES } from './clock/stages';
-import { loadCargoDaily } from './daily/loadCargoDaily';
 import { loadClockDaily } from './daily/loadClockDaily';
 import { loadDaily } from './daily/loadDaily';
 import { loadDepotDaily } from './daily/loadDepotDaily';
@@ -267,30 +262,6 @@ export const WORLDS: World[] = [
       load: loadClockDaily,
       loadingText: '오늘의 시계탑 태엽을 감는 중…',
       clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 시계탑이 열려요`,
-    },
-  }),
-  world({
-    id: 'cargo',
-    title: '선물 화물역',
-    blurb: '같은 선물을 모아 맨 앞 화차부터 칙칙폭폭!',
-    color: '#C2477A',
-    emblem: 'cargo',
-    theme: 'world-cargo',
-    stages: CARGO_STAGES,
-    chapters: CARGO_CHAPTERS,
-    intros: CARGO_INTROS,
-    isBonus: (s) => s.chain !== undefined,
-    // Its first chapter only needs the crane and the line, so it can open as early as the others.
-    unlockAfter: 'last-run',
-    lockNote: '들꽃 기차 마을 1장 보스(1-10)를 깨면 열려요',
-    Game: CargoScreen,
-    daily: {
-      prefix: CARGO_DAILY_PREFIX,
-      // After the chain lesson (1-4); daily yards keep to the first chapter's rules.
-      unlockAfter: 'cg-one-two',
-      load: loadCargoDaily,
-      loadingText: '오늘의 선물을 싣는 중…',
-      clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 선물이 도착해요`,
     },
   }),
 ];

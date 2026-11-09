@@ -34,7 +34,6 @@ const PLACED: Record<string, Pt> = {
   train2: [180, 344],
   space: [180, 470],
   clock: [180, 596],
-  cargo: [298, 344],
   depot: [298, 486],
 };
 const ROW = 126;

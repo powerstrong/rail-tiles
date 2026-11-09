@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react';
-import { CargoFarewell, CargoScene } from './story/CargoScene';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
 import type { SceneProps } from './story/kit';
 import { DepotFarewell, DepotScene } from './story/DepotScene';
@@ -121,17 +120,6 @@ export const STORIES: Record<string, Story> = {
       lines: ['치즈 냠냠! 박자 맞추기 최고였어!', '고마워서 종을 한 번 더 울려 줄게. 댕~', '다음에 또 만나! 똑딱똑딱, 안녕~'],
       Scene: ClockFarewell,
       tail: 72,
-    },
-  },
-  cargo: {
-    friend: '화물역 너구리 보따',
-    lines: ['어서 와! 나는 화물역 너구리 보따야.', '친구들에게 보낼 선물이 뒤죽박죽이야!', '같은 선물을 모아 맨 앞 화차부터 보내 줘!'],
-    Scene: CargoScene,
-    tail: 16,
-    farewell: {
-      lines: ['선물이 모두 친구들에게 도착했대!', '고마워! 너에게도 리본 선물 상자를 줄게.', '또 놀러 와! 칙칙폭폭, 안녕~'],
-      Scene: CargoFarewell,
-      tail: 16,
     },
   },
 };

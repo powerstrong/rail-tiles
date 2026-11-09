@@ -197,7 +197,7 @@ export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, co
           <rect width={MAP_W} height={layout.height} fill="#F3E8D2" />
           {/* The plaza, paved. */}
           <rect x={14} y={14} width={MAP_W - 28} height={140} rx={22} fill="#E9DCC2" />
-          <text x={MAP_W / 2} y={36} textAnchor="middle" className="route-plaza-name">
+          <text x={MAP_W - 30} y={146} textAnchor="end" className="route-plaza-name">
             중앙역 광장
           </text>
           {stations.map((s) => {
