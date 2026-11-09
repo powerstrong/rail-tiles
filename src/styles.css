@@ -2953,3 +2953,327 @@ body:has(.world-clock) {
     transform: translateY(-5px);
   }
 }
+
+/* ------------------------------------------------------------ gift freight yard (선물 화물역) */
+
+.world-cargo {
+  --bg: #fbf0dd;
+  --card: #fffbf3;
+  --line: #ecd8b6;
+  --teal: #c2477a;
+  --ink-soft: #6f5a4c;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+body:has(.world-cargo) {
+  background: #fbf0dd;
+}
+
+.world-cargo .board {
+  max-height: max(180px, calc(100dvh - var(--reserve, 380px)));
+  touch-action: manipulation;
+  overflow: visible;
+}
+
+.world-cargo .toast {
+  white-space: normal;
+  width: max-content;
+  max-width: 92%;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.cargo-slot {
+  transition: transform 0.42s cubic-bezier(0.5, 0, 0.3, 1);
+}
+
+.cargo-wagon {
+  transition: opacity 0.15s ease;
+}
+
+.cargo-wagon.dim {
+  opacity: 0.55;
+}
+
+.cargo-wagon.target {
+  filter: drop-shadow(0 0 6px rgba(76, 196, 106, 0.9));
+}
+
+.cargo-wagon.selected {
+  filter: drop-shadow(0 0 7px rgba(227, 174, 31, 0.95));
+}
+
+.cargo-box {
+  transition: transform 0.16s ease-out;
+}
+
+.cargo-box.lifted {
+  transform: translateY(-10px);
+}
+
+.cargo-box.dropping {
+  animation: cargo-drop 0.34s cubic-bezier(0.35, 0, 0.25, 1) both;
+}
+
+@keyframes cargo-drop {
+  0% {
+    transform: translate(var(--dx), calc(var(--dy) - 10px));
+  }
+  40% {
+    transform: translate(calc(var(--dx) * 0.55), calc(min(var(--dy), 0px) - 56px));
+  }
+  80% {
+    transform: translate(0, -6px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.cargo-ribbon {
+  animation: cargo-tie 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+@keyframes cargo-tie {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+
+.cargo-wait {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
+
+.cargo-wagon.blocked {
+  animation: cargo-shake 0.45s ease 2;
+}
+
+.cargo-blocked-mark {
+  animation: pulse-soft 0.8s ease-in-out infinite;
+}
+
+@keyframes cargo-shake {
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.cargo-leave {
+  animation: cargo-leave 0.64s cubic-bezier(0.5, 0, 0.9, 0.6) both;
+}
+
+@keyframes cargo-leave {
+  0% {
+    transform: translateX(0);
+  }
+  18% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(-420px);
+    opacity: 0.2;
+  }
+}
+
+.cargo-loco-in {
+  animation: cargo-loco-in 0.4s cubic-bezier(0.2, 0.8, 0.3, 1.1) both;
+}
+
+@keyframes cargo-loco-in {
+  from {
+    transform: translateX(-160px);
+  }
+}
+
+.cargo-hook {
+  animation: cargo-hook 0.18s ease-out both;
+}
+
+@keyframes cargo-hook {
+  from {
+    transform: translateY(-30px);
+  }
+}
+
+.cargo-hint {
+  animation: pulse-soft 1s ease-in-out infinite;
+}
+
+.cargo-num {
+  font-size: 15px;
+  font-weight: 800;
+  fill: #8a6a4c;
+  pointer-events: none;
+}
+
+.cargo-stuck {
+  color: #b83f37;
+  font-weight: 800;
+}
+
+.cargo-bar {
+  background: linear-gradient(135deg, #fff1f6, #ffd6e6);
+  box-shadow: 0 3px 0 #efb3c9;
+}
+
+.cargo-bar-icon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.cargo-departures {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 14px;
+  background: #3a3140;
+  color: #ffe9a8;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: inset 0 0 0 3px #574a5e;
+  overflow-x: auto;
+}
+
+.cargo-departures-title {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #e3ae1f;
+  color: #3a3140;
+}
+
+.cargo-departures ol {
+  display: flex;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cargo-departures li {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 8px;
+  background: #fffbf2;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.cargo-departures li svg {
+  width: 24px;
+  height: 24px;
+}
+
+.cargo-departures li.now {
+  box-shadow: 0 0 0 3px #ffd04a, 0 0 12px 3px rgba(255, 208, 74, 0.75);
+  transform: scale(1.18);
+  animation: pulse-soft 1.2s ease-in-out infinite;
+}
+
+.cargo-departures li.gone {
+  opacity: 0.55;
+  transform: scale(0.85);
+}
+
+.cargo-departures-next {
+  margin-left: auto;
+  flex: none;
+  white-space: nowrap;
+}
+
+.cargo-sent {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 34px;
+  padding: 2px 4px;
+  overflow-x: auto;
+}
+
+.cargo-sent-empty {
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 auto;
+  word-break: keep-all;
+  text-align: center;
+}
+
+.cargo-sent-car {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  animation: cargo-car-in 0.35s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes cargo-car-in {
+  from {
+    transform: translateX(-24px) scale(0.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cargo-slot,
+  .cargo-box,
+  .cargo-box.dropping,
+  .cargo-ribbon,
+  .cargo-wait,
+  .cargo-wagon.blocked,
+  .cargo-leave,
+  .cargo-loco-in,
+  .cargo-hook,
+  .cargo-hint,
+  .cargo-sent-car,
+  .cargo-departures li.now {
+    animation: none;
+    transition: none;
+  }
+  .cargo-leave {
+    opacity: 0;
+  }
+}
+
+.cargo-wagon.flash {
+  animation: cargo-flash 0.5s ease 2;
+}
+
+@keyframes cargo-flash {
+  50% {
+    filter: drop-shadow(0 0 7px rgba(229, 88, 79, 1));
+    transform: translateY(-3px);
+  }
+}
+
+.cargo-goal {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ffe1ec;
+  color: #8e2f58;
+  font-weight: 800;
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.cargo-goal.done {
+  background: #d9f5df;
+  color: #2f7a43;
+}
+
+.cargo-board .hit-layer rect:focus-visible {
+  outline: none;
+  stroke: #3a7fc2;
+  stroke-width: 4;
+  stroke-dasharray: 10 6;
+}

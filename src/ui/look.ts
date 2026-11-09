@@ -41,6 +41,7 @@ export const LOOK_ITEMS: LookItem[] = [
   { id: 'body-aurora', slot: 'body', name: '오로라', stars: 610, paint: paint('#5FD3B5', '#3A8FA8', '#E9FFF8', ['#9BF6D8', '#5FD3B5', '#6CB3EE', '#B596EC', '#F59AC0']) },
   { id: 'body-galaxy', slot: 'body', name: '은하수', stars: 690, paint: paint('#5B4FD1', '#3A3196', '#C9C2FF', ['#2E3A7C', '#5B4FD1', '#9B6BF0', '#F59AC0', '#FFF6D6']) },
   { id: 'body-midnight', slot: 'body', name: '자정의 시계탑', stars: 780, paint: paint('#3A2C4F', '#251B35', '#E0AE3F', ['#251B35', '#3A2C4F', '#6A4A8C', '#E0AE3F', '#F6D88A']) },
+  { id: 'body-festival', slot: 'body', name: '축제 꽃가루', stars: 870, paint: paint('#F07AA8', '#C2477A', '#FFF3DC', ['#FFD6E6', '#F07AA8', '#F6C443', '#5DBB5A', '#4A9BE8', '#8E6CE0']) },
   // Cab roof
   { id: 'roof-teal', slot: 'roof', name: '청록 지붕', stars: 0, paint: paint('#2F7F78', '#21605A', '#4FA59C') },
   { id: 'roof-navy', slot: 'roof', name: '남색 지붕', stars: 12, paint: paint('#34508A', '#243A66', '#5A78B5') },
@@ -52,6 +53,7 @@ export const LOOK_ITEMS: LookItem[] = [
   { id: 'roof-depot', slot: 'roof', name: '차고지 청록 지붕', stars: 585, paint: paint('#2E6F8E', '#1F5068', '#5E9DBA') },
   { id: 'roof-station', slot: 'roof', name: '우주 정거장 은빛 지붕', stars: 640, paint: paint('#B9C3DA', '#7F8BAA', '#EEF2FB', ['#EEF2FB', '#B9C3DA', '#8E9BBC', '#DDE4F4']) },
   { id: 'roof-clock', slot: 'roof', name: '시계탑 황동 지붕', stars: 735, paint: paint('#E0AE3F', '#B5832A', '#F6D88A', ['#F6D88A', '#E0AE3F', '#B5832A', '#F2C870']) },
+  { id: 'roof-gift', slot: 'roof', name: '선물 화물역 리본 지붕', stars: 820, paint: paint('#E5584F', '#B83E37', '#F7A49C', ['#F7A49C', '#E5584F', '#C2477A', '#F07A70']) },
   // Smoke
   { id: 'smoke-cloud', slot: 'smoke', name: '하얀 연기', stars: 0 },
   { id: 'smoke-heart', slot: 'smoke', name: '하트 연기', stars: 25 },

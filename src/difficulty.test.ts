@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { audit, difficultyScore } from '../scripts/audit';
+import { auditCargo } from './cargo/audit';
+import { CARGO_INTROS } from './cargo/intros';
+import { CARGO_CHAPTERS, CARGO_STAGES } from './cargo/stages';
 import { auditClock } from './clock/audit';
 import { CLOCK_INTROS } from './clock/intros';
 import { CLOCK_CHAPTERS, CLOCK_STAGES } from './clock/stages';
@@ -114,6 +117,8 @@ curve('depot', DEPOT_STAGES, DEPOT_CHAPTERS, (s) => auditDepot(s)!.score, DEPOT_
 curve('space', SPACE_STAGES, SPACE_CHAPTERS, (s) => auditSpace(s)!.score, SPACE_INTROS, { skip: (s) => s.limit !== undefined });
 // Midnight-bell bonus stages too.
 curve('clock', CLOCK_STAGES, CLOCK_CHAPTERS, (s) => auditClock(s)!.score, CLOCK_INTROS, { skip: (s) => s.limit !== undefined });
+// And the festival-train bonus stages of the freight yard.
+curve('cargo', CARGO_STAGES, CARGO_CHAPTERS, (s) => auditCargo(s)!.score, CARGO_INTROS, { skip: (s) => s.chain !== undefined });
 // Train world 2 has the same rules in src/stages/season2.test.ts.
 // Train world 1 came before the rules; these are its breaks today (see `npm run difficulty`),
 // each capped at its current size.
