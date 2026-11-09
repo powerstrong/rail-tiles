@@ -101,6 +101,11 @@ export function TitleLoop() {
 }
 
 interface TitleProps {
+  /** "강바람 철도 2-4": straight back into the game; null when there is nothing to continue. */
+  continueText: string | null;
+  /** Back into an unfinished stage (else on to the next one). */
+  continueResume: boolean;
+  onContinue: () => void;
   onPlay: () => void;
   onGarage: () => void;
   onSave: () => void;
@@ -108,7 +113,7 @@ interface TitleProps {
   newLooks: number;
 }
 
-export function TitleScreen({ onPlay, onGarage, onSave, newLooks }: TitleProps) {
+export function TitleScreen({ continueText, continueResume, onContinue, onPlay, onGarage, onSave, newLooks }: TitleProps) {
   return (
     <main className="title">
       <div className="title-inner">
@@ -118,9 +123,21 @@ export function TitleScreen({ onPlay, onGarage, onSave, newLooks }: TitleProps) 
         </h1>
         <TitleLoop />
         <p className="title-copy">레일을 이어 작은 기차를 도착역까지 데려다주세요.</p>
-        <button className="primary big" onClick={onPlay} autoFocus>
-          시작하기
-        </button>
+        {continueText ? (
+          <>
+            <button className="primary big title-continue" onClick={onContinue} autoFocus>
+              <span className="title-continue-main">▶ {continueResume ? '이어하기' : '다음 퍼즐'}</span>
+              <span className="title-continue-sub">{continueText}</span>
+            </button>
+            <button className="secondary big-secondary" onClick={onPlay}>
+              🗺️ 노선도 보기
+            </button>
+          </>
+        ) : (
+          <button className="primary big" onClick={onPlay} autoFocus>
+            시작하기
+          </button>
+        )}
         <div className="title-more">
           <button className="secondary" onClick={onGarage}>
             🎨 기차 꾸미기

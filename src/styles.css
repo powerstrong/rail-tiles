@@ -3277,3 +3277,378 @@ body:has(.world-cargo) {
   stroke-width: 4;
   stroke-dasharray: 10 6;
 }
+
+/* ------------------------------------------------------------ title: continue */
+
+.title-continue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 40px;
+}
+
+.title-continue-main {
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.title-continue-sub {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.92;
+}
+
+.big-secondary {
+  margin-top: 12px;
+  font-size: 16px;
+  padding: 11px 26px;
+}
+
+/* ------------------------------------------------------------ route map (노선도) */
+
+.route {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100%);
+  height: 100dvh;
+  margin: 0 auto;
+  padding: max(12px, env(safe-area-inset-top)) 0 0;
+}
+
+.route-head {
+  padding: 0 16px;
+  margin-bottom: 10px;
+}
+
+.route-stars {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--card);
+  font-weight: 900;
+  color: #b5832a;
+  box-shadow: 0 3px 0 var(--line);
+}
+
+.route-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.route-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.route-plaza-name {
+  font-size: 12px;
+  font-weight: 900;
+  fill: #8a6a4c;
+  letter-spacing: 0.1em;
+}
+
+.route-sleepers {
+  fill: none;
+  stroke: #b58b60;
+  stroke-width: 15;
+  stroke-dasharray: 4 6;
+}
+
+.route-rails {
+  fill: none;
+  stroke: #5d6271;
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.route-rails-gap {
+  fill: none;
+  stroke: #e9dcc2;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.route-track-locked {
+  fill: none;
+  stroke: #c9bca5;
+  stroke-width: 4;
+  stroke-dasharray: 7 7;
+  stroke-linecap: round;
+}
+
+.route-fresh .route-rails,
+.route-fresh .route-rails-gap,
+.route-fresh .route-sleepers {
+  stroke-dashoffset: 0;
+  animation: route-open 1.4s ease-out both;
+}
+
+@keyframes route-open {
+  from {
+    opacity: 0;
+  }
+}
+
+.route-place,
+.route-station {
+  cursor: pointer;
+  outline: none;
+}
+
+.route-place-name,
+.route-name {
+  font-size: 13px;
+  font-weight: 900;
+  fill: #3a3846;
+  paint-order: stroke;
+  stroke: #f3e8d2;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.route-sub {
+  font-size: 11px;
+  font-weight: 800;
+  fill: #8a6a4c;
+  paint-order: stroke;
+  stroke: #f3e8d2;
+  stroke-width: 3px;
+}
+
+.route-badge {
+  font-size: 11px;
+  font-weight: 900;
+  fill: #fff;
+}
+
+.route-disc {
+  fill: #fffbf2;
+  stroke: var(--world);
+  stroke-width: 4;
+}
+
+.route-station.locked .route-disc,
+.route-station.soon .route-disc {
+  stroke: #c9bca5;
+  fill: #f3ecdf;
+}
+
+.route-station.locked .route-name {
+  fill: #9a8c78;
+}
+
+.route-station.conquered .route-disc {
+  stroke: #e0ae3f;
+  stroke-width: 5;
+}
+
+.route-ring {
+  fill: none;
+  stroke: var(--world);
+  stroke-width: 3;
+  stroke-dasharray: 6 5;
+  animation: route-spin 6s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.route-station.locked .route-ring {
+  stroke: #b0a28c;
+}
+
+@keyframes route-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.route-station.fresh .route-disc {
+  animation: route-pulse 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes route-pulse {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.route-place:focus-visible > rect:first-child,
+.route-station:focus-visible > rect:first-child {
+  stroke: #3a7fc2;
+  stroke-width: 3;
+  stroke-dasharray: 8 5;
+}
+
+.route-place.picked > rect:first-child {
+  fill: rgba(255, 255, 255, 0.45);
+  rx: 14px;
+}
+
+.route-panel {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgba(244, 233, 214, 0), var(--bg) 18%);
+}
+
+.route-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 74px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.route-card-emblem {
+  width: 50px;
+  height: 50px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--world) 16%, #fff);
+}
+
+.route-card-emblem svg {
+  width: 40px;
+  height: 40px;
+}
+
+.route-card-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  word-break: keep-all;
+}
+
+.route-card-text strong {
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.route-card-text span {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.route-card .primary {
+  flex: none;
+  padding: 11px 16px;
+  font-size: 15px;
+}
+
+.route-continue {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--teal);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #21605a;
+  word-break: keep-all;
+}
+
+.route-continue:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #21605a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-ring,
+  .route-station.fresh .route-disc,
+  .route-fresh .route-rails,
+  .route-fresh .route-rails-gap,
+  .route-fresh .route-sleepers {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------ plaza notice board */
+
+.board-date {
+  margin: -8px 0 14px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: 0 4px 0 var(--line);
+  border: none;
+  border-left: 6px solid var(--world);
+  text-align: left;
+  color: var(--ink);
+}
+
+.board-row:disabled {
+  opacity: 0.6;
+  border-left-color: #c9bca5;
+}
+
+.board-row.done {
+  background: #f1f9ee;
+}
+
+.board-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  word-break: keep-all;
+}
+
+.board-title {
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.board-sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.board-side {
+  flex: none;
+}
+
+.board-go {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--amber);
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+}

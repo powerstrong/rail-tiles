@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 
 export interface WorldCard {
   id: string;
@@ -18,11 +17,13 @@ export interface WorldCard {
   from?: string;
 }
 
-function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
+/** A world's little emblem; `size` places it centred on 0,0 inside another SVG. */
+export function Emblem({ kind, size }: { kind: WorldCard['emblem']; size?: number }) {
+  const box = size ? { x: -size / 2, y: -size / 2, width: size, height: size } : {};
   switch (kind) {
     case 'train':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <rect x="8" y="14" width="24" height="18" rx="4" fill="#E5584F" />
           <rect x="28" y="20" width="12" height="12" rx="3" fill="#BF423B" />
           <rect x="12" y="18" width="8" height="7" rx="2" fill="#A9DFDF" />
@@ -33,7 +34,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'penguin':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <ellipse cx="24" cy="26" rx="14" ry="17" fill="#2D3446" />
           <ellipse cx="24" cy="30" rx="9" ry="12" fill="#fff" />
           <circle cx="19.5" cy="18" r="2.4" fill="#fff" />
@@ -44,7 +45,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'gear':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <circle cx="24" cy="24" r="12" fill="none" stroke="#7F8896" strokeWidth="8" strokeDasharray="5 4" />
           <circle cx="24" cy="24" r="8" fill="#A3ACB8" />
           <circle cx="24" cy="24" r="3" fill="#3A3846" />
@@ -52,7 +53,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'volcano':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <path d="M6 40 L19 14 H29 L42 40 Z" fill="#8C5E3C" />
           <path d="M19 14 Q24 20 29 14 L26 22 Q24 26 22 22 Z" fill="#F0692E" />
           <circle cx="20" cy="8" r="3" fill="#F0A33A" />
@@ -61,7 +62,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'depot':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <path d="M5 20 L24 9 L43 20 V41 H5 Z" fill="#E9E1D2" />
           <path d="M3 21 L24 8 L45 21" stroke="#2E6F8E" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           <rect x="21" y="3" width="6" height="5" rx="2" fill="#E0B145" />
@@ -73,7 +74,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'space':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <circle cx="24" cy="24" r="21" fill="#1F2A4D" />
           <circle cx="11" cy="12" r="1.6" fill="#FFF6D6" />
           <circle cx="38" cy="10" r="1.2" fill="#FFF6D6" />
@@ -88,7 +89,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'clock':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <path d="M10 44 V16 L24 4 L38 16 V44 Z" fill="#8A5A33" />
           <path d="M8 17 L24 3 L40 17" stroke="#6A4223" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           <circle cx="24" cy="22" r="10" fill="#FFF8E8" stroke="#E0AE3F" strokeWidth="3" />
@@ -99,7 +100,7 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
       );
     case 'cargo':
       return (
-        <svg viewBox="0 0 48 48" aria-hidden>
+        <svg viewBox="0 0 48 48" aria-hidden {...box}>
           <rect x="5" y="30" width="38" height="7" rx="2" fill="#5D6271" />
           <circle cx="13" cy="40" r="4" fill="#3A3846" />
           <circle cx="35" cy="40" r="4" fill="#3A3846" />
@@ -110,64 +111,4 @@ function Emblem({ kind }: { kind: WorldCard['emblem'] }) {
         </svg>
       );
   }
-}
-
-interface Props {
-  worlds: WorldCard[];
-  onPick: (id: string) => void;
-  onBack: () => void;
-}
-
-export function WorldSelect({ worlds, onPick, onBack }: Props) {
-  return (
-    <main className="select worlds">
-      <header className="select-head">
-        <button className="icon-btn" onClick={onBack} aria-label="타이틀로">
-          <svg viewBox="0 0 24 24" aria-hidden>
-            <path d="M15 5 L8 12 L15 19" />
-          </svg>
-        </button>
-        <h1>다음 정거장은?</h1>
-      </header>
-      <ol className="world-list">
-        {worlds.map((w) => {
-          const playable = w.state === 'open' || w.state === 'conquered';
-          return (
-            <li key={w.id}>
-              <button
-                className={`world-card ${w.state}`}
-                style={{ '--world': w.color } as CSSProperties}
-                disabled={!playable}
-                onClick={() => onPick(w.id)}
-                aria-label={`${w.title}${w.state === 'conquered' ? ', 여행 완료' : w.state === 'locked' ? ', 잠김' : w.state === 'soon' ? ', 준비 중' : w.fresh ? ', 새로 열림' : ''}`}
-              >
-                {w.fresh && (
-                  <span className="new-dot" aria-hidden>
-                    NEW
-                  </span>
-                )}
-                <span className="world-emblem">
-                  <Emblem kind={w.emblem} />
-                </span>
-                <span className="world-text">
-                  <span className="world-kicker">{w.from ? `${w.from} 다음` : '출발역'}</span>
-                  <span className="world-title">{w.title}</span>
-                  <span className="world-blurb">{w.state === 'soon' ? '곧 열려요!' : w.blurb}</span>
-                  {w.state === 'locked' && w.lockNote && <span className="world-lock">🔒 {w.lockNote}</span>}
-                </span>
-                <span className="world-side">
-                  {w.state === 'conquered' && <span className="world-badge">여행 완료!</span>}
-                  {playable && (
-                    <span className="world-stars">
-                      ★ {w.stars} / {w.maxStars}
-                    </span>
-                  )}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-    </main>
-  );
 }

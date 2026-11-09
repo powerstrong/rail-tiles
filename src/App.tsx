@@ -1,28 +1,38 @@
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { continueTarget } from './continue';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stars } from './engine/stars';
 import { PROGRESS_KEY, type Progress, absorbSaved, loadProgress, recordClear, saveProgress, totalStars } from './storage';
+import { type DailyRow, DailyBoard } from './ui/DailyBoard';
 import { Garage } from './ui/Garage';
 import { type LookItem, LookContext, STARTER_COUNT, type TrainLook, safeLook, unlockedItems } from './ui/look';
+import { layoutRoutes } from './ui/routeLayout';
+import { RouteMap, type StationInfo } from './ui/RouteMap';
 import { SaveScreen } from './ui/SaveScreen';
 import { StageSelect } from './ui/StageSelect';
 import { TitleScreen } from './ui/TitleScreen';
-import { type WorldCard, WorldSelect } from './ui/WorldSelect';
 import { STORIES, farewellId } from './ui/stories';
 import { WorldStory } from './ui/WorldStory';
 import { WORLDS, type World, type WorldStage, openedNote, stageCards, untouched, worldById } from './worlds';
 
+/** A stage number with its object particle, as read aloud: "1-4를", "3-1을". */
+const withObject = (n: string) => `${n}${'0136789'.includes(n.slice(-1)) ? '을' : '를'}`;
+
 type Screen =
   | { name: 'title' }
-  | { name: 'garage' }
-  | { name: 'save' }
+  /** `fromMap`: opened from the plaza, so "back" returns there. */
+  | { name: 'garage'; fromMap?: boolean }
+  | { name: 'save'; fromMap?: boolean }
+  /** The route map with the plaza (the world list). */
   | { name: 'worlds' }
+  /** The plaza notice board: every world's daily puzzle. */
+  | { name: 'board' }
   | { name: 'select'; world: string }
   /** A world's arrival story (on the way in the first time) or farewell (once it is all cleared). */
   | { name: 'story'; world: string; farewell?: boolean }
   | { name: 'game'; world: string; index: number }
   /** The puzzle is kept here, so it stays put if the date turns over mid-game. */
-  | { name: 'daily'; world: string; stage: WorldStage };
+  | { name: 'daily'; world: string; stage: WorldStage; fromBoard?: boolean };
 
 /** A world's daily puzzle for one date: null while it is being built. */
 interface DailyEntry {
@@ -72,7 +82,7 @@ export function App() {
           <span>
             <b>새 꾸미기: {fresh.map((i) => i.name).join(', ')}!</b>
             <br />
-            처음 화면의 ‘기차 꾸미기’에서 바꿔 보세요.
+            노선도 광장의 차고에서 바꿔 보세요.
           </span>
         </div>
       )}
@@ -82,9 +92,23 @@ export function App() {
 
 function Screens({ progress, setProgress, look }: { progress: Progress; setProgress: Dispatch<SetStateAction<Progress>>; look: TrainLook }) {
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
+  /** The place picked on the route map: where the train waits when the map opens. */
+  const [focus, setFocus] = useState<string>(() => progress.last?.world ?? 'train');
+  const layout = useMemo(() => layoutRoutes(WORLDS.map((w) => ({ id: w.id, parent: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.id }))), []);
+  const resume = continueTarget(progress);
   const cleared = useMemo(() => new Set(Object.keys(progress.stars)), [progress]);
   const stars = totalStars(progress);
-  const today = dateKey();
+  // The date, checked every minute and on coming back to the tab, so daily puzzles roll over at midnight.
+  const [today, setToday] = useState(dateKey);
+  useEffect(() => {
+    const check = () => setToday(dateKey());
+    const t = window.setInterval(check, 60_000);
+    document.addEventListener('visibilitychange', check);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', check);
+    };
+  }, []);
 
   const onCleared = (id: string, stars: Stars) => setProgress((p) => recordClear(p, id, stars));
   /** The story plays on the way into a world, once, unless the world was already being played. */
@@ -97,11 +121,20 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
     setScreen(storyFirst(w) ? { name: 'story', world: w.id } : farewellDue(w) ? { name: 'story', world: w.id, farewell: true } : { name: 'select', world: w.id });
   const seen = (id: string) => setProgress((p) => (p.stories?.includes(id) ? p : { ...p, stories: [...(p.stories ?? []), id] }));
   const streakOf = (w: World) => (w.daily ? dailyStreak(cleared, today, w.daily.prefix) : 0);
+  /** Into a stage, remembering it for "continue". */
+  const playStage = (w: World, index: number) => {
+    const id = w.stages[index]?.id;
+    if (!id) return;
+    setProgress((p) => (p.last?.world === w.id && p.last.stage === id ? p : { ...p, last: { world: w.id, stage: id } }));
+    setFocus(w.id);
+    setScreen({ name: 'game', world: w.id, index });
+  };
+  const playContinue = () => resume && playStage(resume.world, resume.index);
 
   // Daily puzzles are built in the background: on the world list once a world's daily is open
   // (so it is ready on arrival), and whenever that world's own screens are showing.
   const here = 'world' in screen ? screen.world : null;
-  const wanted = WORLDS.filter((w) => w.daily && (w.id === here || (screen.name === 'worlds' && cleared.has(w.daily.unlockAfter))))
+  const wanted = WORLDS.filter((w) => w.daily && (w.id === here || ((screen.name === 'worlds' || screen.name === 'board') && cleared.has(w.daily.unlockAfter))))
     .map((w) => w.id)
     .join(',');
   const [dailies, setDailies] = useState<Record<string, DailyEntry>>({});
@@ -130,6 +163,9 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
   if (screen.name === 'title') {
     return (
       <TitleScreen
+        continueText={resume?.text ?? null}
+        continueResume={!!resume?.resume}
+        onContinue={playContinue}
         onPlay={() => setScreen({ name: 'worlds' })}
         onGarage={() => setScreen({ name: 'garage' })}
         onSave={() => setScreen({ name: 'save' })}
@@ -147,17 +183,51 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         onChange={(l) => setProgress((p) => ({ ...p, look: { ...l } }))}
         onBack={() => {
           setProgress((p) => ({ ...p, lookSeen: unlockedItems(totalStars(p)).length }));
-          setScreen({ name: 'title' });
+          setScreen(screen.fromMap ? { name: 'worlds' } : { name: 'title' });
         }}
       />
     );
   }
 
-  if (screen.name === 'save') return <SaveScreen progress={progress} onLoad={setProgress} onBack={() => setScreen({ name: 'title' })} />;
+  if (screen.name === 'save') return <SaveScreen progress={progress} onLoad={setProgress} onBack={() => setScreen(screen.fromMap ? { name: 'worlds' } : { name: 'title' })} />;
+
+  /** Today's puzzle of a world, as far as the lists need to know. */
+  const dailyState = (w: World): DailyRow['state'] => {
+    if (!w.daily || !cleared.has(w.daily.unlockAfter)) return 'locked';
+    if (cleared.has(`${w.daily.prefix}${today}`)) return 'done';
+    const entry = dailies[w.id];
+    if (entry?.date === today && entry.stage) return 'open';
+    return entry?.date === today && entry.failed ? 'failed' : 'loading';
+  };
+  const dailyWorlds = WORLDS.filter((w) => w.daily);
+
+  if (screen.name === 'board') {
+    const rows: DailyRow[] = dailyWorlds.map((w) => {
+      const owner = w.stages.find((s) => s.id === w.daily!.unlockAfter);
+      return {
+        id: w.id,
+        title: w.title,
+        color: w.color,
+        emblem: w.emblem,
+        state: dailyState(w),
+        stars: progress.stars[`${w.daily!.prefix}${today}`] ?? 0,
+        streak: streakOf(w),
+        lockText: `${w.title} ${withObject(owner?.label?.replace(/^STAGE\s*/, '') ?? '')} 깨면 열려요`,
+        loadingText: w.daily!.loadingText,
+      };
+    });
+    const playDaily = (id: string) => {
+      const w = worldById(id);
+      const entry = w && dailies[w.id];
+      if (w && entry?.date === today && entry.stage) setScreen({ name: 'daily', world: w.id, stage: entry.stage, fromBoard: true });
+    };
+    return <DailyBoard rows={rows} date={today} onPlay={playDaily} onBack={() => setScreen({ name: 'worlds' })} />;
+  }
 
   if (screen.name === 'worlds') {
-    const cards: WorldCard[] = WORLDS.map((w) => {
+    const stations: StationInfo[] = WORLDS.map((w) => {
       const locked = !!w.unlockAfter && !cleared.has(w.unlockAfter);
+      const d = dailyState(w);
       return {
         id: w.id,
         title: w.title,
@@ -171,13 +241,39 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         fresh: !!w.unlockAfter && !locked && untouched(w, progress),
         lockNote: w.lockNote,
         from: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.title,
+        daily: d === 'done' ? 'done' : d === 'open' ? 'open' : 'none',
       };
     });
-    const pick = (id: string) => {
-      const w = worldById(id);
-      if (w) enter(w);
+    const states = dailyWorlds.map(dailyState);
+    const openPlace = (id: string) => {
+      if (id === 'garage') setScreen({ name: 'garage', fromMap: true });
+      else if (id === 'mail') setScreen({ name: 'save', fromMap: true });
+      else if (id === 'board') setScreen({ name: 'board' });
+      else {
+        const w = worldById(id);
+        if (w) enter(w);
+      }
     };
-    return <WorldSelect worlds={cards} onPick={pick} onBack={() => setScreen({ name: 'title' })} />;
+    return (
+      <RouteMap
+        layout={layout}
+        stations={stations}
+        focus={focus}
+        onFocus={setFocus}
+        onEnter={(id) => {
+          setFocus(id);
+          openPlace(id);
+        }}
+        onBack={() => setScreen({ name: 'title' })}
+        continueText={resume?.text ?? null}
+        continueResume={!!resume?.resume}
+        onContinue={playContinue}
+        newLooks={Math.max(0, unlockedItems(stars).length - (progress.lookSeen ?? STARTER_COUNT))}
+        dailyOpen={states.filter((x) => x === 'open').length}
+        dailyDone={states.filter((x) => x === 'done').length}
+        totalStars={stars}
+      />
+    );
   }
 
   const world = worldById(screen.world);
@@ -217,7 +313,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         stars={progress.stars}
         cleared={cleared}
         allCleared={world.stages.every((s) => cleared.has(s.id))}
-        onPick={(index) => setScreen({ name: 'game', world: world.id, index })}
+        onPick={(index) => playStage(world, index)}
         onBack={() => setScreen({ name: 'worlds' })}
         onStory={STORIES[world.id] ? () => setScreen({ name: 'story', world: world.id }) : undefined}
         onFarewell={STORIES[world.id] && conquered(world) ? () => setScreen({ name: 'story', world: world.id, farewell: true }) : undefined}
@@ -246,8 +342,8 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         hasNext={false}
         allCleared={false}
         bestStars={progress.stars[screen.stage.id] ?? 0}
-        onBack={toList}
-        onNext={toList}
+        onBack={screen.fromBoard ? () => setScreen({ name: 'board' }) : toList}
+        onNext={screen.fromBoard ? () => setScreen({ name: 'board' }) : toList}
         onCleared={onCleared}
         clearNote={streak > 0 ? world.daily?.clearNote(streak) : undefined}
       />
@@ -268,7 +364,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
       intro={world.intros?.[stage.id]}
       onBack={toList}
       // "Next" is only offered after a clear, which unlocks the following stage.
-      onNext={() => (hasNext ? setScreen({ name: 'game', world: world.id, index: next }) : toList())}
+      onNext={() => (hasNext ? playStage(world, next) : toList())}
       onCleared={onCleared}
       clearNote={openedNote(stage.id, progress)}
     />

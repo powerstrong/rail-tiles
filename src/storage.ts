@@ -13,6 +13,8 @@ export interface Progress {
   lookSeen?: number;
   /** Worlds whose arrival story has been shown. */
   stories?: string[];
+  /** The stage last opened (not a daily puzzle), for "continue". */
+  last?: { world: string; stage: string };
 }
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
@@ -36,7 +38,7 @@ export function loadProgress(storage: StorageLike | null = defaultStorage()): Pr
   try {
     const raw = storage?.getItem(KEY);
     if (!raw) return emptyProgress();
-    const data = JSON.parse(raw) as { schemaVersion?: unknown; cleared?: unknown; stars?: unknown; look?: unknown; lookSeen?: unknown; stories?: unknown };
+    const data = JSON.parse(raw) as { schemaVersion?: unknown; cleared?: unknown; stars?: unknown; look?: unknown; lookSeen?: unknown; stories?: unknown; last?: unknown };
     if (data?.schemaVersion === 1 && Array.isArray(data.cleared)) {
       // v1 only knew "cleared": count each as one star.
       const stars: Record<string, Stars> = {};
@@ -53,13 +55,15 @@ export function loadProgress(storage: StorageLike | null = defaultStorage()): Pr
 }
 
 /** The optional fields, kept only when they have the right shape. */
-function extras(data: { look?: unknown; lookSeen?: unknown; stories?: unknown }): Pick<Progress, 'look' | 'lookSeen' | 'stories'> {
-  const out: Pick<Progress, 'look' | 'lookSeen' | 'stories'> = {};
+function extras(data: { look?: unknown; lookSeen?: unknown; stories?: unknown; last?: unknown }): Pick<Progress, 'look' | 'lookSeen' | 'stories' | 'last'> {
+  const out: Pick<Progress, 'look' | 'lookSeen' | 'stories' | 'last'> = {};
   if (typeof data.look === 'object' && data.look !== null) {
     out.look = Object.fromEntries(Object.entries(data.look).filter(([k, v]) => typeof k === 'string' && typeof v === 'string'));
   }
   if (typeof data.lookSeen === 'number' && Number.isFinite(data.lookSeen)) out.lookSeen = data.lookSeen;
   if (Array.isArray(data.stories)) out.stories = data.stories.filter((id): id is string => typeof id === 'string');
+  const last = data.last as { world?: unknown; stage?: unknown } | null | undefined;
+  if (last && typeof last.world === 'string' && typeof last.stage === 'string') out.last = { world: last.world, stage: last.stage };
   return out;
 }
 
@@ -86,7 +90,8 @@ export const PROGRESS_KEY = KEY;
  * newest "seen" count and the stories seen there. Returns the same object when nothing changes.
  */
 export function absorbSaved(progress: Progress, saved: Progress): Progress {
-  const next: Progress = { ...mergeProgress(progress, saved), look: saved.look ?? progress.look, stories: bothStories(progress.stories, saved.stories) };
+  const next: Progress = { ...mergeProgress(progress, saved), look: saved.look ?? progress.look, stories: bothStories(progress.stories, saved.stories), last: saved.last ?? progress.last };
+  if (!next.last) delete next.last;
   const seen = Math.max(progress.lookSeen ?? 0, saved.lookSeen ?? 0);
   if (seen > 0) next.lookSeen = seen;
   return JSON.stringify(next) === JSON.stringify(progress) ? progress : next;
