@@ -5,6 +5,7 @@ import type { Stars } from './engine/stars';
 import { PROGRESS_KEY, type Progress, absorbSaved, loadProgress, recordClear, saveProgress, totalStars } from './storage';
 import { type DailyRow, DailyBoard } from './ui/DailyBoard';
 import { Garage } from './ui/Garage';
+import { withObject } from './ui/korean';
 import { type LookItem, LookContext, STARTER_COUNT, type TrainLook, safeLook, unlockedItems } from './ui/look';
 import { layoutRoutes } from './ui/routeLayout';
 import { RouteMap, type StationInfo } from './ui/RouteMap';
@@ -14,9 +15,6 @@ import { TitleScreen } from './ui/TitleScreen';
 import { STORIES, farewellId } from './ui/stories';
 import { WorldStory } from './ui/WorldStory';
 import { WORLDS, type World, type WorldStage, openedNote, stageCards, untouched, worldById } from './worlds';
-
-/** A stage number with its object particle, as read aloud: "1-4를", "3-1을". */
-const withObject = (n: string) => `${n}${'0136789'.includes(n.slice(-1)) ? '을' : '를'}`;
 
 type Screen =
   | { name: 'title' }

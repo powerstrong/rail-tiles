@@ -9,6 +9,7 @@ import { type DepotStage, GONE, type Move } from './model';
 import { type DepotState, type Run, addRun, applyMove, canMove, dropRun, initialState, isWon, openRun, reach, stateKey } from './slide';
 import { hintFrom } from './solver';
 import { useFitBoard } from '../ui/useFitBoard';
+import { ResultOverlay } from '../ui/ResultOverlay';
 
 interface Props {
   stage: DepotStage;
@@ -298,7 +299,7 @@ export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
       </div>
 
       {late && (
-        <div className="overlay" role="dialog" aria-label="출발 시각이 지났어요">
+        <ResultOverlay label="출발 시각이 지났어요">
           <div className="result-card">
             <p className="result-kicker">보너스 스테이지</p>
             <h2>출발 시각이 지났어요!</h2>
@@ -312,11 +313,11 @@ export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
               </button>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
 
       {won && (
-        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+        <ResultOverlay label="스테이지 클리어">
           <div className="result-card">
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
@@ -375,7 +376,7 @@ export function DepotScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
               </div>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>

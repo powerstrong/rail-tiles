@@ -8,6 +8,7 @@ import { BEAM, BulbArt, DoorArt, FilterArt, FloorTile, LaserArt, MC, MirrorArt, 
 import type { MachineStage } from './model';
 import { hintLaser, solveLaser } from './solver';
 import { useFitBoard } from '../ui/useFitBoard';
+import { ResultOverlay } from '../ui/ResultOverlay';
 
 const CELL = 100;
 const PAD = 20;
@@ -280,7 +281,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
       </div>
 
       {drained && (
-        <div className="overlay" role="dialog" aria-label="배터리 방전">
+        <ResultOverlay label="배터리 방전">
           <div className="result-card">
             <p className="result-kicker">보너스 스테이지</p>
             <svg viewBox="-50 -60 100 110" className="robot-big" aria-hidden>
@@ -297,11 +298,11 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
               </button>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
 
       {won && (
-        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+        <ResultOverlay label="스테이지 클리어">
           <div className="result-card">
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
@@ -360,7 +361,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
               </div>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>

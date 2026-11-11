@@ -11,6 +11,7 @@ import { SpaceBoard } from './SpaceBoard';
 import { hintFrom } from './solver';
 import { useWinMap } from './useWinMap';
 import { useFitBoard } from '../ui/useFitBoard';
+import { ResultOverlay } from '../ui/ResultOverlay';
 
 interface Props {
   stage: SpaceStage;
@@ -349,7 +350,7 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
       </div>
 
       {outOfAir && (
-        <div className="overlay" role="dialog" aria-label="산소가 다 떨어졌어요">
+        <ResultOverlay label="산소가 다 떨어졌어요">
           <div className="result-card">
             <p className="result-kicker">보너스 스테이지</p>
             <h2>산소가 다 떨어졌어요!</h2>
@@ -363,11 +364,11 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
               </button>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
 
       {won && (
-        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+        <ResultOverlay label="스테이지 클리어">
           <div className="result-card">
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
@@ -426,7 +427,7 @@ export function SpaceScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
               </div>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>
