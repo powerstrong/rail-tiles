@@ -86,6 +86,11 @@ describe('lab mechanics: behavior at the boundaries of each rule', () => {
 });
 
 describe('lab search correctness', () => {
+  it('uses the correct direction particle in acorn hints', () => {
+    expect([0, 1, 2, 3].map(a => describeAction(stage('acorn'), [], a))).toEqual(
+      ['↑ 위로', '→ 오른쪽으로', '↓ 아래로', '← 왼쪽으로'].map(direction => `${direction} 다람쥐를 한 칸 움직여 보세요.`),
+    );
+  });
   it('explains two taps when a clue, candy or bridge must cycle through an intermediate value', () => {
     expect(describeAction(stage('cloud'), [2], 1)).toContain('두 번');
     expect(describeAction(stage('balance', { weights: [3] }), [0], 2)).toContain('두 번');

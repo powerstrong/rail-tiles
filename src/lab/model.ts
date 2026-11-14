@@ -1,3 +1,5 @@
+import { withTo } from '../ui/korean';
+
 /** Experimental games deliberately have no dependency on the shipped world/unlock registry. */
 export const KINDS = ['acorn', 'twins', 'lights', 'coral', 'cloud', 'balance', 'moon', 'mosaic', 'bee', 'bridges'] as const;
 export type Kind = typeof KINDS[number];
@@ -170,7 +172,7 @@ export function describeAction(s: Stage, v: State, a: number): string {
     ? (value - v[at] + 3) % 3 : 1;
   const times = presses === 2 ? '두 번' : '한 번';
   switch (s.kind) {
-    case 'acorn': return `${moveWord(a)}로 다람쥐를 한 칸 움직여 보세요.`;
+    case 'acorn': return `${withTo(moveWord(a))} 다람쥐를 한 칸 움직여 보세요.`;
     case 'twins': return `${moveWord(a)} 버튼으로 두 토끼를 함께 움직여 보세요.`;
     case 'lights': return `${location(s, a)} 반딧불을 눌러 보세요.`;
     case 'coral': return `${['● 빨강', '◆ 노랑', '▲ 초록', '■ 파랑', '♥ 보라'][a]} 색을 골라 보세요.`;

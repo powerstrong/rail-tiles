@@ -267,7 +267,7 @@ function BalanceBoard({ stage, state, onAction, hint, disabled }: LabBoardProps)
     </div>
     <p className="lb-board-note">쟁반에 남은 별사탕 <b>{resting}개</b>{fixed > 0 && <span className="lb-fixed-note">오른쪽 고정 추 {fixed}</span>}</p>
     <div className="lb-candy-tray" role="group" aria-label="별사탕을 눌러 접시로 옮기기">
-      {weights.map((weight, i) => <button key={i} type="button" className={`lb-candy-card lb-candy-side-${state[i]}${hint !== null && Math.floor(hint / 3) === i ? ' lb-hint' : ''}`} onClick={() => onAction(i * 3 + (state[i] + 1) % 3)} disabled={disabled} aria-label={`${i + 1}번 별사탕, 무게 ${weight}, 현재 ${['쟁반', '왼쪽 접시', '오른쪽 접시'][state[i]]}. 누르면 ${['왼쪽 접시', '오른쪽 접시', '쟁반'][state[i]]}으로 옮겨요.`}>
+      {weights.map((weight, i) => <button key={i} type="button" className={`lb-candy-card lb-candy-side-${state[i]}${hint !== null && Math.floor(hint / 3) === i ? ' lb-hint' : ''}`} onClick={() => onAction(i * 3 + (state[i] + 1) % 3)} disabled={disabled} aria-label={`${i + 1}번 별사탕, 무게 ${weight}, 현재 ${['쟁반', '왼쪽 접시', '오른쪽 접시'][state[i]]}. 누르면 ${withTo(['왼쪽 접시', '오른쪽 접시', '쟁반'][state[i]])} 옮겨요.`}>
         <span className="lb-candy-index">{i + 1}번</span><span className="lb-candy-art"><Toy kind="candy" /><b>{weight}</b></span><span className="lb-candy-location">{['쟁반', '← 왼쪽', '오른쪽 →'][state[i]]}</span>
       </button>)}
     </div>

@@ -50,6 +50,13 @@ describe('experimental board render contract', () => {
     const html = renderBoard(s, s.start, null);
     expect((html.match(/class="lb-color-button/g) ?? []).length).toBe(3);
   });
+  it('reads each candy destination with the correct Korean particle', () => {
+    const s = stagesFor('balance')[0];
+    const html = renderBoard(s, [0, 1, 2], null);
+    for (const destination of ['왼쪽 접시로', '오른쪽 접시로', '쟁반으로']) {
+      expect(html).toContain(`누르면 ${destination} 옮겨요.`);
+    }
+  });
   it('shows all ten experiment entries without touching unavailable storage', () => {
     const warn = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {

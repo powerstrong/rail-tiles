@@ -8,7 +8,8 @@ import { PROGRESS_KEY } from '../src/storage';
 const allStages: Stage[] = JSON.parse(readFileSync(new URL('../src/lab/stages.generated.json', import.meta.url), 'utf8'));
 const directions = ['위로 움직이기', '오른쪽으로 움직이기', '아래로 움직이기', '왼쪽으로 움직이기'];
 const arrows = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
-const officialSave = JSON.stringify({ stars: {}, stories: ['train-arrival'], lookSeen: 4 });
+const officialSave = JSON.stringify({ schemaVersion: 2, stars: { 'last-run': 3 }, stories: ['train'], lookSeen: 4,
+  last: { world: 'train', stage: 'last-run' } });
 const test = base.extend<{ runtimeErrors: void }>({
   runtimeErrors: [async ({ context }, use) => {
     const errors: string[] = [];
@@ -124,6 +125,32 @@ test('title and route map entries return to their own screen', async ({ page }) 
   await expect(page.locator('.lab-home')).toBeVisible();
   await page.getByRole('button', { name: '돌아가기', exact: true }).click();
   await expect(page.locator('.route-map')).toBeVisible();
+});
+
+test('official world result buttons wait for the card before accepting keyboard focus', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
+    schemaVersion: 2, stars: { 'last-run': 3 }, stories: ['ice'],
+    last: { world: 'ice', stage: 'ice-first-slide' },
+  })), PROGRESS_KEY);
+  await page.reload();
+  await page.getByRole('button', { name: /이어하기/ }).click();
+  const intro = page.getByRole('button', { name: '알았어요!', exact: true });
+  if (await intro.count()) await intro.click();
+  await page.getByRole('button', { name: '왼쪽으로 밀기', exact: true }).click();
+  await page.getByRole('button', { name: '아래로 밀기', exact: true }).click();
+  const overlay = page.getByRole('dialog', { name: '스테이지 클리어', exact: true });
+  await expect(overlay).toHaveClass('overlay arming');
+  const next = overlay.locator('.result-actions .primary');
+  // Focusing an invisible button used to succeed (including its React autoFocus).
+  await next.evaluate(button => button.focus());
+  await expect(next).not.toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(overlay).toBeVisible();
+  await expect(overlay).toHaveClass('overlay');
+  await expect(next).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(overlay).toHaveCount(0);
 });
 
 for (const viewport of [{ width: 320, height: 568 }, { width: 360, height: 640 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
