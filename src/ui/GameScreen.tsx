@@ -15,6 +15,7 @@ import { StarRow } from './StageSelect';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
 import { useFitBoard } from './useFitBoard';
+import { ResultOverlay } from './ResultOverlay';
 
 const KIND_LABEL: Record<RailKind, string> = { straight: '직선', curve: '곡선', cross: '교차' };
 
@@ -397,6 +398,9 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
   keyHandler.current = (e: KeyboardEvent) => {
     if (showIntro) return;
+    // A result card is open: its buttons take the keys. Above all, a one-shot run that failed
+    // starts over only through "다시 도전" (undo or Enter would hand out a second departure).
+    if (mode === 'result' && (result?.success || stage.oneShot)) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
       e.preventDefault();
       doUndo();
@@ -577,7 +581,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
       </div>
 
       {stage.oneShot && failure && (
-        <div className="overlay" role="dialog" aria-label="출발 기회 끝">
+        <ResultOverlay label="출발 기회 끝">
           <div className="result-card">
             <p className="result-kicker">보너스 스테이지</p>
             <h2>아쉬워요!</h2>
@@ -595,13 +599,13 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
               </button>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
 
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
 
       {success && (
-        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+        <ResultOverlay label="스테이지 클리어">
           <div className="result-card">
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
@@ -672,7 +676,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
               </div>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
     </div>
   );

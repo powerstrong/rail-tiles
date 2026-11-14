@@ -29,11 +29,16 @@ npm run stages     # 스테이지별 정답 경로 수, 최소 레일 수, 정�
 npm run difficulty # 스테이지별 난이도 점수(배포 전 확인용)
 ```
 
+실제 브라우저 검증은 최초에 `npx playwright install chromium`으로 브라우저를 설치한 뒤
+`npm run test:browser`로 실행합니다. 실험실 300판의 화면 조작 완료, 모바일 터치·화면 크기,
+키보드, 저장·탭 동기화, 오프라인 재접속과 힌트 Worker를 검사합니다.
+Linux에서 실행 라이브러리가 없다면 `npx playwright install --with-deps chromium`을 사용합니다.
+
 ### 배포
 
 **GitHub Pages:** https://powerstrong.github.io/rail-tiles/
 
-`main`에 푸시하면 `.github/workflows/deploy.yml`이 테스트, 빌드, 배포를 자동으로 실행합니다.
+`main`에 푸시하면 `.github/workflows/deploy.yml`이 단위 테스트, 빌드, 번들 검사와 브라우저 검증을 통과한 뒤 배포합니다.
 빌드는 상대 경로(`base: './'`)를 쓰므로 다른 정적 호스팅(Cloudflare Pages 등)에도
 빌드 명령 `npm run build`, 출력 디렉터리 `dist`로 그대로 올릴 수 있습니다.
 

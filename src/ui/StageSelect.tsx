@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { Chapter } from '../stages/stages';
 import type { Stars } from '../engine/stars';
+import { withObject } from './korean';
 
 /** What the list needs to know about a stage, whichever world it belongs to. */
 export interface StageCard {
@@ -149,7 +150,7 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
               <span className="chapter-stars" aria-label={`별 ${got}개 / ${ch.count * 3}개`}>
                 ★ {got} / {ch.count * 3}
               </span>
-              <p className="chapter-blurb">{open ? ch.blurb : `챕터 ${ch.number - 1}을 깨면 열려요`}</p>
+              <p className="chapter-blurb">{open ? ch.blurb : `${withObject(`챕터 ${ch.number - 1}`)} 깨면 열려요`}</p>
             </header>
             <ol className="stage-grid">
               {list.map((stage, k) => {

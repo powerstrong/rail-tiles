@@ -9,6 +9,7 @@ import { type Action, type ClockStage, REST } from './model';
 import { explore, nextAction } from './solver';
 import { type ClockState, act, blockUp, cellOf, initialState, isWon, reversedOf, turnOf, whyNot } from './tick';
 import { useFitBoard } from '../ui/useFitBoard';
+import { ResultOverlay } from '../ui/ResultOverlay';
 
 interface Props {
   stage: ClockStage;
@@ -311,7 +312,7 @@ export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
       </div>
 
       {late && (
-        <div className="overlay" role="dialog" aria-label="자정의 종이 울렸어요">
+        <ResultOverlay label="자정의 종이 울렸어요">
           <div className="result-card">
             <p className="result-kicker">보너스 스테이지</p>
             <h2>댕~ 종이 울렸어요!</h2>
@@ -325,11 +326,11 @@ export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
               </button>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
 
       {won && (
-        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+        <ResultOverlay label="스테이지 클리어">
           <div className="result-card">
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
@@ -388,7 +389,7 @@ export function ClockScreen({ stage, hasNext, allCleared, bestStars, intro, onBa
               </div>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>

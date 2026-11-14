@@ -884,6 +884,11 @@ p {
   animation: card-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 1.35s both;
 }
 
+/* Still hidden behind the ceremony: its buttons wait until it shows (ResultOverlay). */
+.overlay.arming .result-card {
+  pointer-events: none;
+}
+
 .result-close {
   position: absolute;
   top: 12px;

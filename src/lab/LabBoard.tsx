@@ -1,6 +1,7 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useId, useState } from 'react';
 import { act, degrees, DIRS, floodRegion, location, neighbor, type Stage, type State } from './model';
 import { runs } from './solver';
+import { withTo } from '../ui/korean';
 import './lab-board.css';
 
 export interface LabBoardProps {
@@ -113,7 +114,7 @@ function Tile({ children, label, onClick, disabled, className = '', selected, st
 
 function Dpad({ stage, state, hint, disabled, onAction }: LabBoardProps) {
   return <div className="lb-dpad" role="group" aria-label="방향 조작">
-    {[0, 3, 2, 1].map(d => <button key={d} type="button" className={`lb-direction lb-direction-${d}${hint === d ? ' lb-hint' : ''}`} onClick={() => onAction(d)} disabled={disabled || !act(stage, state, d)} aria-label={`${DIRECTIONS[d]}로 움직이기`}>
+    {[0, 3, 2, 1].map(d => <button key={d} type="button" className={`lb-direction lb-direction-${d}${hint === d ? ' lb-hint' : ''}`} onClick={() => onAction(d)} disabled={disabled || !act(stage, state, d)} aria-label={`${withTo(DIRECTIONS[d])} 움직이기`}>
       <span aria-hidden="true">{ARROWS[d]}</span>
     </button>)}
     <span className="lb-dpad-heart" aria-hidden="true">✦</span>

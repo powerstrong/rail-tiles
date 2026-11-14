@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:browser": "npm run build && playwright test",
     "typecheck": "tsc --noEmit",
     "stages": "vite-node scripts/stage-report.ts",
     "stage-design": "vite-node scripts/stage-design.ts",
@@ -21,6 +22,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@types/node": "^22.10.2",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",

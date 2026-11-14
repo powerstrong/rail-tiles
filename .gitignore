@@ -3,3 +3,5 @@ dist/
 .omc/
 *.log
 .DS_Store
+test-results/
+playwright-report/

@@ -2,6 +2,7 @@ import { type Intro, IntroCard } from '../ui/IntroCard';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import type { Dir } from '../engine/dir';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
+import { withTo } from '../ui/korean';
 import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { sample, timeline } from './animate';
@@ -11,6 +12,7 @@ import type { PenguinStage, Push } from './model';
 import { type IceState, initialState, isWon, slide } from './slide';
 import { hintFrom } from './solver';
 import { useFitBoard } from '../ui/useFitBoard';
+import { ResultOverlay } from '../ui/ResultOverlay';
 
 interface Props {
   stage: PenguinStage;
@@ -320,7 +322,7 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
         )}
         <div className="dpad" aria-label="미끄러지기">
           {([0, 3, 1, 2] as Dir[]).map((d) => (
-            <button key={d} className={`dpad-btn dpad-${d}`} onClick={() => push({ penguin: selected, dir: d })} disabled={busy || won} aria-label={`${DIR_LABEL[d]}으로 밀기`}>
+            <button key={d} className={`dpad-btn dpad-${d}`} onClick={() => push({ penguin: selected, dir: d })} disabled={busy || won} aria-label={`${withTo(DIR_LABEL[d])} 밀기`}>
               <svg viewBox="0 0 24 24" aria-hidden style={{ transform: `rotate(${d * 90}deg)` }}>
                 <path d="M12 5 L19 14 H5 Z" />
               </svg>
@@ -330,7 +332,7 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
       </div>
 
       {won && (
-        <div className="overlay" role="dialog" aria-label="스테이지 클리어">
+        <ResultOverlay label="스테이지 클리어">
           <div className="result-card">
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
@@ -389,7 +391,7 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
               </div>
             </div>
           </div>
-        </div>
+        </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}
     </div>
