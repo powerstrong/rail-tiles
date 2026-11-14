@@ -109,11 +109,12 @@ interface TitleProps {
   onPlay: () => void;
   onGarage: () => void;
   onSave: () => void;
+  onLab: () => void;
   /** New train looks the player has not seen yet. */
   newLooks: number;
 }
 
-export function TitleScreen({ continueText, continueResume, onContinue, onPlay, onGarage, onSave, newLooks }: TitleProps) {
+export function TitleScreen({ continueText, continueResume, onContinue, onPlay, onGarage, onSave, onLab, newLooks }: TitleProps) {
   return (
     <main className="title">
       <div className="title-inner">
@@ -147,6 +148,11 @@ export function TitleScreen({ continueText, continueResume, onContinue, onPlay, 
             💾 기록 지키기
           </button>
         </div>
+        <button className="lab-entry" onClick={onLab}>
+          <span aria-hidden>🔭</span>
+          <span><b>새로운 세계 실험실</b><small>10개의 새 게임 · 모든 스테이지 자유롭게</small></span>
+          <span aria-hidden>→</span>
+        </button>
         <InstallButton />
       </div>
     </main>

@@ -1,0 +1,231 @@
+/* Board styles are scoped; the released worlds retain their existing art and controls. */
+.lb-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.lb-movement, .lb-lights, .lb-coral, .lb-cloud, .lb-balance, .lb-moon, .lb-mosaic, .lb-bee, .lb-bridges { width: 100%; max-width: 480px; margin-inline: auto; }
+.lb-movement:focus-visible, .lb-mosaic:focus-visible { outline: 3px solid var(--lab-accent, #387358); outline-offset: 8px; border-radius: 16px; }
+.lb-board-note { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 16px; font-size: 14px; color: #66616c; line-height: 1.6; }
+.lb-board-note b { color: #413e4e; font-size: 16px; font-variant-numeric: tabular-nums; }
+.lb-board-note > span { font-size: 13px; }
+.lb-caption { text-align: center; color: #6a6571; font-size: 13px; line-height: 1.65; margin: 16px 0 0; overflow-wrap: anywhere; }
+.lb-grid { display: grid; grid-template-columns: repeat(var(--lb-cols), minmax(0, 1fr)); gap: 5px; width: 100%; }
+.lb-tile { position: relative; display: grid; place-items: center; width: 100%; min-width: 0; padding: 0; aspect-ratio: 1; border: 0; border-radius: 10px; font: inherit; }
+button.lb-tile { transition: box-shadow .14s ease, background .14s ease, transform .14s ease; }
+button.lb-tile:active:not(:disabled) { transform: translateY(2px); }
+button.lb-tile:focus-visible, .lb-direction:focus-visible, .lb-color-button:focus-visible, .lb-candy-card:focus-visible, .lb-island:focus-visible { z-index: 4; outline: 3px solid #287b82; outline-offset: 3px; }
+button.lb-tile:disabled { cursor: default; opacity: 1; }
+.lb-toy { width: 86%; height: 86%; max-width: 74px; overflow: visible; pointer-events: none; }
+.lb-tile-backdrop { position: absolute; inset: 0; display: grid; place-items: center; }
+.lb-tile-backdrop.lb-under-piece { opacity: .36; }
+.lb-cell-check { position: absolute; right: 2px; top: 1px; background: #f9fff1; border: 1.5px solid #4d8858; color: #356440; border-radius: 50%; width: 20px; height: 20px; font-size: 13px; font-weight: 900; line-height: 17px; }
+.lb-grass { color: #83a26f; font-size: 25px; line-height: 1; opacity: .65; }
+.lb-hint { z-index: 3; outline: 3px solid #e59e32 !important; outline-offset: 1px; box-shadow: 0 0 0 6px #f4c46735 !important; }
+
+/* 1 + 2 · Hand-painted forest boards and deliberately large shared controls. */
+.lb-forest-pair { display: flex; gap: 20px; align-items: start; justify-content: center; }
+.lb-forest-side { flex: 1; min-width: 0; max-width: 420px; }
+.lb-forest-name { text-align: center; font-size: 13px; font-weight: 800; color: #786482; margin: 0 0 9px; }
+.lb-forest-grid { padding: 12px; background: #c7d7b3; border: 2px solid #b5c6a3; border-radius: 20px; box-shadow: 0 5px 0 #96ad8c, inset 0 2px 0 #e5ecd8; }
+.lb-forest-cell { background: #edf0d7; box-shadow: inset 0 -2px 0 #dce3c2; }
+.lb-bush-cell { background: #bbcea4; }
+.lb-goal-cell { background: #e3ebca; box-shadow: inset 0 0 0 2px #8ba974; }
+.lb-step-cell { cursor: pointer; }
+.lb-step-cell:hover { background: #fcf5d9; box-shadow: inset 0 0 0 2px #cca960; }
+.lb-forest-side-1 .lb-forest-grid { background: #d7cce3; border-color: #c0b3ce; box-shadow: 0 5px 0 #b09bc2, inset 0 2px 0 #ece5f3; }
+.lb-forest-side-1 .lb-forest-cell { background: #f0e9f2; box-shadow: inset 0 -2px 0 #e0d5e8; }
+.lb-forest-side-1 .lb-bush-cell { background: #c9bdd9; }
+.lb-forest-side-1 .lb-toy-bush { filter: hue-rotate(65deg) saturate(.55); }
+.lb-forest-side-1 .lb-goal-cell { background: #e3dced; box-shadow: inset 0 0 0 2px #ab94bc; }
+.lb-twins .lb-grid { gap: 3px; padding: 8px; border-radius: 16px; }
+.lb-twins .lb-cell-check { width: 16px; height: 16px; font-size: 11px; line-height: 13px; right: -1px; top: -1px; }
+.lb-dpad { display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(2, 48px); gap: 6px; justify-content: center; margin-top: 22px; }
+.lb-direction { display: grid; place-items: center; padding: 0; border: 1px solid #d4c6ad; border-radius: 14px; background: #fffaf0; box-shadow: 0 3px 0 #d3c2a6; color: #514c58; font-size: 28px; font-weight: 800; line-height: 1; }
+.lb-direction-0 { grid-column: 2; grid-row: 1; }
+.lb-direction-1 { grid-column: 3; grid-row: 2; }
+.lb-direction-2 { grid-column: 2; grid-row: 2; }
+.lb-direction-3 { grid-column: 1; grid-row: 2; }
+.lb-direction:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #d3c2a6; }
+.lb-direction:disabled { opacity: .38; box-shadow: none; }
+.lb-dpad-heart { grid-column: 1; grid-row: 1; display: grid; place-items: center; font-size: 17px; color: #c2b192; }
+
+/* 3 · A night festival, with an explicit preview of the cross-shaped effect. */
+.lb-lantern-frame { position: relative; padding: 22px 14px 17px; border: 2px solid #53616d; border-radius: 22px; background: #354652; box-shadow: 0 5px 0 #263742, inset 0 2px 0 #6b7982; overflow: hidden; }
+.lb-festival-string { position: absolute; inset: -31px 8% auto; height: 45px; border: 2px solid #a7b4a6; border-radius: 50%; opacity: .7; }
+.lb-lantern-grid { gap: 8px; }
+.lb-lantern-cell { border-radius: 12px; background: #2e3d48; color: #a1abb2; box-shadow: inset 0 -2px 0 #23333e; }
+.lb-lantern-on { color: #f4cc68; background: #49524e; box-shadow: inset 0 -2px 0 #283a40, 0 0 12px #f0ca661a; }
+.lb-lantern-cell .lb-toy { width: 78%; height: 78%; margin-top: -5px; }
+.lb-lamp-state { position: absolute; bottom: 4px; font-size: 9px; letter-spacing: .06em; font-weight: 800; opacity: .9; }
+.lb-lantern-preview { box-shadow: inset 0 0 0 2px #b5d1c6; }
+.lb-lantern-on.lb-lantern-preview { box-shadow: inset 0 0 0 2px #f5e1a0; }
+
+/* 4 · The active flood region is outlined, not just distinguished by colour. */
+.lb-ocean-frame { padding: 15px 15px 0; background: #c0dfe0; border: 2px solid #9ec7cb; border-radius: 22px; box-shadow: 0 5px 0 #8ab6bf; overflow: hidden; }
+.lb-coral-grid { gap: 4px; }
+.lb-coral-cell { background: var(--lb-color); color: #fffdf5; border-radius: 9px; box-shadow: inset 0 -3px 0 #00000015; }
+.lb-coral-owned { outline: 2px solid #fff9e8; outline-offset: -5px; }
+.lb-coral-shape { font-size: clamp(18px, 5vw, 30px); text-shadow: 0 1px 0 #00000015; }
+.lb-coral-start { position: absolute; top: 0; left: 3px; font-size: 15px; color: #fff; text-shadow: 0 1px 2px #3c435c; }
+.lb-sea-floor { display: flex; justify-content: space-around; color: #699ea5; height: 31px; align-items: center; font-size: 25px; }
+.lb-sea-floor span:nth-child(2) { font-size: 20px; color: #eaf3e4; }
+.lb-palette { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 21px; }
+.lb-color-button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 2px 8px; border: 1px solid #ddd1bf; background: #fffaf1; border-radius: 13px; color: #514b58; font-size: 12px; font-weight: 700; box-shadow: 0 3px 0 #dbccba; min-height: 70px; }
+.lb-color-swatch { width: 38px; height: 35px; display: grid; place-items: center; font-size: 23px; background: var(--lb-color); color: #fff; border-radius: 10px; box-shadow: inset 0 -2px 0 #00000018; }
+.lb-color-current { border: 2px solid #477f84; padding: 5px 1px 7px; box-shadow: none; }
+.lb-color-current .lb-color-swatch { opacity: .7; }
+
+/* 5 · A compact embroidery hoop and readable clues, including zero-length rows. */
+.lb-cloud-board { display: grid; grid-template-columns: minmax(44px, max-content) repeat(var(--lb-cols), minmax(0, 1fr)); gap: 3px; padding: 12px; background: #e0d2b9; border: 2px solid #c1aa87; border-radius: 20px; box-shadow: 0 5px 0 #b59c7d, inset 0 2px 0 #f5ecd9; }
+.lb-cloud-row { display: contents; }
+.lb-clue-corner { display: grid; place-items: center; font-size: 26px; }
+.lb-clue { color: #4d5c6f; font-size: clamp(11px, 3vw, 15px); font-weight: 800; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.lb-clue-col { display: flex; flex-direction: column; align-items: center; justify-content: end; min-height: 49px; padding-bottom: 8px; gap: 2px; }
+.lb-clue-row { display: flex; align-items: center; justify-content: end; min-width: 44px; padding-right: 7px; white-space: nowrap; }
+.lb-clue-met { color: #657c58; }
+.lb-stitch-cell { background: #fffaf0; border: 1px solid #d3c5b1; border-radius: 4px; box-shadow: none; color: #9c9a9a; min-height: 32px; }
+.lb-stitch-cell span { font-size: clamp(18px, 5vw, 30px); line-height: 1; }
+.lb-stitch-1 { color: #fff7ea; background: #6287ab; border-color: #4b7095; box-shadow: inset 0 -2px 0 #3e62832b; }
+.lb-stitch-1 span { text-shadow: 1px 1px 0 #315a7a55; }
+.lb-stitch-2 { background: #f2ecdf; color: #998c7d; }
+.lb-stitch-legend { display: flex; justify-content: center; align-items: center; gap: 10px 16px; flex-wrap: wrap; font-size: 12px; color: #726b75; margin-top: 20px; }
+.lb-stitch-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.lb-stitch-legend i { font-style: normal; width: 22px; height: 22px; display: inline-grid; place-items: center; border-radius: 4px; background: #ede6d9; color: #8d8173; font-size: 19px; }
+.lb-stitch-legend i.lb-legend-filled { background: #6287ab; color: #fff7ea; font-size: 17px; }
+.lb-example { margin-top: 20px; border: 1px solid #e0d3c1; border-radius: 12px; background: #fffaf1; font-size: 13px; color: #686271; line-height: 1.7; }
+.lb-example summary { cursor: pointer; padding: 12px 16px; color: #565464; font-weight: 700; min-height: 44px; }
+.lb-example p { padding: 0 16px 14px; margin: 0; }
+.lb-clue-example { display: block; padding: 0 16px 15px; font-size: 22px; color: #6287ab; text-align: center; letter-spacing: .12em; }
+.lb-clue-example em { color: #a79b8a; font-style: normal; }
+
+/* 6 · The scale's totals are always visible; no mental arithmetic is demanded by the controls. */
+.lb-scale { position: relative; margin-top: 10px; padding: 28px 0 16px; }
+.lb-scale-beam { position: absolute; top: 20px; left: 12%; width: 76%; height: 8px; background: #b99267; border: 1px solid #95724e; border-radius: 5px; transform: rotate(var(--lb-tilt)); transition: transform .25s ease; }
+.lb-scale-stand { position: absolute; left: 50%; top: 11px; bottom: 14px; width: 70px; transform: translateX(-50%); display: flex; align-items: center; flex-direction: column; justify-content: end; pointer-events: none; }
+.lb-scale-stand span { width: 12px; flex: 1; background: #c5a174; border: 1px solid #a78861; border-radius: 8px 8px 0 0; }
+.lb-scale-stand i { display: block; width: 70px; height: 11px; background: #c5a174; border: 1px solid #a78861; border-radius: 10px 10px 4px 4px; }
+.lb-scale-pans { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end; }
+.lb-pan { text-align: center; min-width: 0; }
+.lb-pan-label { font-size: 12px; font-weight: 700; margin: 0 0 10px; color: #886b7d; }
+.lb-pan-bowl { min-height: 96px; display: flex; align-items: end; justify-content: center; border: 2px solid #c39aab; border-top: 0; border-radius: 3px 3px 50% 50%; background: linear-gradient(180deg, #fae8ed11, #f0d6de); box-shadow: 0 3px 0 #dfc1cd; padding: 10px 10px 19px; }
+.lb-pan-2 .lb-pan-label { color: #617d9c; }
+.lb-pan-2 .lb-pan-bowl { border-color: #9db3c8; background: linear-gradient(180deg, #e5eef711, #d9e6f1); box-shadow: 0 3px 0 #c0d1df; }
+.lb-pan-candies { display: flex; justify-content: center; align-items: end; flex-wrap: wrap; gap: 4px; }
+.lb-pan-candy { min-width: 25px; height: 25px; display: grid; place-items: center; border-radius: 7px; background: #fffaf2; border: 1px solid #d0b8a7; color: #785a69; font-size: 13px; font-weight: 800; }
+.lb-pan-empty { font-size: 11px; color: #95828b; align-self: center; padding-bottom: 8px; }
+.lb-fixed-weight { display: flex; flex-direction: column; align-items: center; min-width: 31px; min-height: 40px; padding: 4px; background: #7e8c9c; color: #fff; border-radius: 8px 8px 4px 4px; line-height: 1.2; font-size: 17px; font-weight: 800; }
+.lb-fixed-weight small { font-size: 9px; font-weight: 600; }
+.lb-pan-total { font-size: 13px; color: #766b77; margin-top: 11px; }
+.lb-pan-total strong { display: inline-block; color: #514958; font-size: 26px; font-variant-numeric: tabular-nums; min-width: 35px; }
+.lb-scale-equals { position: absolute; top: 53%; left: 50%; width: 35px; height: 35px; display: grid; place-items: center; transform: translate(-50%, -50%); background: #f7ebd7; border: 2px solid #c4a785; border-radius: 50%; color: #937252; font-size: 24px; font-weight: 800; }
+.lb-scale-even { background: #e8efdb; border-color: #91ac84; color: #5d8256; }
+.lb-fixed-note { padding: 2px 8px; border: 1px solid #c7d2de; border-radius: 6px; background: #e9eff5; color: #657d92; }
+.lb-candy-tray { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 12px; background: #eadecc; border: 1px solid #d3c1a8; border-radius: 17px; box-shadow: inset 0 2px 0 #f6ecdf; }
+.lb-candy-card { position: relative; border: 1px solid #d7b7c5; border-radius: 11px; background: #fff8f5; padding: 6px 3px 7px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; box-shadow: 0 2px 0 #cfb3b9; }
+.lb-candy-index { font-size: 10px; color: #8a7b83; line-height: 1.4; }
+.lb-candy-art { position: relative; width: 56px; height: 48px; max-width: 100%; display: grid; place-items: center; }
+.lb-candy-art .lb-toy { width: 100%; height: 100%; }
+.lb-candy-art b { position: absolute; display: grid; place-items: center; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 22px; height: 24px; border-radius: 50%; background: #fffaf0ed; color: #7c4d65; font-size: 18px; line-height: 1; font-weight: 900; }
+.lb-candy-location { font-size: 11px; font-weight: 700; color: #a08189; line-height: 1.4; }
+.lb-candy-side-1 { background: #f7e8ec; border-color: #b58b9d; }
+.lb-candy-side-1 .lb-candy-location { color: #965c75; }
+.lb-candy-side-2 { background: #e7eff5; border-color: #94abc0; }
+.lb-candy-side-2 .lb-candy-location { color: #547899; }
+
+/* 7 · Lunar sockets retain the final star beneath stones. */
+.lb-moon-frame { background: #dedff0; border: 2px solid #b5b8d2; border-radius: 24px; padding: 14px; box-shadow: 0 5px 0 #a7abc7, inset 0 2px 0 #f6f4fb; }
+.lb-moon-grid { gap: 5px; }
+.lb-moon-cell { background: #c6c9df; border-radius: 50%; box-shadow: inset 0 3px 0 #b2b6cf; }
+.lb-moon-cell .lb-toy { width: 90%; height: 90%; position: relative; z-index: 1; }
+.lb-moon-hole { color: #8c91b5; font-size: 32px; line-height: 1; }
+.lb-star-cell { background: #f6e7b8; box-shadow: inset 0 2px 0 #dfca92; }
+.lb-moon-star { position: absolute; color: #b68a38; font-size: clamp(18px, 6vw, 32px); opacity: .9; }
+.lb-star-cell .lb-toy { opacity: .88; }
+.lb-star-cell .lb-moon-hole { opacity: 0; }
+.lb-void { background: transparent; box-shadow: none; }
+.lb-picked { outline: 3px solid #8a67a0; outline-offset: 1px; z-index: 2; }
+.lb-landing { background: #eef3d2; box-shadow: inset 0 0 0 2px #8f9f6c; }
+.lb-landing .lb-moon-hole { color: #6e855a; font-size: 24px; }
+
+/* 8 · Familiar numbered wooden tiles, with the target available rather than a memory test. */
+.lb-mosaic-grid { gap: 8px; padding: 14px; background: #c5a27e; border: 2px solid #b1906c; border-radius: 20px; box-shadow: 0 5px 0 #9e7b59, inset 0 2px 0 #e5c6a2; }
+.lb-mosaic-cell { background: #f6dfb9; color: #6f523e; border: 1px solid #dbbd91; border-radius: 12px; box-shadow: inset 0 2px 0 #fff0d8, 0 3px 0 #a17b52; overflow: hidden; }
+.lb-mosaic-cell strong { position: relative; z-index: 1; font-size: clamp(26px, 9vw, 44px); font-weight: 800; text-shadow: 0 2px 0 #fff5dd; }
+.lb-piece-star { position: absolute; right: -9%; top: -16%; font-size: 100px; color: #e6c18a; opacity: .45; transform: rotate(calc(var(--lb-piece) * 17deg)); }
+.lb-mosaic-home { background: #e1e5c4; color: #61714a; border-color: #c5cc9f; box-shadow: inset 0 2px 0 #f1f4dc, 0 3px 0 #8a9670; }
+.lb-mosaic-home .lb-piece-star { color: #becb8b; }
+.lb-mosaic-blank { background: #b18f6d; color: #e3c8a8; border-color: #a2805e; box-shadow: inset 0 3px 0 #997654; }
+.lb-blank-dots { font-size: 27px; letter-spacing: .02em; }
+.lb-mini-mosaic { display: grid; grid-template-columns: repeat(var(--lb-cols), 37px); gap: 4px; justify-content: center; padding: 0 16px 17px; }
+.lb-mini-mosaic span { display: grid; place-items: center; height: 37px; border-radius: 6px; background: #f1ddbd; border: 1px solid #d5bb94; color: #7d6146; font-size: 16px; font-weight: 800; }
+.lb-mini-mosaic span.lb-mini-blank { background: #e7dbca; color: #9a8a77; font-size: 10px; }
+
+/* 9 · A continuous invitation route remains visible beneath visited flowers. */
+.lb-bee-frame { position: relative; padding: 12px; background: #cbd9b2; border: 2px solid #b2c399; border-radius: 23px; box-shadow: 0 5px 0 #98ad83, inset 0 2px 0 #e5ecd5; }
+.lb-bee-grid { position: relative; gap: 0; }
+.lb-flower-path { position: absolute; inset: 12px; width: calc(100% - 24px); height: calc(100% - 24px); pointer-events: none; z-index: 1; }
+.lb-flower-path polyline { fill: none; stroke: #d3ad60; stroke-width: 9; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2 11; }
+.lb-bee-cell { border-radius: 11px; background: #f2efcf; border: 3px solid #cbd9b2; position: relative; }
+.lb-bee-cell .lb-toy, .lb-flower-visited { z-index: 2; }
+.lb-bee-cell .lb-toy { width: 91%; height: 91%; position: relative; }
+.lb-bee-grass { background: #bed09f; }
+.lb-bee-visited { background: #dce3b9; }
+.lb-bee-next { box-shadow: inset 0 0 0 2px #a98e42; background: #fff7d9; }
+.lb-flower-visited { color: #83975d; font-size: 20px; }
+.lb-start-marker { position: absolute; left: 2px; top: 1px; color: #7c6a36; font-size: 8px; font-weight: 800; z-index: 3; line-height: 1.2; }
+
+/* 10 · Native island buttons over a scalable drawing keep both touch and keyboard access. */
+.lb-pond { position: relative; width: 100%; background: #b8dcd5; border: 2px solid #90bdb5; border-radius: 25px; box-shadow: 0 5px 0 #7da99f, inset 0 2px 0 #dceee6; }
+.lb-pond-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; border-radius: 24px; }
+.lb-island { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: translate(-50%, -50%); width: clamp(44px, 11vw, 60px); height: clamp(48px, 12vw, 64px); background: #f4edc9; border: 2px solid #b6b17d; border-radius: 42% 48% 43% 45%; box-shadow: 0 3px 0 #829a76; padding: 1px 2px 4px; z-index: 2; color: #5f624d; }
+.lb-island strong { font-size: clamp(19px, 6vw, 25px); line-height: 1; font-weight: 800; }
+.lb-island-id { font-size: 8px; line-height: 1.1; color: #767b60; margin-bottom: 1px; }
+.lb-island-count { font-size: 9px; line-height: 1.2; margin-top: 2px; font-weight: 700; white-space: nowrap; }
+.lb-island-done { background: #d9e7bc; border-color: #8ca477; color: #4a724a; }
+.lb-island-over { background: #f4d5c8; border-color: #c58970; color: #a45f48; }
+.lb-island:active:not(:disabled) { transform: translate(-50%, calc(-50% + 2px)); }
+.lb-bridge-possible { stroke: #f9f1c3; stroke-width: 8; stroke-dasharray: 4 9; stroke-linecap: round; }
+.lb-bridge-shadow { stroke: #8b754f; stroke-width: 7; stroke-linecap: round; }
+.lb-bridge-plank { stroke: #e6cc91; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 3 2; }
+.lb-hint-bridge .lb-bridge-possible { stroke: #d89830; }
+.lb-hint-bridge .lb-bridge-plank { stroke: #f2b952; }
+.lb-bridge-note { min-height: 44px; margin-top: 17px; }
+.lb-bridge-key { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 15px; font-size: 11px; color: #756c6d; }
+.lb-bridge-key span { display: inline-flex; align-items: center; gap: 5px; }
+.lb-bridge-key i { width: 22px; height: 5px; background: #d9bf87; border: 1px solid #9e845c; border-radius: 2px; }
+.lb-bridge-key i.lb-key-double { height: 10px; background: linear-gradient(#d9bf87 0 35%, transparent 35% 65%, #d9bf87 65%); border: 0; border-top: 1px solid #9e845c; border-bottom: 1px solid #9e845c; }
+
+@media (max-width: 400px) {
+  .lb-twins .lb-forest-pair { gap: 10px; }
+  .lb-twins .lb-grid { padding: 5px; gap: 2px; }
+  .lb-twins .lb-toy { width: 96%; height: 96%; }
+  .lb-twins .lb-forest-name { font-size: 11px; }
+  .lb-grid { gap: 4px; }
+  .lb-lantern-grid { gap: 6px; }
+  .lb-cloud-board { padding: 8px; gap: 2px; grid-template-columns: minmax(40px, max-content) repeat(var(--lb-cols), minmax(0, 1fr)); }
+  .lb-clue-row { min-width: 40px; padding-right: 5px; }
+  .lb-scale-pans { gap: 36px; }
+  .lb-pan-bowl { padding-inline: 6px; }
+  .lb-candy-tray { padding: 9px; gap: 8px; }
+  .lb-candy-art { width: 49px; height: 43px; }
+  .lb-candy-card { padding-inline: 1px; }
+  .lb-board-note { gap: 4px 10px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button.lb-tile, .lb-scale-beam { transition: none; }
+}
+
+/* An overview is useful for simultaneous movement; enlarged views are the player's choice. */
+.lb-view-options { display: flex; justify-content: flex-end; margin: -4px 0 12px; }
+.lb-view-toggle { min-height: 44px; border: 1px solid #d5c7b3; border-radius: 10px; background: #fffbf3; color: #6d6475; padding: 8px 12px; font-size: 12px; font-weight: 750; }
+.lb-view-toggle[aria-pressed='true'] { border-color: #a290b4; background: #f0eaf5; color: #765a8c; }
+.lb-twins-large .lb-forest-pair { flex-direction: column; align-items: center; gap: 24px; }
+.lb-twins-large .lb-forest-side { width: 100%; max-width: 280px; }
+.lb-twins-large .lb-forest-name { font-size: 14px; }
+.lb-twins-large .lb-grid { padding: 10px; gap: 4px; }
+.lb-cloud-scroll { max-width: 100%; overflow-x: auto; padding-bottom: 8px; }
+.lb-cloud-board.lb-cloud-large { min-width: calc(84px + var(--lb-cols) * 47px); grid-template-columns: 54px repeat(var(--lb-cols), minmax(44px, 1fr)); }
+.lb-cloud-large .lb-stitch-cell { min-height: 44px; }
+.lb-scroll-note { color: #776c7d; font-size: 12px; line-height: 1.7; text-align: center; margin: 0 0 10px; }
+.lb-toy-squirrel, .lb-toy-bunny, .lb-toy-acorn, .lb-toy-bee, .lb-cell-check { animation: lb-piece-arrive .16s ease-out; }
+@keyframes lb-piece-arrive { from { transform: scale(.88); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .lb-toy-squirrel, .lb-toy-bunny, .lb-toy-acorn, .lb-toy-bee, .lb-cell-check { animation: none; }
+}

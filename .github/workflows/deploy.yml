@@ -26,6 +26,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - run: npx vite-node scripts/lab-release-check.ts
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

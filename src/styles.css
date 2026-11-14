@@ -3327,3 +3327,13 @@ body:has(.world-clock) {
   font-weight: 900;
   font-size: 14px;
 }
+
+/* A separate door into experiments; shipped world progress stays untouched. */
+.lab-entry { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 66px; padding: 14px 18px; border: 2px solid #cec4e3; border-radius: 18px; background: #f3edf9; color: #57466d; text-align: left; box-shadow: 0 3px 0 #dcd1e8; }
+.lab-entry > span:first-child { font-size: 28px; }
+.lab-entry > span:nth-child(2) { flex: 1; }
+.lab-entry b, .lab-entry small { display: block; }
+.lab-entry b { font-size: 16px; }
+.lab-entry small { margin-top: 4px; font-size: 12px; line-height: 1.5; }
+.route-lab-entry { width: calc(100% - 28px); max-width: 640px; margin: 0 auto 12px; flex: none; }
+.lab-loading { min-height: 70dvh; display: grid; place-items: center; padding: 24px; color: var(--ink-soft); }
