@@ -159,3 +159,17 @@ describe('stars', () => {
     });
   });
 });
+
+describe('promoted lab completion migration', () => {
+  it('imports valid rabbit and bee stamps as one star and preserves better official stars', () => {
+    const records: Record<string, string> = {
+      'rail-tiles:progress': JSON.stringify({ schemaVersion: 2, stars: { 'lab-v1-bee-1': 3, 'last-run': 2 } }),
+      'rail-tiles-lab-v1': JSON.stringify({ completed: { 'lab-v1-bee-1': true, 'lab-v1-twins-30': true, 'lab-v1-bee-31': true, 'lab-v1-removed-1': true } }),
+    };
+    const store = { getItem: (key: string) => records[key] ?? null, setItem: (key: string, value: string) => { records[key] = value; } };
+    const p = loadProgress(store);
+    expect(p.stars).toEqual({ 'lab-v1-bee-1': 3, 'last-run': 2, 'lab-v1-twins-30': 1 });
+    saveProgress(p, store);
+    expect(loadProgress(store)).toEqual(p);
+  });
+});

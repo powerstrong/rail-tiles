@@ -1,3 +1,4 @@
+import { TwinsScene, BeeScene } from './story/GardenScene';
 import type { ComponentType } from 'react';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
 import type { SceneProps } from './story/kit';
@@ -34,6 +35,16 @@ export const farewellId = (world: string) => `${world}:bye`;
 
 /** One story per world, by world id (`src/ui/stories.test.ts` checks every world has one). */
 export const STORIES: Record<string, Story> = {
+  twins: {
+    friend: '루루와 라라', tail: 50, Scene: TwinsScene,
+    lines: ['거울 숲에 온 걸 환영해!', '같은 버튼을 눌러도 옆으로는 반대로 움직여.', '벽에서 기다리며 두 집에 함께 도착해 보자!'],
+    farewell: { tail: 50, Scene: TwinsScene, lines: ['두 친구가 함께 집에 도착했어!', '달빛 차 한 잔을 선물할게.', '또 함께 산책하자. 안녕!'] },
+  },
+  bee: {
+    friend: '꿀벌 보리', tail: 50, Scene: BeeScene,
+    lines: ['꽃밭에 온 걸 환영해!', '모든 꽃을 한 번씩 만나고 벌집으로 돌아가자.', '직전 꽃으로 되짚으면 길을 한 칸 지울 수 있어!'],
+    farewell: { tail: 50, Scene: BeeScene, lines: ['모든 꽃에게 인사를 전했어!', '달콤한 꿀 한 병을 선물할게.', '다음 꽃잔치에도 놀러 와. 안녕!'] },
+  },
   train: {
     friend: '역장님',
     lines: ['어서 와요! 여기는 들꽃 기차 마을이에요.', '그런데 선로가 중간에 뚝 끊겨 있어요.', '레일을 이어서 손님들께 기차를 데려다줄래요?'],

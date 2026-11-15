@@ -1,9 +1,8 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { act, type Stage, type State } from './model';
 import { LabBoard } from './LabBoard';
-import { LabScreen } from './LabScreen';
 import { LAB_STAGES, stagesFor } from './stages';
 import { solve } from './solver';
 import { KINDS } from './model';
@@ -40,14 +39,4 @@ describe('experimental board render contract', () => {
     }
   });
 
-  it('shows all two experiment entries without touching unavailable storage', () => {
-    const warn = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const html = renderToStaticMarkup(createElement(LabScreen, { onBack: () => {} }));
-      expect((html.match(/<button[^>]*class="lab-concept /g) ?? []).length).toBe(2);
-      expect(html).toContain('60');
-      expect(html).toContain('상상 실험실');
-      expect(html).not.toContain('NaN');
-    } finally { warn.mockRestore(); }
-  });
 });

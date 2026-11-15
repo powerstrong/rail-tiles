@@ -5,7 +5,7 @@ export interface WorldCard {
   blurb: string;
   /** Accent colour and a small emblem drawn in SVG. */
   color: string;
-  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space' | 'clock';
+  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space' | 'clock' | 'twins' | 'bee';
   stars: number;
   maxStars: number;
   state: 'open' | 'locked' | 'conquered' | 'soon';
@@ -21,6 +21,12 @@ export interface WorldCard {
 export function Emblem({ kind, size }: { kind: WorldCard['emblem']; size?: number }) {
   const box = size ? { x: -size / 2, y: -size / 2, width: size, height: size } : {};
   switch (kind) {
+    case 'twins':
+      return <svg viewBox="0 0 48 48" aria-hidden {...box}>
+        {[15, 33].map(x => <g key={x}><ellipse cx={x - 3} cy="13" rx="3" ry="10" fill="#fff8ee" stroke="#78579d" /><ellipse cx={x + 3} cy="13" rx="3" ry="10" fill="#fff8ee" stroke="#78579d" /><circle cx={x} cy="30" r="10" fill="#fff8ee" stroke="#78579d" /><circle cx={x - 3} cy="28" r="1" /><circle cx={x + 3} cy="28" r="1" /></g>)}
+      </svg>;
+    case 'bee':
+      return <svg viewBox="0 0 48 48" aria-hidden {...box}><ellipse cx="18" cy="14" rx="8" ry="11" fill="#e4f2f7" stroke="#77a4ae" /><ellipse cx="31" cy="14" rx="8" ry="11" fill="#e4f2f7" stroke="#77a4ae" /><ellipse cx="24" cy="30" rx="18" ry="12" fill="#edc75b" stroke="#8b6a23" /><path d="M23 18 V42 M32 19 V41" stroke="#8b6a23" strokeWidth="5" /><circle cx="13" cy="27" r="2" fill="#55432f" /></svg>;
     case 'train':
       return (
         <svg viewBox="0 0 48 48" aria-hidden {...box}>

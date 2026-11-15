@@ -1,3 +1,6 @@
+import { PuzzleScreen } from './lab/PuzzleScreen';
+import { CONCEPTS } from './lab/catalog';
+import { stagesFor } from './lab/stages';
 import type { ComponentType } from 'react';
 import { CLOCK_DAILY_PREFIX } from './clock/generate';
 import { ClockScreen } from './clock/ClockScreen';
@@ -125,6 +128,13 @@ export const WORLDS: World[] = [
       clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 노선이 열려요`,
     },
   }),
+  ...CONCEPTS.map(concept => world({
+    id: concept.id, title: concept.title, blurb: concept.tagline, color: concept.color,
+    emblem: concept.id, theme: `world-${concept.id}`,
+    stages: stagesFor(concept.id).map(s => ({ ...s, label: `STAGE ${Math.floor((s.number - 1) / 10) + 1}-${(s.number - 1) % 10 + 1}` })),
+    chapters: concept.chapters.map((title, i) => ({ number: i + 1, title, blurb: concept.goal, color: concept.color, start: i * 10, count: 10 })),
+    Game: PuzzleScreen,
+  })),
   world({
     id: 'ice',
     title: '펭귄 얼음 나라',

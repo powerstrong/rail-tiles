@@ -28,6 +28,8 @@ export const isPlaza = (id: string): id is PlazaId => id in PLAZA;
 /** Station discs, hand-placed for the shipped worlds (a phone is 360 wide). */
 const PLACED: Record<string, Pt> = {
   train: [180, 222],
+  twins: [62, 222],
+  bee: [298, 222],
   ice: [62, 344],
   machine: [62, 470],
   volcano: [62, 596],
@@ -102,8 +104,10 @@ export function layoutRoutes(worlds: WorldLink[]): Layout {
   const add = (a: string, b: string, pts: Pt[], track: string) => edges.push({ a, b, pts, len: lengthOf(pts), track });
   add('board', 'garage', [stops.board, stops.garage], `M${stops.board[0]} ${SIDING_Y} H${stops.garage[0] - 22}`);
   add('board', 'mail', [stops.board, stops.mail], `M${stops.board[0]} ${SIDING_Y} H${stops.mail[0] + 22}`);
-  const root = worlds.find((w) => !w.parent);
-  if (root) add('board', root.id, [stops.board, stops[root.id]], `M${stops.board[0]} ${SIDING_Y} V${discs[root.id][1]}`);
+  for (const root of worlds.filter(w => !w.parent)) {
+    const [x, y] = discs[root.id];
+    add('board', root.id, [stops.board, stops[root.id]], `M${stops.board[0]} ${SIDING_Y} L${x} ${y - STOP_GAP} V${y}`);
+  }
 
   for (const w of worlds) {
     if (!w.parent || !discs[w.parent]) continue;

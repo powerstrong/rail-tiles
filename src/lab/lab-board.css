@@ -104,3 +104,8 @@ button.lb-tile:disabled { cursor: default; opacity: 1; }
 .lb-bee-grid { touch-action: none; user-select: none; }
 .lb-hive-lock { position: absolute; bottom: 1px; font-size: clamp(8px, 2.1vw, 12px); background: #fff7df; border-radius: 4px; }
 .lb-bee-retrace { outline: 2px dashed #a17a38; outline-offset: -4px; }
+.lb-direction { position: relative; padding-bottom: 10px; }
+.lb-paired-arrows { position: absolute; bottom: 2px; font-size: 9px; white-space: nowrap; }
+.lb-rabbit-preview { min-height: 32px; margin: 0 0 8px; font-size: 12px; text-align: center; color: #6d517f; }
+.lb-preview-cell { outline: 2px dashed #8f76a5; outline-offset: -4px; }
+.lb-home-rule, .lb-rabbit-reaction { font-size: 13px; text-align: center; line-height: 1.6; color: #6b557c; }

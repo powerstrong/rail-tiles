@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { continueTarget } from './continue';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stars } from './engine/stars';
@@ -16,11 +16,8 @@ import { STORIES, farewellId } from './ui/stories';
 import { WorldStory } from './ui/WorldStory';
 import { WORLDS, type World, type WorldStage, openedNote, stageCards, untouched, worldById } from './worlds';
 
-const LabScreen = lazy(() => import('./lab/LabScreen').then(m => ({ default: m.LabScreen })));
-
 type Screen =
   | { name: 'title' }
-  | { name: 'lab'; fromMap?: boolean }
   /** `fromMap`: opened from the plaza, so "back" returns there. */
   | { name: 'garage'; fromMap?: boolean }
   | { name: 'save'; fromMap?: boolean }
@@ -171,17 +168,10 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         onPlay={() => setScreen({ name: 'worlds' })}
         onGarage={() => setScreen({ name: 'garage' })}
         onSave={() => setScreen({ name: 'save' })}
-        onLab={() => setScreen({ name: 'lab' })}
         newLooks={Math.max(0, unlockedItems(stars).length - (progress.lookSeen ?? STARTER_COUNT))}
       />
     );
   }
-
-  if (screen.name === 'lab') return (
-    <Suspense fallback={<main className="lab-loading" role="status">새로운 퍼즐 세계를 펼치는 중…</main>}>
-      <LabScreen onBack={() => setScreen(screen.fromMap ? { name: 'worlds' } : { name: 'title' })} />
-    </Suspense>
-  );
 
   if (screen.name === 'garage') {
     return (
@@ -274,7 +264,6 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
           openPlace(id);
         }}
         onBack={() => setScreen({ name: 'title' })}
-        onLab={() => setScreen({ name: 'lab', fromMap: true })}
         continueText={resume?.text ?? null}
         continueResume={!!resume?.resume}
         onContinue={playContinue}

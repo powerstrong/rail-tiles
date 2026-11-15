@@ -27,12 +27,13 @@ describe('audited laboratory catalog', () => {
     }
   });
 
-  it('keeps experiment identifiers away from shipped stars and daily streaks', () => {
+  it('registers both games as early official worlds with stable ids', () => {
     const shipped = new Set(WORLDS.flatMap(w => w.stages.map(s => s.id)));
+    for (const kind of KINDS) expect(WORLDS.find(w => w.id === kind)?.unlockAfter).toBeUndefined();
     const ids = LAB_STAGES.map(s => s.id);
     expect(new Set(ids).size).toBe(60);
     for (const s of LAB_STAGES) {
-      expect(shipped.has(s.id), s.id).toBe(false);
+      expect(shipped.has(s.id), s.id).toBe(true);
       for (const w of WORLDS) if (w.daily) expect(s.id.startsWith(w.daily.prefix)).toBe(false);
     }
   });

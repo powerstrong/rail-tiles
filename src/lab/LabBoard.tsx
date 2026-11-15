@@ -9,6 +9,8 @@ export interface LabBoardProps {
   onAction: (action: number) => void;
   hint: number | null;
   disabled: boolean;
+  previousState?: State;
+  lastAction?: number | null;
 }
 
 const ARROWS = ['↑', '→', '↓', '←'];
@@ -70,17 +72,20 @@ function Tile({ children, label, onClick, disabled, className = '', selected, st
   return <button type="button" className={`lb-tile ${className}`} aria-label={label} aria-pressed={selected} onClick={onClick} disabled={disabled} style={style}>{children}</button>;
 }
 
-function Dpad({ stage, state, hint, disabled, onAction }: LabBoardProps) {
+function Dpad({ stage, state, hint, disabled, onAction, onPreview }: LabBoardProps & { onPreview: (dir: number) => void }) {
   return <div className="lb-dpad" role="group" aria-label="방향 조작">
-    {[0, 3, 2, 1].map(d => <button key={d} type="button" className={`lb-direction lb-direction-${d}${hint === d ? ' lb-hint' : ''}`} onClick={() => onAction(d)} disabled={disabled || !act(stage, state, d)} aria-label={`${withTo(DIRECTIONS[d])} 움직이기`}>
+    {[0, 3, 2, 1].map(d => <button key={d} type="button" className={`lb-direction lb-direction-${d}${hint === d ? ' lb-hint' : ''}`} onFocus={() => onPreview(d)} onPointerEnter={() => onPreview(d)} onClick={() => onAction(d)} disabled={disabled || !act(stage, state, d)} aria-label={`${withTo(DIRECTIONS[d])} 움직이기`}>
       <span aria-hidden="true">{ARROWS[d]}</span>
+      <small className="lb-paired-arrows" aria-hidden="true">🐰{ARROWS[d]} 🐰{ARROWS[d % 2 ? (d + 2) % 4 : d]}</small>
     </button>)}
     <span className="lb-dpad-heart" aria-hidden="true">✦</span>
   </div>;
 }
 
 function MovementBoard(props: LabBoardProps) {
-  const { stage, state, onAction, disabled, hint } = props;
+  const { stage, state, onAction, disabled, hint, previousState, lastAction } = props;
+  const [previewDir, setPreviewDir] = useState(stage.number === 2 ? 1 : 0);
+  const preview = act(stage, state, previewDir) ?? state;
   const [large, setLarge] = useState(false);
   const floors = [stage.terrain!, stage.terrain2!];
   const handleKey = (e: KeyboardEvent) => {
@@ -91,17 +96,19 @@ function MovementBoard(props: LabBoardProps) {
   const hintNext = hint !== null ? act(stage, state, hint) : null;
   return <div className={`lb-movement lb-twins${large ? ' lb-twins-large' : ''}`} onKeyDown={handleKey} tabIndex={0} aria-label={`두 토끼 게임판. 방향키 또는 아래 화살표 버튼으로 움직여요.`}>
     <div className="lb-board-note"><span>↕ 함께</span><span>↔ 서로 반대로</span></div>
-    {<div className="lb-view-options"><button type="button" className="lb-view-toggle" aria-label={large ? '두 숲 나란히 보기' : '숲 크게 보기'} aria-pressed={large} onClick={() => setLarge(value => !value)}>{large ? '↔ 두 숲 나란히 보기' : '⊕ 숲 크게 보기'}</button></div>}
+    <div className="lb-view-options"><button type="button" className="lb-view-toggle" aria-label={large ? '두 숲 나란히 보기' : '숲 크게 보기'} aria-pressed={large} onClick={() => setLarge(value => !value)}>{large ? '↔ 두 숲 나란히 보기' : '⊕ 숲 크게 보기'}</button></div>
+    <p className="lb-home-rule">집에 있어도 다음 버튼에 다시 움직여요. 두 집에 함께 도착하면 완성이에요.</p>
     <div className="lb-forest-pair">
       {floors.map((floor, board) => <div className={`lb-forest-side lb-forest-side-${board}`} key={board}>
-        {<p className="lb-forest-name">{board === 0 ? '루루의 숲' : '라라의 거울 숲'}</p>}
+        <p className="lb-forest-name">{board === 0 ? '루루의 숲' : '라라의 거울 숲'}</p>
+        <p className="lb-rabbit-preview">다음 {ARROWS[board === 1 && previewDir % 2 ? (previewDir + 2) % 4 : previewDir]} {preview[board] === state[board] ? '벽 앞에서 쉬어요' : '한 칸 움직여요'}</p>
         <div className="lb-grid lb-forest-grid" style={boardStyle(stage)} role="group" aria-label={`${board === 0 ? '루루' : '라라'}의 숲`}>
           {floor.map((open, cell) => {
             const player = state[board] === cell;
             const goal = stage.goal[board] === cell;
             const hintedHere = hintNext !== null && hintNext[board] !== state[board] && hintNext[board] === cell;
             const label = `${location(stage, cell)}, ${!open ? '나무 울타리' : player ? `${board === 0 ? '루루' : '라라'}${goal ? ', 집에 도착' : ''}` : goal ? '토끼 집' : '숲길'}`;
-            return <Tile key={cell} label={label} disabled={disabled} className={`${!open ? 'lb-bush-cell' : 'lb-forest-cell'}${goal ? ' lb-goal-cell' : ''}${hintedHere ? ' lb-hint' : ''}`}>
+            return <Tile key={cell} label={label} disabled={disabled} className={`${!open ? 'lb-bush-cell' : 'lb-forest-cell'}${goal ? ' lb-goal-cell' : ''}${hintedHere ? ' lb-hint' : ''}${preview[board] !== state[board] && preview[board] === cell ? ' lb-preview-cell' : ''}`}>
               {!open ? <Toy kind="bush" /> : <>
                 {goal && <div className={`lb-tile-backdrop${player ? ' lb-under-piece' : ''}`}><Toy kind="home" blue={board === 1} /></div>}
                 {player && <Toy kind="bunny" blue={board === 1} />}
@@ -113,7 +120,8 @@ function MovementBoard(props: LabBoardProps) {
         </div>
       </div>)}
     </div>
-    <Dpad {...props} />
+    {previousState && lastAction != null && <p className="lb-rabbit-reaction" role="status">{[0, 1].map(i => `${i === 0 ? '루루' : '라라'}: ${previousState[i] === state[i] ? '벽에 막혀 쉬었어요' : '한 칸 움직였어요'}`).join(' · ')}</p>}
+    <Dpad {...props} onPreview={setPreviewDir} />
     <p className="lb-caption">한 버튼으로 두 친구가 함께 움직여요.</p>
   </div>;
 }

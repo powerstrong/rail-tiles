@@ -106,6 +106,8 @@ describe('world registry', () => {
   it('keeps the shipped unlock rules (players already opened worlds by them)', () => {
     const rules = Object.fromEntries(WORLDS.map((w) => [w.id, [w.unlockAfter ?? null, w.daily?.unlockAfter ?? null, w.daily?.prefix ?? null]]));
     expect(rules).toEqual({
+      twins: [null, null, null],
+      bee: [null, null, null],
       train: [null, 'first-passenger', 'daily-'],
       train2: ['last-run', null, null],
       ice: ['last-run', 'ice-snow-pile', 'ice-daily-'],
@@ -129,7 +131,7 @@ describe('world registry', () => {
 
   it('marks the bonus stages each world has', () => {
     const bonuses = Object.fromEntries(WORLDS.map((w) => [w.id, stageCards(w).filter((c) => c.bonus).length]));
-    expect(bonuses).toEqual({ train: 0, train2: 5, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3 });
+    expect(bonuses).toEqual({ twins: 0, bee: 0, train: 0, train2: 5, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3 });
   });
 
   for (const w of WORLDS) {

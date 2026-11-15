@@ -19,7 +19,6 @@ interface Props {
   /** Go into a world, or open a plaza building. */
   onEnter: (id: string) => void;
   onBack: () => void;
-  onLab: () => void;
   /** "강바람 철도 2-4" when there is something to continue. */
   continueText: string | null;
   continueResume: boolean;
@@ -88,7 +87,7 @@ const pressKeys = (e: KeyboardEvent, f: () => void) => {
   f();
 };
 
-export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, onLab, continueText, continueResume, onContinue, newLooks, dailyOpen, dailyDone, totalStars }: Props) {
+export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, continueText, continueResume, onContinue, newLooks, dailyOpen, dailyDone, totalStars }: Props) {
   const { smoke } = useLook();
   const trainRef = useRef<SVGGElement>(null);
   const smokeRef = useRef<SVGGElement>(null);
@@ -193,11 +192,6 @@ export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, on
         </span>
       </header>
 
-      <button className="lab-entry route-lab-entry" onClick={onLab}>
-        <span aria-hidden>🔭</span>
-        <span><b>새로운 세계 실험실</b><small>해금 없이 10개 게임을 만나 보세요</small></span>
-        <span aria-hidden>→</span>
-      </button>
 
       <div className="route-scroll" ref={scrollRef}>
         <svg className="route-map" viewBox={`0 0 ${MAP_W} ${layout.height}`} role="group" aria-label="노선도">

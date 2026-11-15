@@ -1,3 +1,4 @@
+import { loadLabProgress } from './lab/storage';
 import type { Stars } from './engine/stars';
 
 const KEY = 'rail-tiles:progress';
@@ -34,7 +35,7 @@ export function emptyProgress(): Progress {
 const isStars = (v: unknown): v is Stars => v === 1 || v === 2 || v === 3;
 
 /** Never throws: missing, corrupt or future-version data falls back to a fresh start. v1 data is migrated. */
-export function loadProgress(storage: StorageLike | null = defaultStorage()): Progress {
+function loadStoredProgress(storage: StorageLike | null = defaultStorage()): Progress {
   try {
     const raw = storage?.getItem(KEY);
     if (!raw) return emptyProgress();
@@ -52,6 +53,14 @@ export function loadProgress(storage: StorageLike | null = defaultStorage()): Pr
   } catch {
     return emptyProgress();
   }
+}
+
+/** Old lab stamps record completion only, so migrate as one star without reducing any record. */
+export function loadProgress(storage: StorageLike | null = defaultStorage()): Progress {
+  const progress = loadStoredProgress(storage);
+  const legacy = loadLabProgress(storage);
+  for (const id of Object.keys(legacy.completed)) if (!progress.stars[id]) progress.stars[id] = 1;
+  return progress;
 }
 
 /** The optional fields, kept only when they have the right shape. */
