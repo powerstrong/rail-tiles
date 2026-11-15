@@ -5,6 +5,7 @@ export interface LabProgress { completed: Record<string, true>; ratings: Partial
 export interface LabStorage { getItem(key: string): string | null; setItem(key: string, value: string): void }
 const empty = (): LabProgress => ({ completed: {}, ratings: {} });
 const validId = (id: string) => [...KINDS, 'coral'].some(k => id.startsWith(`lab-v1-${k}-`) && /^(?:[1-9]|[12][0-9]|30)$/.test(id.slice(`lab-v1-${k}-`.length)));
+const validId = (id: string) => [...KINDS, 'balance'].some(k => id.startsWith(`lab-v1-${k}-`) && /^(?:[1-9]|[12][0-9]|30)$/.test(id.slice(`lab-v1-${k}-`.length)));
 const storage = (): LabStorage | null => { try { return typeof localStorage === 'undefined' ? null : localStorage; } catch { return null; } };
 export function loadLabProgress(store = storage()): LabProgress {
   try {
