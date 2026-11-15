@@ -1,3 +1,4 @@
+import { FlowEmblem } from '../flow/FlowArt';
 
 export interface WorldCard {
   id: string;
@@ -5,7 +6,7 @@ export interface WorldCard {
   blurb: string;
   /** Accent colour and a small emblem drawn in SVG. */
   color: string;
-  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space' | 'clock' | 'twins' | 'bee';
+  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space' | 'clock' | 'twins' | 'bee' | 'flow';
   stars: number;
   maxStars: number;
   state: 'open' | 'locked' | 'conquered' | 'soon';
@@ -21,6 +22,7 @@ export interface WorldCard {
 export function Emblem({ kind, size }: { kind: WorldCard['emblem']; size?: number }) {
   const box = size ? { x: -size / 2, y: -size / 2, width: size, height: size } : {};
   switch (kind) {
+    case 'flow': return <FlowEmblem size={size} />;
     case 'twins':
       return <svg viewBox="0 0 48 48" aria-hidden {...box}>
         {[15, 33].map(x => <g key={x}><ellipse cx={x - 3} cy="13" rx="3" ry="10" fill="#fff8ee" stroke="#78579d" /><ellipse cx={x + 3} cy="13" rx="3" ry="10" fill="#fff8ee" stroke="#78579d" /><circle cx={x} cy="30" r="10" fill="#fff8ee" stroke="#78579d" /><circle cx={x - 3} cy="28" r="1" /><circle cx={x + 3} cy="28" r="1" /></g>)}

@@ -1,4 +1,6 @@
 import { PuzzleScreen } from './lab/PuzzleScreen';
+import { FlowScreen } from './flow/FlowScreen';
+import { FLOW_CHAPTERS, FLOW_STAGES } from './flow/stages';
 import { CONCEPTS } from './lab/catalog';
 import { stagesFor } from './lab/stages';
 import type { ComponentType } from 'react';
@@ -276,6 +278,11 @@ export const WORLDS: World[] = [
       loadingText: '오늘의 시계탑 태엽을 감는 중…',
       clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 시계탑이 열려요`,
     },
+  }),
+  world({
+    id: 'flow', title: '색깔 길 잇기', blurb: '색실로 단추를 이어 마을의 조각보를 꿰매요',
+    color: '#347d75', emblem: 'flow', theme: 'world-flow',
+    stages: FLOW_STAGES, chapters: FLOW_CHAPTERS, Game: FlowScreen,
   }),
 ];
 
