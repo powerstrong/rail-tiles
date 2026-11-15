@@ -1,7 +1,7 @@
 {
-  "name": "Rail Tiles 기찻길 퍼즐",
-  "short_name": "기찻길 퍼즐",
-  "description": "레일을 이어 작은 기차를 도착역까지! 펭귄, 로봇, 화산 월드까지 담긴 어린이 퍼즐 게임",
+  "name": "미지의 세계",
+  "short_name": "미지의 세계",
+  "description": "기차를 타고 펭귄, 로봇, 화산, 거울 토끼, 꿀벌의 퍼즐 세계를 여행하는 어린이 퍼즐 게임",
   "lang": "ko",
   "start_url": "./",
   "scope": "./",

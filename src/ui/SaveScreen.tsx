@@ -35,7 +35,7 @@ export function SaveScreen({ progress, onLoad, onBack }: Props) {
   const share = async () => {
     if (!code) return;
     try {
-      await navigator.share({ title: 'Rail Tiles 기록', text: code });
+      await navigator.share({ title: '미지의 세계 기록', text: code });
     } catch {
       // Cancelled, or sharing is not available: copying still works.
     }

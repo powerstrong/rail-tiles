@@ -119,10 +119,10 @@ export function TitleScreen({ continueText, continueResume, onContinue, onPlay, 
       <div className="title-inner">
         <p className="title-kicker">내 기차로 떠나는 퍼즐 여행</p>
         <h1 className="logo">
-          Rail<span>Tiles</span>
+          미지의<span>세계</span>
         </h1>
         <TitleLoop />
-        <p className="title-copy">레일을 이어 작은 기차를 도착역까지 데려다주세요.</p>
+        <p className="title-copy">기차를 타고 낯선 퍼즐 세계를 하나씩 찾아가요.</p>
         {continueText ? (
           <>
             <button className="primary big title-continue" onClick={onContinue} autoFocus>
