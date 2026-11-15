@@ -1,3 +1,4 @@
+import { BalanceScene } from '../balance/BalanceScene';
 import { TwinsScene, BeeScene } from './story/GardenScene';
 import type { ComponentType } from 'react';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
@@ -35,6 +36,11 @@ export const farewellId = (world: string) => `${world}:bye`;
 
 /** One story per world, by world id (`src/ui/stories.test.ts` checks every world has one). */
 export const STORIES: Record<string, Story> = {
+  balance: {
+    friend: '별지기 소미', tail: 54, Scene: BalanceScene,
+    lines: ['어서 와! 별사탕 축제를 준비하고 있어.', '사탕을 누르면 반대 접시로 폴짝 옮겨져.', '양쪽 무게를 맞추면 별빛이 반짝일 거야!'],
+    farewell: { tail: 54, Scene: BalanceScene, lines: ['모든 저울이 반듯해졌어!', '반짝이는 별사탕을 기차에 실어 줄게.', '우리 또 별빛을 나누자. 안녕!'] },
+  },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,
     lines: ['거울 숲에 온 걸 환영해!', '같은 버튼을 눌러도 옆으로는 반대로 움직여.', '벽에서 기다리며 두 집에 함께 도착해 보자!'],

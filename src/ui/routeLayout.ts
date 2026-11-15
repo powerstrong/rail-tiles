@@ -27,6 +27,7 @@ export const isPlaza = (id: string): id is PlazaId => id in PLAZA;
 
 /** Station discs, hand-placed for the shipped worlds (a phone is 360 wide). */
 const PLACED: Record<string, Pt> = {
+  balance: [298, 596],
   train: [180, 222],
   twins: [62, 222],
   bee: [298, 222],
