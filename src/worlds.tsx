@@ -1,5 +1,6 @@
 import { PiecesScreen } from './pieces/PiecesScreen';
 import { PIECES_CHAPTERS, PIECES_STAGES } from './pieces/stages';
+import { CORAL_WORLD } from './coral/world';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { FlowScreen } from './flow/FlowScreen';
 import { FLOW_CHAPTERS, FLOW_STAGES } from './flow/stages';
@@ -291,6 +292,7 @@ export const WORLDS: World[] = [
     color: '#347d75', emblem: 'flow', theme: 'world-flow',
     stages: FLOW_STAGES, chapters: FLOW_CHAPTERS, Game: FlowScreen,
   }),
+  world(CORAL_WORLD),
 ];
 
 export const worldById = (id: string): World | undefined => WORLDS.find((w) => w.id === id);

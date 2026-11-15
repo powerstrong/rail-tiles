@@ -1,0 +1,65 @@
+.coral-play { --coral-ink: #254b52; width: min(100%, 470px); margin: 0 auto; padding: 12px 18px 28px; color: var(--coral-ink); background: linear-gradient(#f8fcf6, #e9f5ef); min-height: 100dvh; box-sizing: border-box; }
+.coral-play * { box-sizing: border-box; }
+.coral-play button { min-height: 44px; border: 1px solid #bed6d0; background: #fffdf6; color: var(--coral-ink); border-radius: 12px; font: inherit; cursor: pointer; touch-action: manipulation; }
+.coral-play button:focus-visible { outline: 3px solid #224e6e; outline-offset: 3px; }
+.coral-play button:disabled { cursor: default; }
+.coral-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.coral-top > span { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 800; }
+.coral-top svg { width: 33px; height: 33px; }
+.coral-top button:first-child { width: 44px; font-size: 22px; }
+.coral-top button:last-child { padding: 0 8px; font-size: 12px; }
+.coral-heading { position: relative; padding: 16px 0 10px; }
+.coral-heading p { margin: 0 0 4px; font-size: 12px; font-weight: 700; color: #547b7a; display: flex; justify-content: space-between; }
+.coral-heading h1 { font-size: 27px; line-height: 1.3; letter-spacing: -.8px; margin: 0; }
+.coral-heading h1:focus, .coral-clear h2:focus { outline: none; }
+.coral-best { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; margin-top: 5px; }
+.coral-best .star-row svg { width: 14px; height: 14px; }
+.coral-goal { display: flex; align-items: center; gap: 6px; justify-content: space-between; border-top: 1px solid #d5e5dd; }
+.coral-goal p { font-size: 13px; margin: 5px 0; }
+.coral-goal button { border: 0; background: transparent; flex-shrink: 0; font-size: 12px; padding: 0 5px; }
+.coral-rules { padding: 10px 14px; border-radius: 12px; background: #fffdf6; font-size: 13px; line-height: 1.6; }
+.coral-rules p { margin: 5px 0; }
+.coral-score { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 10px; font-size: 12px; }
+.coral-score strong { font-size: 25px; color: #286964; margin-right: 3px; }
+.coral-score > div:last-child { text-align: right; line-height: 1.5; color: #805e1b; }
+.coral-score > div:last-child span { color: #587875; }
+.coral-ocean { background: #cbe8e3; border: 1px solid #b0d2cc; border-radius: 18px; padding: 10px 10px 0; overflow: hidden; box-shadow: 0 5px 0 #b5d5c9; }
+.coral-board-label { display: flex; justify-content: space-between; margin: 0 3px 8px; font-size: 12px; }
+.coral-board-label strong { color: #245f5b; }
+.coral-grid { display: grid; grid-template-columns: repeat(var(--coral-cols), minmax(0, 1fr)); gap: 4px; }
+.coral-cell { position: relative; aspect-ratio: 1; min-width: 0; display: flex; align-items: center; justify-content: center; border-radius: 9px; background: var(--pigment); color: #fffdf2; box-shadow: inset 0 -3px 0 #00000016; }
+.coral-cell.is-owned { outline: 2px solid #fffdf0; outline-offset: -3px; }
+.coral-cell .coral-pigment { width: 59%; height: 59%; filter: drop-shadow(0 1px 0 #00000020); }
+.coral-origin { position: absolute; left: 5px; top: 0; font-size: 20px; color: #173f4c; text-shadow: 0 1px #fff; line-height: 1.3; }
+.coral-cell.is-rock { background: #bdd6cf; box-shadow: none; }
+.coral-cell.is-rock > svg { width: 80%; height: 80%; }
+.coral-cell.is-preview { outline: 3px dashed #163e48; outline-offset: -3px; filter: brightness(1.18); }
+.coral-cell.is-wave .coral-pigment { animation: coral-wave 480ms var(--wave-delay) both; }
+.coral-bubble { position: absolute; width: 12px; height: 12px; border: 2px solid #fffdf1; border-radius: 50%; top: 15%; left: 66%; pointer-events: none; animation: coral-bubble 650ms var(--wave-delay) both; }
+.coral-seafloor { height: 25px; }
+.coral-seafloor svg { width: 100%; height: 100%; }
+.coral-palette-label { display: flex; justify-content: space-between; align-items: center; margin: 17px 0 7px; font-size: 13px; font-weight: 800; }
+.coral-palette-label span { font-weight: 400; font-size: 12px; }
+.coral-palette { display: grid; gap: 7px; }
+.coral-play .coral-color { min-width: 0; padding: 6px 1px 7px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; border: 1px solid #b9d0c7; box-shadow: 0 3px 0 #c8dcd2; }
+.coral-swatch { border-radius: 9px; width: 33px; height: 30px; display: grid; place-items: center; background: var(--pigment); color: #fffdf1; }
+.coral-swatch svg { width: 29px; height: 29px; }
+.coral-color strong { font-size: 14px; }
+.coral-play .coral-color:disabled { background: #dcebe2; box-shadow: none; border-color: #abc7bc; }
+.coral-color:disabled strong { font-size: 12px; }
+.coral-play .coral-color.is-hint { outline: 3px solid #a87816; outline-offset: 2px; background: #fff3b9; }
+.coral-feedback { min-height: 47px; padding: 10px 0 6px; font-size: 12px; line-height: 1.6; }
+.coral-feedback small { display: block; font-size: 11px; color: #805e1b; }
+.coral-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.coral-tools button { font-size: 12px; padding: 5px 1px; }
+.coral-tools button:disabled { color: #65837a; background: #e2ede5; }
+.coral-clear { margin-top: 18px; background: #fffbed; border: 2px solid #e7cf87; border-radius: 18px; padding: 20px 12px; text-align: center; }
+.coral-clear .result-stars svg { width: 38px; height: 38px; }
+.coral-clear h2 { font-size: 21px; margin: 10px 0; }
+.coral-clear p { font-size: 13px; line-height: 1.6; }
+.coral-clear > div { display: grid; gap: 8px; margin-top: 12px; }
+.coral-play .coral-primary { color: #fff; background: #30796f; border: 0; }
+@keyframes coral-wave { 0% { transform: scale(.7); opacity: .4; } 50% { transform: scale(1.24) rotate(8deg); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes coral-bubble { 0% { transform: translateY(10px) scale(.5); opacity: 0; } 25% { opacity: .9; } 100% { transform: translateY(-28px) scale(1.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .coral-play *, .coral-play *::before, .coral-play *::after { animation: none !important; transition: none !important; } .coral-bubble { display: none; } }
+@media (max-width: 340px) { .coral-play { padding-left: 12px; padding-right: 12px; } .coral-top > span { font-size: 12px; } .coral-heading h1 { font-size: 24px; } .coral-goal p { font-size: 12px; } .coral-palette { gap: 5px; } }

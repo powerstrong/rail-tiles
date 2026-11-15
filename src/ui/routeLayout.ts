@@ -29,6 +29,7 @@ export const isPlaza = (id: string): id is PlazaId => id in PLAZA;
 const PLACED: Record<string, Pt> = {
   flow: [298, 596],
   pieces: [298, 596],
+  coral: [298, 596],
   train: [180, 222],
   twins: [62, 222],
   bee: [298, 222],

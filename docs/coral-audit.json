@@ -1,0 +1,926 @@
+{
+  "seed": "0xc0a1beef",
+  "randomRunsPerStage": 2000,
+  "report": [
+    {
+      "number": 1,
+      "title": "첫 물결",
+      "cols": 3,
+      "rows": 3,
+      "par": 1,
+      "rocks": 0,
+      "reachableSets": 2,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 6,
+          "finishIn": 1
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        0,
+        0,
+        2000
+      ]
+    },
+    {
+      "number": 2,
+      "title": "두 번의 인사",
+      "cols": 3,
+      "rows": 3,
+      "par": 2,
+      "rocks": 0,
+      "reachableSets": 4,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 2,
+          "finishIn": 2
+        },
+        {
+          "color": 1,
+          "gain": 2,
+          "finishIn": 2
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        247,
+        761,
+        992
+      ]
+    },
+    {
+      "number": 3,
+      "title": "옆으로 쭉",
+      "cols": 3,
+      "rows": 3,
+      "par": 3,
+      "rocks": 0,
+      "reachableSets": 6,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 1,
+          "finishIn": 3
+        },
+        {
+          "color": 2,
+          "gain": 2,
+          "finishIn": 3
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        587,
+        908,
+        505
+      ]
+    },
+    {
+      "number": 4,
+      "title": "큰 무리 찾기",
+      "cols": 4,
+      "rows": 4,
+      "par": 3,
+      "rocks": 0,
+      "reachableSets": 8,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 7,
+          "finishIn": 3
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 4
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        624,
+        877,
+        499
+      ]
+    },
+    {
+      "number": 5,
+      "title": "모퉁이 너머",
+      "cols": 4,
+      "rows": 4,
+      "par": 4,
+      "rocks": 0,
+      "reachableSets": 18,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 3,
+          "finishIn": 5
+        },
+        {
+          "color": 1,
+          "gain": 3,
+          "finishIn": 4
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        978,
+        767,
+        255
+      ]
+    },
+    {
+      "number": 6,
+      "title": "다음 이웃",
+      "cols": 4,
+      "rows": 4,
+      "par": 4,
+      "rocks": 0,
+      "reachableSets": 17,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 4,
+          "finishIn": 4
+        },
+        {
+          "color": 2,
+          "gain": 4,
+          "finishIn": 5
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        983,
+        876,
+        141
+      ]
+    },
+    {
+      "number": 7,
+      "title": "다시 만난 색",
+      "cols": 4,
+      "rows": 4,
+      "par": 4,
+      "rocks": 0,
+      "reachableSets": 16,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 1,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 2,
+          "finishIn": 4
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        836,
+        1033,
+        131
+      ]
+    },
+    {
+      "number": 8,
+      "title": "이어지는 물결",
+      "cols": 4,
+      "rows": 4,
+      "par": 5,
+      "rocks": 0,
+      "reachableSets": 24,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 4,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1021,
+        807,
+        172
+      ]
+    },
+    {
+      "number": 9,
+      "title": "한 번 덜 고르기",
+      "cols": 4,
+      "rows": 4,
+      "par": 5,
+      "rocks": 0,
+      "reachableSets": 27,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 2,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        623,
+        999,
+        378
+      ]
+    },
+    {
+      "number": 10,
+      "title": "무지개 만",
+      "cols": 4,
+      "rows": 4,
+      "par": 6,
+      "rocks": 0,
+      "reachableSets": 30,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 2,
+          "finishIn": 6
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 7
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1072,
+        731,
+        197
+      ]
+    },
+    {
+      "number": 11,
+      "title": "가운데서 안녕",
+      "cols": 5,
+      "rows": 5,
+      "par": 3,
+      "rocks": 0,
+      "reachableSets": 9,
+      "firstChoices": [
+        {
+          "color": 2,
+          "gain": 5,
+          "finishIn": 4
+        },
+        {
+          "color": 3,
+          "gain": 8,
+          "finishIn": 3
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        503,
+        970,
+        527
+      ]
+    },
+    {
+      "number": 12,
+      "title": "네 방향 친구",
+      "cols": 5,
+      "rows": 5,
+      "par": 4,
+      "rocks": 0,
+      "reachableSets": 32,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 4,
+          "finishIn": 5
+        },
+        {
+          "color": 1,
+          "gain": 4,
+          "finishIn": 4
+        },
+        {
+          "color": 2,
+          "gain": 4,
+          "finishIn": 5
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1196,
+        716,
+        88
+      ]
+    },
+    {
+      "number": 13,
+      "title": "양쪽을 한꺼번에",
+      "cols": 5,
+      "rows": 5,
+      "par": 5,
+      "rocks": 0,
+      "reachableSets": 83,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 2,
+          "finishIn": 6
+        },
+        {
+          "color": 1,
+          "gain": 4,
+          "finishIn": 5
+        },
+        {
+          "color": 3,
+          "gain": 5,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": true,
+      "randomStars": [
+        1573,
+        400,
+        27
+      ]
+    },
+    {
+      "number": 14,
+      "title": "작은 다리",
+      "cols": 5,
+      "rows": 5,
+      "par": 5,
+      "rocks": 0,
+      "reachableSets": 60,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 4,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 5,
+          "finishIn": 5
+        },
+        {
+          "color": 3,
+          "gain": 1,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1574,
+        373,
+        53
+      ]
+    },
+    {
+      "number": 15,
+      "title": "밖으로 퍼져요",
+      "cols": 5,
+      "rows": 5,
+      "par": 5,
+      "rocks": 0,
+      "reachableSets": 181,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 1,
+          "finishIn": 6
+        },
+        {
+          "color": 1,
+          "gain": 8,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1523,
+        407,
+        70
+      ]
+    },
+    {
+      "number": 16,
+      "title": "마주 보는 무리",
+      "cols": 5,
+      "rows": 5,
+      "par": 6,
+      "rocks": 0,
+      "reachableSets": 265,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 4,
+          "finishIn": 6
+        },
+        {
+          "color": 1,
+          "gain": 1,
+          "finishIn": 7
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 7
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1579,
+        406,
+        15
+      ]
+    },
+    {
+      "number": 17,
+      "title": "돌아오는 색",
+      "cols": 5,
+      "rows": 5,
+      "par": 6,
+      "rocks": 0,
+      "reachableSets": 185,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 4,
+          "finishIn": 6
+        },
+        {
+          "color": 1,
+          "gain": 1,
+          "finishIn": 7
+        },
+        {
+          "color": 2,
+          "gain": 0,
+          "finishIn": 7
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1563,
+        379,
+        58
+      ]
+    },
+    {
+      "number": 18,
+      "title": "먼 쪽 이웃",
+      "cols": 5,
+      "rows": 5,
+      "par": 6,
+      "rocks": 0,
+      "reachableSets": 109,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 3,
+          "finishIn": 7
+        },
+        {
+          "color": 2,
+          "gain": 0,
+          "finishIn": 7
+        },
+        {
+          "color": 3,
+          "gain": 4,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1772,
+        220,
+        8
+      ]
+    },
+    {
+      "number": 19,
+      "title": "갈래를 이어요",
+      "cols": 5,
+      "rows": 5,
+      "par": 7,
+      "rocks": 0,
+      "reachableSets": 305,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 1,
+          "finishIn": 8
+        },
+        {
+          "color": 1,
+          "gain": 4,
+          "finishIn": 7
+        },
+        {
+          "color": 2,
+          "gain": 2,
+          "finishIn": 7
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1566,
+        372,
+        62
+      ]
+    },
+    {
+      "number": 20,
+      "title": "빛나는 소용돌이",
+      "cols": 5,
+      "rows": 5,
+      "par": 7,
+      "rocks": 0,
+      "reachableSets": 428,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 0,
+          "finishIn": 8
+        },
+        {
+          "color": 1,
+          "gain": 3,
+          "finishIn": 7
+        },
+        {
+          "color": 3,
+          "gain": 1,
+          "finishIn": 8
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1701,
+        278,
+        21
+      ]
+    },
+    {
+      "number": 21,
+      "title": "바위 옆으로",
+      "cols": 5,
+      "rows": 5,
+      "par": 4,
+      "rocks": 2,
+      "reachableSets": 39,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 6,
+          "finishIn": 4
+        },
+        {
+          "color": 2,
+          "gain": 2,
+          "finishIn": 5
+        },
+        {
+          "color": 3,
+          "gain": 4,
+          "finishIn": 5
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1441,
+        510,
+        49
+      ]
+    },
+    {
+      "number": 22,
+      "title": "좁은 물길",
+      "cols": 5,
+      "rows": 5,
+      "par": 5,
+      "rocks": 4,
+      "reachableSets": 50,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 5,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 6
+        },
+        {
+          "color": 3,
+          "gain": 2,
+          "finishIn": 5
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1527,
+        415,
+        58
+      ]
+    },
+    {
+      "number": 23,
+      "title": "돌아서 만나요",
+      "cols": 5,
+      "rows": 5,
+      "par": 5,
+      "rocks": 5,
+      "reachableSets": 39,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 5,
+          "finishIn": 5
+        },
+        {
+          "color": 2,
+          "gain": 4,
+          "finishIn": 6
+        },
+        {
+          "color": 3,
+          "gain": 0,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1915,
+        77,
+        8
+      ]
+    },
+    {
+      "number": 24,
+      "title": "두 물길 합치기",
+      "cols": 5,
+      "rows": 5,
+      "par": 6,
+      "rocks": 3,
+      "reachableSets": 83,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 1,
+          "finishIn": 7
+        },
+        {
+          "color": 1,
+          "gain": 3,
+          "finishIn": 6
+        },
+        {
+          "color": 2,
+          "gain": 3,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1469,
+        450,
+        81
+      ]
+    },
+    {
+      "number": 25,
+      "title": "바위 뒤 친구",
+      "cols": 5,
+      "rows": 5,
+      "par": 6,
+      "rocks": 4,
+      "reachableSets": 86,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 1,
+          "finishIn": 6
+        },
+        {
+          "color": 1,
+          "gain": 0,
+          "finishIn": 7
+        },
+        {
+          "color": 3,
+          "gain": 3,
+          "finishIn": 7
+        }
+      ],
+      "smallerFirstCanBeBetter": true,
+      "randomStars": [
+        1911,
+        83,
+        6
+      ]
+    },
+    {
+      "number": 26,
+      "title": "작은 입구",
+      "cols": 5,
+      "rows": 5,
+      "par": 6,
+      "rocks": 4,
+      "reachableSets": 57,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 1,
+          "finishIn": 7
+        },
+        {
+          "color": 1,
+          "gain": 1,
+          "finishIn": 7
+        },
+        {
+          "color": 2,
+          "gain": 4,
+          "finishIn": 6
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1847,
+        150,
+        3
+      ]
+    },
+    {
+      "number": 27,
+      "title": "이어지는 골목",
+      "cols": 5,
+      "rows": 5,
+      "par": 7,
+      "rocks": 3,
+      "reachableSets": 142,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 0,
+          "finishIn": 8
+        },
+        {
+          "color": 1,
+          "gain": 2,
+          "finishIn": 8
+        },
+        {
+          "color": 2,
+          "gain": 4,
+          "finishIn": 7
+        },
+        {
+          "color": 3,
+          "gain": 2,
+          "finishIn": 7
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1874,
+        117,
+        9
+      ]
+    },
+    {
+      "number": 28,
+      "title": "먼저 여는 길",
+      "cols": 5,
+      "rows": 5,
+      "par": 7,
+      "rocks": 3,
+      "reachableSets": 223,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 2,
+          "finishIn": 7
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 8
+        },
+        {
+          "color": 3,
+          "gain": 1,
+          "finishIn": 7
+        },
+        {
+          "color": 4,
+          "gain": 0,
+          "finishIn": 8
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1909,
+        87,
+        4
+      ]
+    },
+    {
+      "number": 29,
+      "title": "온 바다의 색",
+      "cols": 5,
+      "rows": 5,
+      "par": 8,
+      "rocks": 5,
+      "reachableSets": 285,
+      "firstChoices": [
+        {
+          "color": 0,
+          "gain": 0,
+          "finishIn": 9
+        },
+        {
+          "color": 1,
+          "gain": 2,
+          "finishIn": 8
+        },
+        {
+          "color": 2,
+          "gain": 0,
+          "finishIn": 9
+        },
+        {
+          "color": 3,
+          "gain": 1,
+          "finishIn": 9
+        }
+      ],
+      "smallerFirstCanBeBetter": false,
+      "randomStars": [
+        1977,
+        23,
+        0
+      ]
+    },
+    {
+      "number": 30,
+      "title": "무지개 산호 정원",
+      "cols": 5,
+      "rows": 5,
+      "par": 8,
+      "rocks": 3,
+      "reachableSets": 340,
+      "firstChoices": [
+        {
+          "color": 1,
+          "gain": 1,
+          "finishIn": 8
+        },
+        {
+          "color": 2,
+          "gain": 1,
+          "finishIn": 9
+        },
+        {
+          "color": 3,
+          "gain": 2,
+          "finishIn": 9
+        },
+        {
+          "color": 4,
+          "gain": 1,
+          "finishIn": 8
+        }
+      ],
+      "smallerFirstCanBeBetter": true,
+      "randomStars": [
+        1954,
+        46,
+        0
+      ]
+    }
+  ]
+}
