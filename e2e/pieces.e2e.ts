@@ -140,3 +140,20 @@ test('pieces: available from a fresh route map, sequential stage locks and conti
   await page.reload(); await page.getByRole('button', { name: /다음 퍼즐/ }).click();
   await expect(page.locator('.pieces h1')).toHaveText(stages[1].title);
 });
+
+test('pieces: seven-column targets stay 44px on small phones and the last stage finishes by touch', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const page = await context.newPage();
+  const stage = await open(page, 30);
+  for (const width of [390, 360, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    // A viewport resize can resolve before Chromium applies its media queries.
+    await expect.poll(() => page.locator('.pieces-cell').evaluateAll(nodes => nodes.every(node => {
+      const { width, height } = node.getBoundingClientRect(); return width >= 44 && height >= 44;
+    }))).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
+  }
+  for (const [index, pose] of stage.solution.entries()) await place(page, stage, index, pose, true);
+  await expect(page.locator('.pieces-clear')).toBeVisible();
+  await context.close();
+});

@@ -68,9 +68,14 @@ test.describe('bee 50-stage mobile course', () => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     const stage = await open(page, 50), dead = deadEnd(stage);
-    const cell = await page.locator('.lb-bee-cell').first().boundingBox();
-    expect(cell!.width).toBeGreaterThanOrEqual(44); expect(cell!.height).toBeGreaterThanOrEqual(44);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    for (const width of [390, 360, 320]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expect.poll(async () => {
+        const cell = await page.locator('.lb-bee-cell').first().boundingBox();
+        return Math.min(cell!.width, cell!.height);
+      }).toBeGreaterThanOrEqual(44);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    }
     for (const a of dead.prefix.slice(1)) await tap(page, a);
     await tap(page, dead.action);
     await expect(page.locator('.lab-stuck')).toBeVisible();

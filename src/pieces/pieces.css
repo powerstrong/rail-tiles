@@ -42,3 +42,8 @@
 .pieces-picture { animation: pieces-reveal .35s ease-out; }
 @keyframes pieces-reveal { from { opacity: .1; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .pieces-picture { animation: none; } }
+/* Seven columns still need 44px hit targets on a 320px phone. */
+@media (max-width: 359px) {
+  .pieces { padding-inline: 4px; }
+  .pieces-canvas { padding-inline: 0; }
+}

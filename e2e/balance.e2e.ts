@@ -93,11 +93,13 @@ test.describe('balance with full motion', () => {
 test.describe('balance mobile touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   test('first and final puzzles fit and finish with taps, including paired candies', async ({ page }) => {
-    for (const number of [1, 30]) {
+    for (const width of [390, 360, 320]) for (const number of [1, 30]) {
+      await page.setViewportSize({ width, height: 844 });
       const stage = await open(page, number);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-      const sizes = await page.locator('.balance-candy').evaluateAll(nodes => nodes.map(node => ({ width: node.getBoundingClientRect().width, height: node.getBoundingClientRect().height })));
-      expect(sizes.every(({ width, height }) => width >= 44 && height >= 44)).toBe(true);
+      await expect.poll(() => page.locator('.balance-candy').evaluateAll(nodes => nodes.every(node => {
+        const { width, height } = node.getBoundingClientRect(); return width >= 44 && height >= 44;
+      }))).toBe(true);
       for (const group of stage.solution) await press(page, group, true);
       await expect(page.locator('.balance-clear')).toBeVisible();
     }
