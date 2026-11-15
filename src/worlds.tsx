@@ -1,3 +1,4 @@
+import { CORAL_WORLD } from './coral/world';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { CONCEPTS } from './lab/catalog';
 import { stagesFor } from './lab/stages';
@@ -277,6 +278,7 @@ export const WORLDS: World[] = [
       clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 시계탑이 열려요`,
     },
   }),
+  world(CORAL_WORLD),
 ];
 
 export const worldById = (id: string): World | undefined => WORLDS.find((w) => w.id === id);
