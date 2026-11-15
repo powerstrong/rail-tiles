@@ -8,7 +8,7 @@ export interface WorldCard {
   blurb: string;
   /** Accent colour and a small emblem drawn in SVG. */
   color: string;
-  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space' | 'clock' | 'twins' | 'bee' | 'flow' | 'pieces' | 'coral' | 'balance';
+  emblem: 'train' | 'penguin' | 'gear' | 'volcano' | 'depot' | 'space' | 'clock' | 'twins' | 'bee' | 'flow' | 'pieces' | 'coral' | 'balance' | 'cloud';
   stars: number;
   maxStars: number;
   state: 'open' | 'locked' | 'conquered' | 'soon';
@@ -29,6 +29,8 @@ export function Emblem({ kind, size }: { kind: WorldCard['emblem']; size?: numbe
       return <svg viewBox="0 0 48 48" aria-hidden {...box}><path d="M5 6 H25 V17 H15 V38 H5 Z" fill="#f4ba57" stroke="#355b54" strokeWidth="2" /><path d="M29 7 H42 V39 H19 V26 H29 Z" fill="#69bcbc" stroke="#355b54" strokeWidth="2" /><circle cx="10" cy="12" r="2" fill="#355b54" /><path d="M34 29 l4 6 h-8 Z" fill="#355b54" /></svg>;
     case 'coral': return <CoralEmblem size={size} />;
     case 'balance': return <BalanceEmblem size={size} />;
+    case 'cloud':
+      return <svg viewBox="0 0 48 48" aria-hidden {...box}><circle cx="24" cy="24" r="19" fill="#fff9ed" stroke="#bd956a" strokeWidth="4" /><path d="M14 14l8 8m0 -8l-8 8m12 -8l8 8m0 -8l-8 8m-12 4l8 8m0 -8l-8 8m12 -8l8 8m0 -8l-8 8" stroke="#4775a1" strokeWidth="3" strokeLinecap="round" /></svg>;
     case 'twins':
       return <svg viewBox="0 0 48 48" aria-hidden {...box}>
         {[15, 33].map(x => <g key={x}><ellipse cx={x - 3} cy="13" rx="3" ry="10" fill="#fff8ee" stroke="#78579d" /><ellipse cx={x + 3} cy="13" rx="3" ry="10" fill="#fff8ee" stroke="#78579d" /><circle cx={x} cy="30" r="10" fill="#fff8ee" stroke="#78579d" /><circle cx={x - 3} cy="28" r="1" /><circle cx={x + 3} cy="28" r="1" /></g>)}

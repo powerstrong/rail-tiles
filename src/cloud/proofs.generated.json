@@ -1,0 +1,5055 @@
+{
+  "seed": 3238862886,
+  "stages": [
+    {
+      "id": "lab-v1-cloud-1",
+      "solution": [
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-2",
+      "solution": [
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-3",
+      "solution": [
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-4",
+      "solution": [
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-5",
+      "solution": [
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-6",
+      "solution": [
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-7",
+      "solution": [
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-8",
+      "solution": [
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-9",
+      "solution": [
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-10",
+      "solution": [
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-11",
+      "solution": [
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 9,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-12",
+      "solution": [
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 3
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-13",
+      "solution": [
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-14",
+      "solution": [
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 3
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-15",
+      "solution": [
+        {
+          "cell": 22,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-16",
+      "solution": [
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-17",
+      "solution": [
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 20,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-18",
+      "solution": [
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 3
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 22,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-19",
+      "solution": [
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 3
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 20,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-20",
+      "solution": [
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 3
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 22,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 10,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 24,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-21",
+      "solution": [
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 3
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 32,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 3
+        },
+        {
+          "cell": 29,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 34,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 33,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 25,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 31,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-22",
+      "solution": [
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 33,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 25,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-23",
+      "solution": [
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 25,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 3
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 33,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 26,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-24",
+      "solution": [
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 3
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 3
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 25,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 33,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 34,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-25",
+      "solution": [
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 16,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 3
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 25,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 33,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-26",
+      "solution": [
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 3
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 3
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 3
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 25,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 33,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-27",
+      "solution": [
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 33,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 7,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 25,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 11,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 32,
+          "value": 1,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-28",
+      "solution": [
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 3
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 28,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 3
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 3
+        },
+        {
+          "cell": 19,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 33,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 25,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 30,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 29,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-29",
+      "solution": [
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "col",
+          "line": 3,
+          "candidates": 3
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 3
+        },
+        {
+          "cell": 32,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 6,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 3
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 33,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 4,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 1,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 0,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 14,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 17,
+          "value": 2,
+          "axis": "row",
+          "line": 2,
+          "candidates": 2
+        },
+        {
+          "cell": 18,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 2
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 2
+        },
+        {
+          "cell": 28,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 25,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 13,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 9,
+          "value": 2,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        }
+      ]
+    },
+    {
+      "id": "lab-v1-cloud-30",
+      "solution": [
+        {
+          "cell": 34,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 33,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 16,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 19,
+          "value": 1,
+          "axis": "col",
+          "line": 1,
+          "candidates": 3
+        },
+        {
+          "cell": 9,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 13,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 32,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 21,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 10,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 8,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 20,
+          "value": 1,
+          "axis": "row",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 17,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 35,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 11,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 7,
+          "value": 1,
+          "axis": "row",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 1,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 3
+        },
+        {
+          "cell": 4,
+          "value": 1,
+          "axis": "row",
+          "line": 0,
+          "candidates": 3
+        },
+        {
+          "cell": 29,
+          "value": 2,
+          "axis": "col",
+          "line": 5,
+          "candidates": 2
+        },
+        {
+          "cell": 12,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 15,
+          "value": 1,
+          "axis": "col",
+          "line": 3,
+          "candidates": 2
+        },
+        {
+          "cell": 31,
+          "value": 2,
+          "axis": "row",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 22,
+          "value": 1,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 28,
+          "value": 2,
+          "axis": "col",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 30,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 3
+        },
+        {
+          "cell": 18,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 24,
+          "value": 2,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 6,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 14,
+          "value": 1,
+          "axis": "row",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 23,
+          "value": 2,
+          "axis": "row",
+          "line": 3,
+          "candidates": 1
+        },
+        {
+          "cell": 0,
+          "value": 1,
+          "axis": "col",
+          "line": 0,
+          "candidates": 1
+        },
+        {
+          "cell": 26,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 2
+        },
+        {
+          "cell": 25,
+          "value": 2,
+          "axis": "col",
+          "line": 1,
+          "candidates": 1
+        },
+        {
+          "cell": 27,
+          "value": 1,
+          "axis": "row",
+          "line": 4,
+          "candidates": 1
+        },
+        {
+          "cell": 5,
+          "value": 1,
+          "axis": "col",
+          "line": 5,
+          "candidates": 1
+        },
+        {
+          "cell": 2,
+          "value": 2,
+          "axis": "col",
+          "line": 2,
+          "candidates": 1
+        },
+        {
+          "cell": 3,
+          "value": 2,
+          "axis": "row",
+          "line": 0,
+          "candidates": 1
+        }
+      ]
+    }
+  ]
+}

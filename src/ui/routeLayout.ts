@@ -31,6 +31,7 @@ const PLACED: Record<string, Pt> = {
   pieces: [298, 596],
   coral: [298, 596],
   balance: [298, 596],
+  cloud: [298, 596],
   train: [180, 222],
   twins: [62, 222],
   bee: [298, 222],

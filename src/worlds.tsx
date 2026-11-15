@@ -3,6 +3,8 @@ import { PIECES_CHAPTERS, PIECES_STAGES } from './pieces/stages';
 import { CORAL_WORLD } from './coral/world';
 import { BalanceScreen } from './balance/BalanceScreen';
 import { BALANCE_CHAPTERS, BALANCE_STAGES } from './balance/stages';
+import { CloudScreen } from './cloud/CloudScreen';
+import { CLOUD_CHAPTERS, CLOUD_STAGES } from './cloud/stages';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { FlowScreen } from './flow/FlowScreen';
 import { FLOW_CHAPTERS, FLOW_STAGES } from './flow/stages';
@@ -124,6 +126,9 @@ export const WORLDS: World[] = [
     id: 'pieces', title: '조각 맞추기', blurb: '돌리고 맞추면, 숨어 있던 그림이 짠!',
     color: '#25857d', emblem: 'pieces',
     stages: PIECES_STAGES, chapters: PIECES_CHAPTERS, Game: PiecesScreen,
+    id: 'cloud', title: '구름 자수 공방', blurb: '숫자 묶음을 풀어 색실 작품을 수놓아요',
+    color: '#4775a1', emblem: 'cloud', theme: 'world-cloud',
+    stages: CLOUD_STAGES, chapters: CLOUD_CHAPTERS, Game: CloudScreen,
   }),
   world({
     id: 'train',

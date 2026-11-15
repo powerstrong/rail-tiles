@@ -110,6 +110,7 @@ describe('world registry', () => {
       pieces: [null, null, null],
       coral: [null, null, null],
       balance: [null, null, null],
+      cloud: [null, null, null],
       twins: [null, null, null],
       bee: [null, null, null],
       train: [null, 'first-passenger', 'daily-'],
@@ -135,7 +136,7 @@ describe('world registry', () => {
 
   it('marks the bonus stages each world has', () => {
     const bonuses = Object.fromEntries(WORLDS.map((w) => [w.id, stageCards(w).filter((c) => c.bonus).length]));
-    expect(bonuses).toEqual({ flow: 0, twins: 0, bee: 0, train: 0, train2: 0, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3, pieces: 0, coral: 0, balance: 0 });
+    expect(bonuses).toEqual({ flow: 0, twins: 0, bee: 0, train: 0, train2: 0, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3, pieces: 0, coral: 0, balance: 0, cloud: 0 });
   });
 
   for (const w of WORLDS) {
