@@ -1,3 +1,4 @@
+import { PiecesScene } from '../pieces/Art';
 import { TwinsScene, BeeScene } from './story/GardenScene';
 import { FlowScene } from '../flow/FlowArt';
 import type { ComponentType } from 'react';
@@ -40,6 +41,10 @@ export const STORIES: Record<string, Story> = {
     friend: '실타래 솔솔', tail: 52, Scene: FlowScene,
     lines: ['실바람 마을 잔치에 걸 조각보를 만들자!', '색과 무늬가 같은 단추끼리 실로 이어 줘.', '겹치면 실이 끊겨. 언제든 다시 이을 수 있어!'],
     farewell: { tail: 52, Scene: FlowScene, lines: ['모든 조각보가 포근하게 이어졌어!', '우리가 함께 만든 잔치 깃발을 선물할게.', '다음 잔치에도 놀러 와. 안녕!'] },
+  pieces: {
+    friend: '그림 조각 모모', tail: 50, Scene: PiecesScene,
+    lines: ['그림 공방에 온 걸 환영해!', '조각을 돌려서 빈 틀을 채워 줄래?', '틀을 다 채우면 숨어 있던 그림이 나타나!'],
+    farewell: { tail: 50, Scene: PiecesScene, lines: ['서른 개 그림을 모두 찾아냈구나!', '네가 만든 그림책을 선물할게.', '또 새로운 모양을 찾으러 와. 안녕!'] },
   },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,

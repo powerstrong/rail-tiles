@@ -1,3 +1,5 @@
+import { PiecesScreen } from './pieces/PiecesScreen';
+import { PIECES_CHAPTERS, PIECES_STAGES } from './pieces/stages';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { FlowScreen } from './flow/FlowScreen';
 import { FLOW_CHAPTERS, FLOW_STAGES } from './flow/stages';
@@ -115,6 +117,11 @@ export interface World<S extends WorldStage = WorldStage> {
 const world = <S extends WorldStage>(w: World<S>) => w as unknown as World;
 
 export const WORLDS: World[] = [
+  world({
+    id: 'pieces', title: '조각 맞추기', blurb: '돌리고 맞추면, 숨어 있던 그림이 짠!',
+    color: '#25857d', emblem: 'pieces',
+    stages: PIECES_STAGES, chapters: PIECES_CHAPTERS, Game: PiecesScreen,
+  }),
   world({
     id: 'train',
     title: '들꽃 기차 마을',
