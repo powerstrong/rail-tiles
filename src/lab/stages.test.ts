@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { beeQuality } from '../../scripts/bee-quality';
 import { WORLDS } from '../worlds';
 import { CONCEPTS } from './catalog';
 import { act, actions, DIRS, isWon, KINDS, neighbor, type Stage, type State } from './model';
@@ -73,6 +74,26 @@ describe('audited laboratory catalog', () => {
 });
 
 describe('age-appropriate construction constraints', () => {
+
+  it('uses full-size dense boards and a measured decision curve rather than corridor length', () => {
+    for (const s of stagesFor('bee')) {
+      expect(s.cols, s.id).toBe(5);
+      expect(s.rows, s.id).toBe(s.number <= 20 ? 5 : 6);
+      expect(s.par, s.id).toBeGreaterThanOrEqual(s.number > 20 ? 25 : 16);
+      const quality = beeQuality(s);
+      expect(quality.unknown, s.id).toBe(0);
+      if (s.number <= 3) {
+        expect(quality.choices, s.id).toBe(0);
+        expect(quality.wins, s.id).toBe(quality.trials);
+      } else {
+        const min = s.number <= 10 ? 3 + Math.floor((s.number - 4) / 2)
+          : s.number <= 20 ? 7 + Math.floor((s.number - 11) / 4) : 10 + Math.floor((s.number - 21) / 4);
+        expect(quality.decisions, s.id).toBeGreaterThanOrEqual(min);
+        expect(quality.decisions, s.id).toBeLessThanOrEqual(min + (s.number <= 20 ? 1 : 2));
+        expect(quality.randomRate, s.id).toBeLessThanOrEqual(s.number <= 10 ? .20 / (1 + (s.number - 4) / 2) : s.number <= 20 ? .015 : .002);
+      }
+    }
+  });
 
   it('requires a genuine choice in later flower paths and saves the hive for last', () => {
     for (const s of stagesFor('bee')) {

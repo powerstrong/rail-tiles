@@ -3,7 +3,7 @@ import { act, KINDS, type Stage, type State } from '../src/lab/model';
 import { readFileSync } from 'node:fs';
 const stages: Stage[] = JSON.parse(readFileSync(new URL('../src/lab/stages.generated.json', import.meta.url), 'utf8'));
 const stagesFor = (kind: Stage['kind']) => stages.filter(s => s.kind === kind);
-import { explore } from '../src/lab/reachability';
+import { explore, forward, reachability } from '../src/lab/reachability';
 import { PROGRESS_KEY } from '../src/storage';
 
 const directions = ['위로 움직이기', '오른쪽으로 움직이기', '아래로 움직이기', '왼쪽으로 움직이기'];
@@ -90,12 +90,20 @@ test('rabbits show both directions, waiting, and homes remain movable', async ({
 });
 
 test('bee dead ends stay interactive and recover to the last finishable prefix', async ({ page }) => {
-  const stage = stagesFor('bee').find(s => { const g = explore(s); return g.states.size > g.toWin.size; })!;
-  const graph = explore(stage);
-  const dead = [...graph.states.values()].sort((a, b) => b.length - a.length).find(v => !graph.toWin.has(v.join(',')))!;
+  const stage = stagesFor('bee')[9], graph = explore(stage);
+  let prefix = stage.start, dead: State | undefined;
+  for (const action of stage.solution) {
+    // Query actual alternative choices instead of relying on a complete graph.
+    reachability(graph, prefix);
+    dead = Array.from({ length: stage.cols * stage.rows }, (_, a) => forward(stage, prefix, a))
+      .find((v): v is State => v !== null && reachability(graph, v) === 'impossible');
+    if (dead) break;
+    prefix = forward(stage, prefix, action)!;
+  }
+  expect(dead).toBeDefined();
   await open(page, 'bee', stage.number);
   let state = stage.start;
-  for (const action of dead.slice(1)) state = await move(page, stage, state, action);
+  for (const action of dead!.slice(1)) state = await move(page, stage, state, action);
   await expect(page.locator('.lab-stuck')).toBeVisible();
   await expect(page.locator('.lb-bee-retrace')).toBeEnabled();
   await page.getByRole('button', { name: '마지막으로 풀 수 있던 지점으로 되돌리기' }).click();
@@ -116,11 +124,11 @@ test('bee taps and drags retrace exactly one adjacent cell without skipping', as
   };
   await page.mouse.move(...Object.values(await point(state.at(-1)!)) as [number, number]);
   await page.mouse.down();
-  const jump = await point(8); await page.mouse.move(jump.x, jump.y);
+  const jump = await point(stage.solution[7]); await page.mouse.move(jump.x, jump.y);
   await expect(page.locator('.lb-bee-visited')).toHaveCount(2);
-  const next = await point(2); await page.mouse.move(next.x, next.y);
+  const next = await point(stage.solution[1]); await page.mouse.move(next.x, next.y);
   await expect(page.locator('.lb-bee-visited')).toHaveCount(3);
-  const previous = await point(1); await page.mouse.move(previous.x, previous.y);
+  const previous = await point(stage.solution[0]); await page.mouse.move(previous.x, previous.y);
   await expect(page.locator('.lb-bee-visited')).toHaveCount(2);
   await page.mouse.up();
   await page.keyboard.press('ControlOrMeta+z');
@@ -132,6 +140,18 @@ for (const width of [320, 390, 844]) test(`${width}px: boards fit without page o
   for (const kind of KINDS) {
     await open(page, kind, 30);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    if (kind === 'bee') {
+      const lock = await page.locator('.lb-hive-lock').boundingBox();
+      const hive = await page.locator('.lb-bee-cell').nth(stagesFor('bee')[29].goal[0]).boundingBox();
+      expect(lock!.x).toBeGreaterThanOrEqual(hive!.x);
+      expect(lock!.x + lock!.width).toBeLessThanOrEqual(hive!.x + hive!.width);
+      expect(lock!.height).toBeLessThan(hive!.height / 2);
+    }
+    if (kind === 'bee' && width === 390) {
+      const cell = await page.locator('.lb-bee-cell').first().boundingBox();
+      expect(cell!.width).toBeGreaterThanOrEqual(44);
+      expect(cell!.height).toBeGreaterThanOrEqual(44);
+    }
     if (kind === 'twins') {
       await page.getByRole('button', { name: '숲 크게 보기', exact: true }).click();
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);

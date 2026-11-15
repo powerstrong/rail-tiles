@@ -1,0 +1,1545 @@
+{
+  "method": {
+    "trialsPerStage": 20000,
+    "seed": "0xbeef0000 + stage.number",
+    "rounds": 20,
+    "browser": "Chromium headless, viewport 390×844, CDP CPU slowdown 4×",
+    "nodeVersion": "v26.13.0"
+  },
+  "quality": [
+    {
+      "id": "lab-v1-bee-1",
+      "cols": 5,
+      "rows": 5,
+      "par": 16,
+      "gaps": 8,
+      "choices": 0,
+      "decisions": 0,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 20000,
+      "randomRate": 1
+    },
+    {
+      "id": "lab-v1-bee-2",
+      "cols": 5,
+      "rows": 5,
+      "par": 16,
+      "gaps": 8,
+      "choices": 0,
+      "decisions": 0,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 20000,
+      "randomRate": 1
+    },
+    {
+      "id": "lab-v1-bee-3",
+      "cols": 5,
+      "rows": 5,
+      "par": 16,
+      "gaps": 8,
+      "choices": 0,
+      "decisions": 0,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 20000,
+      "randomRate": 1
+    },
+    {
+      "id": "lab-v1-bee-4",
+      "cols": 5,
+      "rows": 5,
+      "par": 18,
+      "gaps": 6,
+      "choices": 4,
+      "decisions": 3,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 1491,
+      "randomRate": 0.07455
+    },
+    {
+      "id": "lab-v1-bee-5",
+      "cols": 5,
+      "rows": 5,
+      "par": 18,
+      "gaps": 6,
+      "choices": 7,
+      "decisions": 4,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 374,
+      "randomRate": 0.0187
+    },
+    {
+      "id": "lab-v1-bee-6",
+      "cols": 5,
+      "rows": 5,
+      "par": 19,
+      "gaps": 5,
+      "choices": 5,
+      "decisions": 4,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 464,
+      "randomRate": 0.0232
+    },
+    {
+      "id": "lab-v1-bee-7",
+      "cols": 5,
+      "rows": 5,
+      "par": 19,
+      "gaps": 5,
+      "choices": 4,
+      "decisions": 4,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 910,
+      "randomRate": 0.0455
+    },
+    {
+      "id": "lab-v1-bee-8",
+      "cols": 5,
+      "rows": 5,
+      "par": 20,
+      "gaps": 4,
+      "choices": 5,
+      "decisions": 5,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 666,
+      "randomRate": 0.0333
+    },
+    {
+      "id": "lab-v1-bee-9",
+      "cols": 5,
+      "rows": 5,
+      "par": 20,
+      "gaps": 4,
+      "choices": 6,
+      "decisions": 5,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 241,
+      "randomRate": 0.01205
+    },
+    {
+      "id": "lab-v1-bee-10",
+      "cols": 5,
+      "rows": 5,
+      "par": 21,
+      "gaps": 3,
+      "choices": 7,
+      "decisions": 6,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 210,
+      "randomRate": 0.0105
+    },
+    {
+      "id": "lab-v1-bee-11",
+      "cols": 5,
+      "rows": 5,
+      "par": 22,
+      "gaps": 2,
+      "choices": 9,
+      "decisions": 8,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 74,
+      "randomRate": 0.0037
+    },
+    {
+      "id": "lab-v1-bee-12",
+      "cols": 5,
+      "rows": 5,
+      "par": 22,
+      "gaps": 2,
+      "choices": 9,
+      "decisions": 7,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 86,
+      "randomRate": 0.0043
+    },
+    {
+      "id": "lab-v1-bee-13",
+      "cols": 5,
+      "rows": 5,
+      "par": 22,
+      "gaps": 2,
+      "choices": 10,
+      "decisions": 7,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 95,
+      "randomRate": 0.00475
+    },
+    {
+      "id": "lab-v1-bee-14",
+      "cols": 5,
+      "rows": 5,
+      "par": 22,
+      "gaps": 2,
+      "choices": 10,
+      "decisions": 7,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 89,
+      "randomRate": 0.00445
+    },
+    {
+      "id": "lab-v1-bee-15",
+      "cols": 5,
+      "rows": 5,
+      "par": 23,
+      "gaps": 1,
+      "choices": 11,
+      "decisions": 8,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 185,
+      "randomRate": 0.00925
+    },
+    {
+      "id": "lab-v1-bee-16",
+      "cols": 5,
+      "rows": 5,
+      "par": 23,
+      "gaps": 1,
+      "choices": 11,
+      "decisions": 8,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 200,
+      "randomRate": 0.01
+    },
+    {
+      "id": "lab-v1-bee-17",
+      "cols": 5,
+      "rows": 5,
+      "par": 23,
+      "gaps": 1,
+      "choices": 10,
+      "decisions": 8,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 118,
+      "randomRate": 0.0059
+    },
+    {
+      "id": "lab-v1-bee-18",
+      "cols": 5,
+      "rows": 5,
+      "par": 23,
+      "gaps": 1,
+      "choices": 11,
+      "decisions": 8,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 266,
+      "randomRate": 0.0133
+    },
+    {
+      "id": "lab-v1-bee-19",
+      "cols": 5,
+      "rows": 5,
+      "par": 24,
+      "gaps": 0,
+      "choices": 11,
+      "decisions": 9,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 153,
+      "randomRate": 0.00765
+    },
+    {
+      "id": "lab-v1-bee-20",
+      "cols": 5,
+      "rows": 5,
+      "par": 24,
+      "gaps": 0,
+      "choices": 12,
+      "decisions": 9,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 158,
+      "randomRate": 0.0079
+    },
+    {
+      "id": "lab-v1-bee-21",
+      "cols": 5,
+      "rows": 6,
+      "par": 25,
+      "gaps": 4,
+      "choices": 10,
+      "decisions": 10,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 17,
+      "randomRate": 0.00085
+    },
+    {
+      "id": "lab-v1-bee-22",
+      "cols": 5,
+      "rows": 6,
+      "par": 25,
+      "gaps": 4,
+      "choices": 12,
+      "decisions": 10,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 30,
+      "randomRate": 0.0015
+    },
+    {
+      "id": "lab-v1-bee-23",
+      "cols": 5,
+      "rows": 6,
+      "par": 25,
+      "gaps": 4,
+      "choices": 15,
+      "decisions": 10,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 19,
+      "randomRate": 0.00095
+    },
+    {
+      "id": "lab-v1-bee-24",
+      "cols": 5,
+      "rows": 6,
+      "par": 26,
+      "gaps": 3,
+      "choices": 12,
+      "decisions": 10,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 20,
+      "randomRate": 0.001
+    },
+    {
+      "id": "lab-v1-bee-25",
+      "cols": 5,
+      "rows": 6,
+      "par": 26,
+      "gaps": 3,
+      "choices": 12,
+      "decisions": 11,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 17,
+      "randomRate": 0.00085
+    },
+    {
+      "id": "lab-v1-bee-26",
+      "cols": 5,
+      "rows": 6,
+      "par": 26,
+      "gaps": 3,
+      "choices": 11,
+      "decisions": 11,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 3,
+      "randomRate": 0.00015
+    },
+    {
+      "id": "lab-v1-bee-27",
+      "cols": 5,
+      "rows": 6,
+      "par": 27,
+      "gaps": 2,
+      "choices": 14,
+      "decisions": 11,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 39,
+      "randomRate": 0.00195
+    },
+    {
+      "id": "lab-v1-bee-28",
+      "cols": 5,
+      "rows": 6,
+      "par": 27,
+      "gaps": 2,
+      "choices": 13,
+      "decisions": 11,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 16,
+      "randomRate": 0.0008
+    },
+    {
+      "id": "lab-v1-bee-29",
+      "cols": 5,
+      "rows": 6,
+      "par": 27,
+      "gaps": 2,
+      "choices": 13,
+      "decisions": 12,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 4,
+      "randomRate": 0.0002
+    },
+    {
+      "id": "lab-v1-bee-30",
+      "cols": 5,
+      "rows": 6,
+      "par": 28,
+      "gaps": 1,
+      "choices": 14,
+      "decisions": 12,
+      "unknown": 0,
+      "trials": 20000,
+      "wins": 3,
+      "randomRate": 0.00015
+    }
+  ],
+  "node": [
+    {
+      "id": "lab-v1-bee-1",
+      "entryMs": {
+        "p50": 0.0780960000001869,
+        "p95": 3.280827000000045,
+        "max": 3.280827000000045
+      },
+      "moveMs": {
+        "p50": 0.001984999999876891,
+        "p95": 0.003993000000264146,
+        "max": 0.023322000000007392
+      },
+      "entrySamples": 20,
+      "moveSamples": 320,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 17,
+      "maxVisited": 17
+    },
+    {
+      "id": "lab-v1-bee-2",
+      "entryMs": {
+        "p50": 0.057713000000148895,
+        "p95": 0.07929900000044654,
+        "max": 0.07929900000044654
+      },
+      "moveMs": {
+        "p50": 0.0010809999998855346,
+        "p95": 0.0017170000000987784,
+        "max": 0.06106399999998757
+      },
+      "entrySamples": 20,
+      "moveSamples": 320,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 17,
+      "maxVisited": 17
+    },
+    {
+      "id": "lab-v1-bee-3",
+      "entryMs": {
+        "p50": 0.07260300000007192,
+        "p95": 0.11138500000015483,
+        "max": 0.11138500000015483
+      },
+      "moveMs": {
+        "p50": 0.0011370000001988956,
+        "p95": 0.0021400000000539876,
+        "max": 0.010983000000123866
+      },
+      "entrySamples": 20,
+      "moveSamples": 320,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 17,
+      "maxVisited": 17
+    },
+    {
+      "id": "lab-v1-bee-4",
+      "entryMs": {
+        "p50": 0.08383699999967575,
+        "p95": 2.752962000000025,
+        "max": 2.752962000000025
+      },
+      "moveMs": {
+        "p50": 0.0010829999996531114,
+        "p95": 0.0022969999999986612,
+        "max": 0.050759000000198284
+      },
+      "entrySamples": 20,
+      "moveSamples": 460,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 35,
+      "maxVisited": 25
+    },
+    {
+      "id": "lab-v1-bee-5",
+      "entryMs": {
+        "p50": 0.09638200000017605,
+        "p95": 0.6419460000001891,
+        "max": 0.6419460000001891
+      },
+      "moveMs": {
+        "p50": 0.001099999999951251,
+        "p95": 0.03522100000009232,
+        "max": 1.0647149999999783
+      },
+      "entrySamples": 20,
+      "moveSamples": 540,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 70,
+      "maxVisited": 26
+    },
+    {
+      "id": "lab-v1-bee-6",
+      "entryMs": {
+        "p50": 0.13869999999997162,
+        "p95": 1.517290999999659,
+        "max": 1.517290999999659
+      },
+      "moveMs": {
+        "p50": 0.0012790000000677537,
+        "p95": 0.03914500000018961,
+        "max": 0.10336400000005597
+      },
+      "entrySamples": 20,
+      "moveSamples": 540,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 70,
+      "maxVisited": 36
+    },
+    {
+      "id": "lab-v1-bee-7",
+      "entryMs": {
+        "p50": 0.11839000000009037,
+        "p95": 0.18242999999984022,
+        "max": 0.18242999999984022
+      },
+      "moveMs": {
+        "p50": 0.0011650000001282024,
+        "p95": 0.0018650000001798617,
+        "max": 0.0031280000002880115
+      },
+      "entrySamples": 20,
+      "moveSamples": 480,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 33,
+      "maxVisited": 32
+    },
+    {
+      "id": "lab-v1-bee-8",
+      "entryMs": {
+        "p50": 0.06569100000024264,
+        "p95": 0.08033499999964988,
+        "max": 0.08033499999964988
+      },
+      "moveMs": {
+        "p50": 0.0011999999996987754,
+        "p95": 0.002339000000119995,
+        "max": 0.005846000000019558
+      },
+      "entrySamples": 20,
+      "moveSamples": 500,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 27,
+      "maxVisited": 23
+    },
+    {
+      "id": "lab-v1-bee-9",
+      "entryMs": {
+        "p50": 0.06081900000026508,
+        "p95": 0.11765900000000329,
+        "max": 0.11765900000000329
+      },
+      "moveMs": {
+        "p50": 0.0012630000001081498,
+        "p95": 0.014189999999871361,
+        "max": 0.05733199999986027
+      },
+      "entrySamples": 20,
+      "moveSamples": 580,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 64,
+      "maxVisited": 28
+    },
+    {
+      "id": "lab-v1-bee-10",
+      "entryMs": {
+        "p50": 0.049073000000134925,
+        "p95": 0.06184299999995346,
+        "max": 0.06184299999995346
+      },
+      "moveMs": {
+        "p50": 0.0011580000000321888,
+        "p95": 0.02839399999993475,
+        "max": 0.14127899999994042
+      },
+      "entrySamples": 20,
+      "moveSamples": 620,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 136,
+      "maxVisited": 38
+    },
+    {
+      "id": "lab-v1-bee-11",
+      "entryMs": {
+        "p50": 0.039104999999835854,
+        "p95": 0.052815000000009604,
+        "max": 0.052815000000009604
+      },
+      "moveMs": {
+        "p50": 0.001130000000102882,
+        "p95": 0.00218300000005911,
+        "max": 0.7667419999997946
+      },
+      "entrySamples": 20,
+      "moveSamples": 640,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 98,
+      "maxVisited": 69
+    },
+    {
+      "id": "lab-v1-bee-12",
+      "entryMs": {
+        "p50": 0.04381599999987884,
+        "p95": 0.07644399999981033,
+        "max": 0.07644399999981033
+      },
+      "moveMs": {
+        "p50": 0.001160999999683554,
+        "p95": 0.013643999999658263,
+        "max": 0.06877200000008088
+      },
+      "entrySamples": 20,
+      "moveSamples": 640,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 118,
+      "maxVisited": 45
+    },
+    {
+      "id": "lab-v1-bee-13",
+      "entryMs": {
+        "p50": 0.051367000000027474,
+        "p95": 0.06534899999996924,
+        "max": 0.06534899999996924
+      },
+      "moveMs": {
+        "p50": 0.001036999999996624,
+        "p95": 0.03259200000002238,
+        "max": 0.14125100000001112
+      },
+      "entrySamples": 20,
+      "moveSamples": 680,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 219,
+      "maxVisited": 132
+    },
+    {
+      "id": "lab-v1-bee-14",
+      "entryMs": {
+        "p50": 0.05188999999973021,
+        "p95": 0.09547299999985626,
+        "max": 0.09547299999985626
+      },
+      "moveMs": {
+        "p50": 0.0011350000004313188,
+        "p95": 0.016521999999895343,
+        "max": 0.04586100000005899
+      },
+      "entrySamples": 20,
+      "moveSamples": 680,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 121,
+      "maxVisited": 36
+    },
+    {
+      "id": "lab-v1-bee-15",
+      "entryMs": {
+        "p50": 0.04262199999993754,
+        "p95": 0.08159999999998035,
+        "max": 0.08159999999998035
+      },
+      "moveMs": {
+        "p50": 0.001093000000309985,
+        "p95": 0.014912999999978638,
+        "max": 0.022186000000147033
+      },
+      "entrySamples": 20,
+      "moveSamples": 700,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 91,
+      "maxVisited": 25
+    },
+    {
+      "id": "lab-v1-bee-16",
+      "entryMs": {
+        "p50": 0.046405999999933556,
+        "p95": 0.7308250000000953,
+        "max": 0.7308250000000953
+      },
+      "moveMs": {
+        "p50": 0.0009390000000166765,
+        "p95": 0.03148000000010143,
+        "max": 2.782882999999856
+      },
+      "entrySamples": 20,
+      "moveSamples": 720,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 168,
+      "maxVisited": 38
+    },
+    {
+      "id": "lab-v1-bee-17",
+      "entryMs": {
+        "p50": 0.043804000000363885,
+        "p95": 0.05176599999958853,
+        "max": 0.05176599999958853
+      },
+      "moveMs": {
+        "p50": 0.000735999999960768,
+        "p95": 0.029411999999865657,
+        "max": 0.05050699999992503
+      },
+      "entrySamples": 20,
+      "moveSamples": 720,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 142,
+      "maxVisited": 47
+    },
+    {
+      "id": "lab-v1-bee-18",
+      "entryMs": {
+        "p50": 0.047615000000405416,
+        "p95": 0.05280999999968117,
+        "max": 0.05280999999968117
+      },
+      "moveMs": {
+        "p50": 0.0009150000000772707,
+        "p95": 0.02518899999995483,
+        "max": 0.26690300000018397
+      },
+      "entrySamples": 20,
+      "moveSamples": 740,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 183,
+      "maxVisited": 61
+    },
+    {
+      "id": "lab-v1-bee-19",
+      "entryMs": {
+        "p50": 0.046608999999989464,
+        "p95": 0.6785840000002281,
+        "max": 0.6785840000002281
+      },
+      "moveMs": {
+        "p50": 0.0007470000000466825,
+        "p95": 0.025403000000096654,
+        "max": 0.05436499999996158
+      },
+      "entrySamples": 20,
+      "moveSamples": 780,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 154,
+      "maxVisited": 26
+    },
+    {
+      "id": "lab-v1-bee-20",
+      "entryMs": {
+        "p50": 0.06433800000013434,
+        "p95": 0.07148499999993874,
+        "max": 0.07148499999993874
+      },
+      "moveMs": {
+        "p50": 0.0007260000002133893,
+        "p95": 0.029500999999982014,
+        "max": 0.04018900000028225
+      },
+      "entrySamples": 20,
+      "moveSamples": 740,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 147,
+      "maxVisited": 46
+    },
+    {
+      "id": "lab-v1-bee-21",
+      "entryMs": {
+        "p50": 0.12162500000022192,
+        "p95": 0.1372710000000552,
+        "max": 0.1372710000000552
+      },
+      "moveMs": {
+        "p50": 0.0008159999997587875,
+        "p95": 0.0016080000000329164,
+        "max": 0.07426699999996345
+      },
+      "entrySamples": 20,
+      "moveSamples": 700,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 105,
+      "maxVisited": 98
+    },
+    {
+      "id": "lab-v1-bee-22",
+      "entryMs": {
+        "p50": 0.04918200000020079,
+        "p95": 0.06437499999992724,
+        "max": 0.06437499999992724
+      },
+      "moveMs": {
+        "p50": 0.0008309999998346029,
+        "p95": 0.02014000000008309,
+        "max": 0.22776199999998425
+      },
+      "entrySamples": 20,
+      "moveSamples": 760,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 118,
+      "maxVisited": 31
+    },
+    {
+      "id": "lab-v1-bee-23",
+      "entryMs": {
+        "p50": 0.05105999999977939,
+        "p95": 0.09247700000014447,
+        "max": 0.09247700000014447
+      },
+      "moveMs": {
+        "p50": 0.0009620000000722939,
+        "p95": 0.019048000000111642,
+        "max": 2.1074970000004214
+      },
+      "entrySamples": 20,
+      "moveSamples": 800,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 131,
+      "maxVisited": 28
+    },
+    {
+      "id": "lab-v1-bee-24",
+      "entryMs": {
+        "p50": 0.059993999999733205,
+        "p95": 1.5607420000001184,
+        "max": 1.5607420000001184
+      },
+      "moveMs": {
+        "p50": 0.0008729999999559368,
+        "p95": 0.05466999999998734,
+        "max": 0.9432670000001053
+      },
+      "entrySamples": 20,
+      "moveSamples": 840,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 236,
+      "maxVisited": 68
+    },
+    {
+      "id": "lab-v1-bee-25",
+      "entryMs": {
+        "p50": 0.051458999999795196,
+        "p95": 0.30863399999998364,
+        "max": 0.30863399999998364
+      },
+      "moveMs": {
+        "p50": 0.0008280000001832377,
+        "p95": 0.0013249999997242412,
+        "max": 0.012141000000156055
+      },
+      "entrySamples": 20,
+      "moveSamples": 760,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 56,
+      "maxVisited": 36
+    },
+    {
+      "id": "lab-v1-bee-26",
+      "entryMs": {
+        "p50": 0.07613999999966836,
+        "p95": 0.09086299999989933,
+        "max": 0.09086299999989933
+      },
+      "moveMs": {
+        "p50": 0.0008569999999963329,
+        "p95": 0.027405999999700725,
+        "max": 0.06212199999981749
+      },
+      "entrySamples": 20,
+      "moveSamples": 820,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 188,
+      "maxVisited": 51
+    },
+    {
+      "id": "lab-v1-bee-27",
+      "entryMs": {
+        "p50": 0.06801500000028682,
+        "p95": 0.0850150000001122,
+        "max": 0.0850150000001122
+      },
+      "moveMs": {
+        "p50": 0.0009360000003653113,
+        "p95": 0.009980000000268774,
+        "max": 0.3934119999998984
+      },
+      "entrySamples": 20,
+      "moveSamples": 840,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 101,
+      "maxVisited": 32
+    },
+    {
+      "id": "lab-v1-bee-28",
+      "entryMs": {
+        "p50": 0.06479099999978644,
+        "p95": 0.6891630000000077,
+        "max": 0.6891630000000077
+      },
+      "moveMs": {
+        "p50": 0.0010750000001280569,
+        "p95": 0.014072999999825697,
+        "max": 0.02367000000003827
+      },
+      "entrySamples": 20,
+      "moveSamples": 800,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 95,
+      "maxVisited": 35
+    },
+    {
+      "id": "lab-v1-bee-29",
+      "entryMs": {
+        "p50": 0.0811069999999745,
+        "p95": 0.41207500000018626,
+        "max": 0.41207500000018626
+      },
+      "moveMs": {
+        "p50": 0.0008479999996779952,
+        "p95": 0.0036679999998341373,
+        "max": 0.7303910000000542
+      },
+      "entrySamples": 20,
+      "moveSamples": 840,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 148,
+      "maxVisited": 59
+    },
+    {
+      "id": "lab-v1-bee-30",
+      "entryMs": {
+        "p50": 0.07328400000005786,
+        "p95": 0.14551399999982095,
+        "max": 0.14551399999982095
+      },
+      "moveMs": {
+        "p50": 0.0009710000003906316,
+        "p95": 0.020062999999936437,
+        "max": 0.15337899999985893
+      },
+      "entrySamples": 20,
+      "moveSamples": 920,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 159,
+      "maxVisited": 49
+    }
+  ],
+  "throttled": [
+    {
+      "id": "lab-v1-bee-1",
+      "entryMs": {
+        "p50": 0.29999999701976776,
+        "p95": 6.5999999940395355,
+        "max": 6.5999999940395355
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 2.7999999970197678
+      },
+      "entrySamples": 20,
+      "moveSamples": 320,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 17,
+      "maxVisited": 17
+    },
+    {
+      "id": "lab-v1-bee-2",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 0.7999999970197678,
+        "max": 0.7999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000000894069672
+      },
+      "entrySamples": 20,
+      "moveSamples": 320,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 17,
+      "maxVisited": 17
+    },
+    {
+      "id": "lab-v1-bee-3",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 2.0999999940395355,
+        "max": 2.0999999940395355
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000000894069672
+      },
+      "entrySamples": 20,
+      "moveSamples": 320,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 17,
+      "maxVisited": 17
+    },
+    {
+      "id": "lab-v1-bee-4",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 4.200000002980232,
+        "max": 4.200000002980232
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3.9000000059604645
+      },
+      "entrySamples": 20,
+      "moveSamples": 460,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 35,
+      "maxVisited": 25
+    },
+    {
+      "id": "lab-v1-bee-5",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 1.2000000029802322,
+        "max": 1.2000000029802322
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "max": 1.4000000059604645
+      },
+      "entrySamples": 20,
+      "moveSamples": 540,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 70,
+      "maxVisited": 26
+    },
+    {
+      "id": "lab-v1-bee-6",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 3.0999999940395355,
+        "max": 3.0999999940395355
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.7999999970197678
+      },
+      "entrySamples": 20,
+      "moveSamples": 540,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 70,
+      "maxVisited": 36
+    },
+    {
+      "id": "lab-v1-bee-7",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 2.9000000059604645,
+        "max": 2.9000000059604645
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000000894069672
+      },
+      "entrySamples": 20,
+      "moveSamples": 480,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 33,
+      "maxVisited": 32
+    },
+    {
+      "id": "lab-v1-bee-8",
+      "entryMs": {
+        "p50": 0,
+        "p95": 0.7999999970197678,
+        "max": 0.7999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 1.6000000089406967
+      },
+      "entrySamples": 20,
+      "moveSamples": 500,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 27,
+      "maxVisited": 23
+    },
+    {
+      "id": "lab-v1-bee-9",
+      "entryMs": {
+        "p50": 0,
+        "p95": 0.7999999970197678,
+        "max": 0.7999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 1
+      },
+      "entrySamples": 20,
+      "moveSamples": 580,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 64,
+      "maxVisited": 28
+    },
+    {
+      "id": "lab-v1-bee-10",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 2.5,
+        "max": 2.5
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3.0999999940395355
+      },
+      "entrySamples": 20,
+      "moveSamples": 620,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 136,
+      "maxVisited": 38
+    },
+    {
+      "id": "lab-v1-bee-11",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 1,
+        "max": 1
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 1.800000011920929
+      },
+      "entrySamples": 20,
+      "moveSamples": 640,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 98,
+      "maxVisited": 69
+    },
+    {
+      "id": "lab-v1-bee-12",
+      "entryMs": {
+        "p50": 0,
+        "p95": 2.6000000089406967,
+        "max": 2.6000000089406967
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 2.5
+      },
+      "entrySamples": 20,
+      "moveSamples": 640,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 118,
+      "maxVisited": 45
+    },
+    {
+      "id": "lab-v1-bee-13",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 3.2000000029802322,
+        "max": 3.2000000029802322
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3
+      },
+      "entrySamples": 20,
+      "moveSamples": 680,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 219,
+      "maxVisited": 132
+    },
+    {
+      "id": "lab-v1-bee-14",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 1.2999999970197678,
+        "max": 1.2999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3
+      },
+      "entrySamples": 20,
+      "moveSamples": 680,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 121,
+      "maxVisited": 36
+    },
+    {
+      "id": "lab-v1-bee-15",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 0.7999999970197678,
+        "max": 0.7999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.7000000029802322
+      },
+      "entrySamples": 20,
+      "moveSamples": 700,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 91,
+      "maxVisited": 25
+    },
+    {
+      "id": "lab-v1-bee-16",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 0.5,
+        "max": 0.5
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3.0999999940395355
+      },
+      "entrySamples": 20,
+      "moveSamples": 720,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 168,
+      "maxVisited": 38
+    },
+    {
+      "id": "lab-v1-bee-17",
+      "entryMs": {
+        "p50": 0,
+        "p95": 0.3999999910593033,
+        "max": 0.3999999910593033
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3.0999999940395355
+      },
+      "entrySamples": 20,
+      "moveSamples": 720,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 142,
+      "maxVisited": 47
+    },
+    {
+      "id": "lab-v1-bee-18",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 0.5,
+        "max": 0.5
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3.2000000029802322
+      },
+      "entrySamples": 20,
+      "moveSamples": 740,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 183,
+      "maxVisited": 61
+    },
+    {
+      "id": "lab-v1-bee-19",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 3.2999999970197678,
+        "max": 3.2999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 3.2000000029802322
+      },
+      "entrySamples": 20,
+      "moveSamples": 780,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 154,
+      "maxVisited": 26
+    },
+    {
+      "id": "lab-v1-bee-20",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 1.0999999940395355,
+        "max": 1.0999999940395355
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3.1000000089406967
+      },
+      "entrySamples": 20,
+      "moveSamples": 740,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 147,
+      "maxVisited": 46
+    },
+    {
+      "id": "lab-v1-bee-21",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 1.1000000089406967,
+        "max": 1.1000000089406967
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000000894069672
+      },
+      "entrySamples": 20,
+      "moveSamples": 700,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 105,
+      "maxVisited": 98
+    },
+    {
+      "id": "lab-v1-bee-22",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 2.3999999910593033,
+        "max": 2.3999999910593033
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3
+      },
+      "entrySamples": 20,
+      "moveSamples": 760,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 118,
+      "maxVisited": 31
+    },
+    {
+      "id": "lab-v1-bee-23",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 0.9000000059604645,
+        "max": 0.9000000059604645
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "max": 0.9000000059604645
+      },
+      "entrySamples": 20,
+      "moveSamples": 800,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 131,
+      "maxVisited": 28
+    },
+    {
+      "id": "lab-v1-bee-24",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 1.2000000029802322,
+        "max": 1.2000000029802322
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "max": 3.2000000029802322
+      },
+      "entrySamples": 20,
+      "moveSamples": 840,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 236,
+      "maxVisited": 68
+    },
+    {
+      "id": "lab-v1-bee-25",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 0.3999999910593033,
+        "max": 0.3999999910593033
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 0.20000000298023224
+      },
+      "entrySamples": 20,
+      "moveSamples": 760,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 56,
+      "maxVisited": 36
+    },
+    {
+      "id": "lab-v1-bee-26",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 7.4000000059604645,
+        "max": 7.4000000059604645
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3.2000000029802322
+      },
+      "entrySamples": 20,
+      "moveSamples": 820,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 188,
+      "maxVisited": 51
+    },
+    {
+      "id": "lab-v1-bee-27",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 2.800000011920929,
+        "max": 2.800000011920929
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3.1000000089406967
+      },
+      "entrySamples": 20,
+      "moveSamples": 840,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 101,
+      "maxVisited": 32
+    },
+    {
+      "id": "lab-v1-bee-28",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 1.8999999910593033,
+        "max": 1.8999999910593033
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 2.7000000029802322
+      },
+      "entrySamples": 20,
+      "moveSamples": 800,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 95,
+      "maxVisited": 35
+    },
+    {
+      "id": "lab-v1-bee-29",
+      "entryMs": {
+        "p50": 0.10000000894069672,
+        "p95": 1.2999999970197678,
+        "max": 1.2999999970197678
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3.1000000089406967
+      },
+      "entrySamples": 20,
+      "moveSamples": 840,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 148,
+      "maxVisited": 59
+    },
+    {
+      "id": "lab-v1-bee-30",
+      "entryMs": {
+        "p50": 0.09999999403953552,
+        "p95": 0.29999999701976776,
+        "max": 0.29999999701976776
+      },
+      "moveMs": {
+        "p50": 0,
+        "p95": 0,
+        "max": 3.0999999940395355
+      },
+      "entrySamples": 20,
+      "moveSamples": 920,
+      "entryUnknown": 0,
+      "moveUnknown": 0,
+      "maxMemo": 159,
+      "maxVisited": 49
+    }
+  ]
+}

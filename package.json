@@ -15,7 +15,8 @@
     "stage-design": "vite-node scripts/stage-design.ts",
     "difficulty": "vite-node scripts/difficulty.ts",
     "lab:generate": "vite-node scripts/lab-generate.ts",
-    "lab:release-check": "npm run build && vite-node scripts/lab-release-check.ts"
+    "lab:release-check": "npm run build && vite-node scripts/lab-release-check.ts",
+    "lab:bee-audit": "vite-node scripts/bee-audit.ts"
   },
   "dependencies": {
     "react": "18.3.1",
