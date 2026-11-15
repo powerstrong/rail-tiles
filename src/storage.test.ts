@@ -173,3 +173,19 @@ describe('promoted lab completion migration', () => {
     expect(loadProgress(store)).toEqual(p);
   });
 });
+
+describe('memory progress alongside shipped worlds', () => {
+  it('preserves old stars, stories, gates and best ratings through save and export', async () => {
+    const old = { ...emptyProgress(), stars: { 'last-run': 3 as const, 'lab-v1-twins-01': 2 as const, 't2-boss-1': 1 as const }, stories: ['train', 'twins'], last: { world: 'memory', stage: 'memory-1-01' } };
+    const store = memory();
+    saveProgress(old, store);
+    const added = recordClear(loadProgress(store), 'memory-1-01', 3);
+    saveProgress(recordClear(added, 'memory-1-01', 1), store);
+    const restored = loadProgress(store);
+    expect(restored.stars).toEqual({ ...old.stars, 'memory-1-01': 3 });
+    expect(restored.stories).toEqual(old.stories);
+    expect(restored.last).toEqual(old.last);
+    const code = await exportCode(restored);
+    expect((await readCode(code))?.stars).toEqual(restored.stars);
+  });
+});

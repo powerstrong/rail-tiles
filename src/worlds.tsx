@@ -5,6 +5,8 @@ import { BalanceScreen } from './balance/BalanceScreen';
 import { BALANCE_CHAPTERS, BALANCE_STAGES } from './balance/stages';
 import { CloudScreen } from './cloud/CloudScreen';
 import { CLOUD_CHAPTERS, CLOUD_STAGES } from './cloud/stages';
+import { MemoryScreen } from './memory/MemoryScreen';
+import { MEMORY_CHAPTERS, MEMORY_STAGES } from './memory/stages';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { FlowScreen } from './flow/FlowScreen';
 import { FLOW_CHAPTERS, FLOW_STAGES } from './flow/stages';
@@ -154,6 +156,11 @@ export const WORLDS: World[] = [
     chapters: concept.chapters.map((title, i) => ({ number: i + 1, title, blurb: concept.goal, color: concept.color, start: i * 10, count: 10 })),
     Game: PuzzleScreen,
   })),
+  world({
+    id: 'memory', title: '미지의 세계', blurb: '짝을 찾으며 새로운 풍경을 만나요',
+    color: '#397d79', emblem: 'memory', theme: 'world-memory',
+    stages: MEMORY_STAGES, chapters: MEMORY_CHAPTERS, Game: MemoryScreen,
+  }),
   world({
     id: 'ice',
     title: '펭귄 얼음 나라',

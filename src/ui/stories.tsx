@@ -2,6 +2,7 @@ import { PiecesScene } from '../pieces/Art';
 import { CORAL_STORY } from '../coral/story';
 import { BalanceScene } from '../balance/BalanceScene';
 import { CloudScene } from '../cloud/CloudScene';
+import { MemoryScene } from './story/MemoryScene';
 import { TwinsScene, BeeScene } from './story/GardenScene';
 import { FlowScene } from '../flow/FlowArt';
 import type { ComponentType } from 'react';
@@ -58,6 +59,10 @@ export const STORIES: Record<string, Story> = {
     friend: '구름 공방지기', tail: 50, Scene: CloudScene,
     lines: ['구름 위 자수 공방에 온 걸 환영해!', '숫자만큼 붙여 수놓고, 묶음 사이는 비워 줘.', '한 땀부터 시작해서 우리 전시회를 열자!'],
     farewell: { tail: 50, Scene: CloudScene, lines: ['서른 작품에 모두 색실이 피었어!', '네가 수놓은 마음을 기차에 걸어 줄게.', '작품을 보러 언제든 다시 와. 안녕!'] },
+  memory: {
+    friend: '탐험 역장님', tail: 50, Scene: MemoryScene,
+    lines: ['미지의 세계에 온 걸 환영해요!', '같은 그림 두 장을 찾아 주세요.', '짝을 찾으며 새로운 풍경을 만나요.'],
+    farewell: { tail: 50, Scene: MemoryScene, lines: ['서른 번의 여행을 모두 해냈어요!', '발견한 풍경이 하나의 세계로 이어졌어요.', '다음에도 함께 찾아요. 안녕!'] },
   },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,
