@@ -1,4 +1,3 @@
-/* Laboratory styles are scoped: shipped worlds keep their own layout and progression. */
 .lab {
   --lab-accent: #47735e;
   --lab-wash: #e5efdc;
@@ -56,7 +55,6 @@
 .lab-notebook h2 { font-size: 15px; margin-bottom: 3px; }
 .lab-notebook p { font-size: 12px; color: #7a7466; }
 .lab-footer-note { text-align: center; color: #878071; font-size: 12px; margin: 25px 0 5px; }
-/* World introductions and the always-open stage collection. */
 .lab-select { width: min(1000px, 100%); }
 .lab-world-intro { display: grid; grid-template-columns: 1fr 210px; align-items: center; gap: 32px; padding: 30px; border-radius: 23px; background: var(--lab-wash); border: 1px solid #ffffff8c; }
 .lab-world-intro h1 { font-size: clamp(25px, 4vw, 36px); line-height: 1.4; letter-spacing: -.05em; margin: 5px 0 8px; }
@@ -97,7 +95,6 @@
 .lab-rating-options .is-picked { border-color: var(--lab-accent); color: var(--lab-accent); background: var(--lab-wash); box-shadow: inset 0 0 0 1px var(--lab-accent); }
 .lab-storage-notice { margin: 0 0 16px; padding: 11px 14px; border: 1px solid #d7be8b; border-radius: 12px; background: #fff4d9; color: #77623d; font-size: 12px; }
 .lab-small { color: #827b6b; font-size: 11px; margin-top: 10px; line-height: 1.7; }
-/* Play shell. The board implementation owns its own scoped geometry. */
 .lab-play { max-width: 850px; }
 .lab-play .lab-top { margin-bottom: 20px; }
 .lab-play-world { color: var(--lab-accent); font-size: 13px; font-weight: 750; }
@@ -139,120 +136,114 @@
 .lab-neighbor-nav button { min-height: 44px; padding: 8px 10px; border: 0; background: transparent; color: #6f7567; font-size: 12px; font-weight: 750; }
 .lab-neighbor-nav button:disabled { color: #b1a996; }
 .lab-review-toggle { text-align: center; margin-top: 10px; }
-@media (min-width: 1000px) {
-  .lab-concept-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .lab-concept-art { height: 142px; }
-  .lab-concept-copy { padding: 15px 15px 13px; }
-  .lab-concept h3 { font-size: 17px; }
-  .lab-concept-dots { display: none; }
+@media (min-width: 1000px) {.lab-concept-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.lab-concept-art { height: 142px; }
+.lab-concept-copy { padding: 15px 15px 13px; }
+.lab-concept h3 { font-size: 17px; }
+.lab-concept-dots { display: none; }
 }
-@media (max-width: 760px) {
-  .lab { padding: 18px 20px 28px; }
-  .lab-hero { padding: 4px 6px 24px; grid-template-columns: 1fr 220px; }
-  .lab-hero-art svg { width: 200px; }
-  .lab-concept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
-  .lab-welcome-strip { gap: 18px; font-size: 11px; }
-  .lab-world-intro { padding: 23px; grid-template-columns: 1fr 150px; gap: 15px; }
-  .lab-world-intro .lab-scene { width: 150px; height: 125px; }
-  .lab-stage-grid { gap: 8px; }
-  .lab-stage { padding: 10px; min-height: 90px; }
+@media (max-width: 760px) {.lab { padding: 18px 20px 28px; }
+.lab-hero { padding: 4px 6px 24px; grid-template-columns: 1fr 220px; }
+.lab-hero-art svg { width: 200px; }
+.lab-concept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+.lab-welcome-strip { gap: 18px; font-size: 11px; }
+.lab-world-intro { padding: 23px; grid-template-columns: 1fr 150px; gap: 15px; }
+.lab-world-intro .lab-scene { width: 150px; height: 125px; }
+.lab-stage-grid { gap: 8px; }
+.lab-stage { padding: 10px; min-height: 90px; }
 }
-@media (max-width: 480px) {
-  .lab { padding: 14px 14px 25px; }
-  .lab-top { margin-bottom: 24px; gap: 8px; }
-  .lab-back { font-size: 13px; gap: 7px; }
-  .lab-tag { font-size: 10px; padding: 4px 9px; }
-  .lab-hero { grid-template-columns: 1fr 135px; gap: 0; padding: 0 0 20px 4px; }
-  .lab-hero h1 { font-size: 33px; margin-bottom: 13px; white-space: nowrap; }
-  .lab-hero .lab-eyebrow { font-size: 10px; white-space: nowrap; }
-  .lab-hero-lead { font-size: 20px; line-height: 1.5; }
-  .lab-hero-description { font-size: 11px; margin-top: 13px; }
-  .lab-hero-art { padding-top: 28px; align-self: center; }
-  .lab-hero-art svg { width: 145px; max-width: 110%; }
-  .lab-art-caption { font-size: 9px; white-space: nowrap; }
-  .lab-orbit-one { right: 0; top: 19px; font-size: 22px; }
-  .lab-orbit-two { left: 0; top: 110px; font-size: 20px; }
-  .lab-welcome-strip { gap: 0; justify-content: space-between; font-size: 10px; padding: 13px 1px; }
-  .lab-section-heading { margin-top: 27px; }
-  .lab-section-heading h2 { font-size: 20px; }
-  .lab-section-heading .lab-eyebrow { font-size: 10px; }
-  .lab-total-stamps { font-size: 10px; }
-  .lab-total-stamps b { font-size: 15px; }
-  .lab-concept-grid { gap: 12px; }
-  .lab-concept { border-radius: 16px; }
-  .lab-concept-art { height: 128px; }
-  .lab-concept-art .lab-scene { width: 154px; height: 107px; margin-top: 18px; }
-  .lab-concept-no { left: 11px; top: 10px; font-size: 9px; }
-  .lab-concept-skill { font-size: 9px; right: 7px; bottom: 7px; }
-  .lab-concept-copy { padding: 13px 11px 11px; }
-  .lab-concept h3 { font-size: 16px; letter-spacing: -.055em; }
-  .lab-concept-copy > p { font-size: 13px; min-height: 42px; }
-  .lab-concept-bottom { font-size: 9px; margin-top: 10px; padding-top: 9px; }
-  .lab-concept-progress { font-size: 10px; }
-  .lab-concept-dots { display: none; }
-  .lab-notebook { padding: 17px 14px; gap: 10px; margin-top: 23px; }
-  .lab-notebook h2 { font-size: 13px; }
-  .lab-notebook p { font-size: 11px; }
-  .lab-notebook > span { font-size: 25px; }
-  .lab-world-intro { display: block; position: relative; padding: 21px 19px; overflow: hidden; }
-  .lab-world-intro > .lab-scene { display: none; }
-  .lab-world-intro h1 { font-size: 26px; }
-  .lab-tagline { font-size: 14px; }
-  .lab-story { font-size: 14px; }
-  .lab-goal { font-size: 14px; gap: 7px; }
-  .lab-rule-card ol, .lab-play-rules ol { font-size: 14px; padding-left: 34px; padding-right: 17px; }
-  .lab-rule-card summary { font-size: 14px; }
-  .lab-stage-intro { margin-top: 25px; }
-  .lab-stage-intro h2 { font-size: 18px; }
-  .lab-stage-intro > span { font-size: 11px; }
-  .lab-stage-intro p { font-size: 11px; }
-  .lab-chapter { padding: 19px 0; }
-  .lab-stage-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .lab-stage { display: flex; flex-direction: column; align-items: center; text-align: center; min-height: 90px; padding: 10px 7px 9px; border-radius: 10px; }
-  .lab-stage-number { font-size: 20px; }
-  .lab-stage-name { align-self: center; font-size: 13px; line-height: 1.5; padding-top: 4px; word-break: keep-all; }
-  .lab-stage-stamp { position: absolute; right: 4px; top: 1px; font-size: 12px; }
-  .lab-chapter-title h2 { font-size: 15px; }
-  .lab-ratings { padding: 13px 10px 15px; }
-  .lab-rating-options { gap: 6px; }
-  .lab-rating-options button { gap: 4px; padding: 8px; font-size: 10px; }
-  .lab-rating-options button > span { font-size: 14px; }
-  .lab-play-world { font-size: 11px; }
-  .lab-play .lab-top { margin-bottom: 15px; }
-  .lab-play-heading { margin-bottom: 13px; align-items: start; gap: 5px; }
-  .lab-play-heading h1 { font-size: 24px; }
-  .lab-play-heading .lab-eyebrow { font-size: 10px; }
-  .lab-done-tag { font-size: 9px; padding: 3px 7px; margin-top: 2px; }
-  .lab-play-goal { gap: 7px; padding: 10px; }
-  .lab-play-goal p { font-size: 14px; }
-  .lab-play-goal > button { font-size: 12px; padding: 4px 6px; }
-  .lab-play-goal > button span { margin-left: 2px; }
-  .lab-play-rules > p { font-size: 14px; }
-  .lab-play-status { font-size: 10px; }
-  .lab-play-status > span:last-child { font-size: 9px; }
-  .lab-play-canvas { margin-top: 19px; }
-  .lab-feedback-line { font-size: 14px; padding: 8px; min-height: 48px; }
-  .lab-tools { gap: 7px; }
-  .lab-tools button { gap: 5px; padding: 8px 5px; font-size: 13px; }
-  .lab-tools button > span:first-child { font-size: 20px; }
-  .lab-clear { padding: 18px 15px; gap: 10px; grid-template-columns: 43px 1fr; }
-  .lab-clear-stamp { width: 40px; height: 40px; font-size: 26px; }
-  .lab-clear h2 { font-size: 17px; }
-  .lab-clear p:not(.lab-eyebrow) { font-size: 11px; }
-  .lab-clear .lab-eyebrow { font-size: 10px; }
-  .lab-clear-actions { gap: 8px; }
-  .lab-solid-button, .lab-outline-button { font-size: 12px; padding: 9px 12px; }
-  .lab-neighbor-nav { gap: 4px; }
-  .lab-neighbor-nav button { font-size: 11px; padding: 8px; }
+@media (max-width: 480px) {.lab { padding: 14px 14px 25px; }
+.lab-top { margin-bottom: 24px; gap: 8px; }
+.lab-back { font-size: 13px; gap: 7px; }
+.lab-tag { font-size: 10px; padding: 4px 9px; }
+.lab-hero { grid-template-columns: 1fr 135px; gap: 0; padding: 0 0 20px 4px; }
+.lab-hero h1 { font-size: 33px; margin-bottom: 13px; white-space: nowrap; }
+.lab-hero .lab-eyebrow { font-size: 10px; white-space: nowrap; }
+.lab-hero-lead { font-size: 20px; line-height: 1.5; }
+.lab-hero-description { font-size: 11px; margin-top: 13px; }
+.lab-hero-art { padding-top: 28px; align-self: center; }
+.lab-hero-art svg { width: 145px; max-width: 110%; }
+.lab-art-caption { font-size: 9px; white-space: nowrap; }
+.lab-orbit-one { right: 0; top: 19px; font-size: 22px; }
+.lab-orbit-two { left: 0; top: 110px; font-size: 20px; }
+.lab-welcome-strip { gap: 0; justify-content: space-between; font-size: 10px; padding: 13px 1px; }
+.lab-section-heading { margin-top: 27px; }
+.lab-section-heading h2 { font-size: 20px; }
+.lab-section-heading .lab-eyebrow { font-size: 10px; }
+.lab-total-stamps { font-size: 10px; }
+.lab-total-stamps b { font-size: 15px; }
+.lab-concept-grid { gap: 12px; }
+.lab-concept { border-radius: 16px; }
+.lab-concept-art { height: 128px; }
+.lab-concept-art .lab-scene { width: 154px; height: 107px; margin-top: 18px; }
+.lab-concept-no { left: 11px; top: 10px; font-size: 9px; }
+.lab-concept-skill { font-size: 9px; right: 7px; bottom: 7px; }
+.lab-concept-copy { padding: 13px 11px 11px; }
+.lab-concept h3 { font-size: 16px; letter-spacing: -.055em; }
+.lab-concept-copy > p { font-size: 13px; min-height: 42px; }
+.lab-concept-bottom { font-size: 9px; margin-top: 10px; padding-top: 9px; }
+.lab-concept-progress { font-size: 10px; }
+.lab-concept-dots { display: none; }
+.lab-notebook { padding: 17px 14px; gap: 10px; margin-top: 23px; }
+.lab-notebook h2 { font-size: 13px; }
+.lab-notebook p { font-size: 11px; }
+.lab-notebook > span { font-size: 25px; }
+.lab-world-intro { display: block; position: relative; padding: 21px 19px; overflow: hidden; }
+.lab-world-intro > .lab-scene { display: none; }
+.lab-world-intro h1 { font-size: 26px; }
+.lab-tagline { font-size: 14px; }
+.lab-story { font-size: 14px; }
+.lab-goal { font-size: 14px; gap: 7px; }
+.lab-rule-card ol, .lab-play-rules ol { font-size: 14px; padding-left: 34px; padding-right: 17px; }
+.lab-rule-card summary { font-size: 14px; }
+.lab-stage-intro { margin-top: 25px; }
+.lab-stage-intro h2 { font-size: 18px; }
+.lab-stage-intro > span { font-size: 11px; }
+.lab-stage-intro p { font-size: 11px; }
+.lab-chapter { padding: 19px 0; }
+.lab-stage-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lab-stage { display: flex; flex-direction: column; align-items: center; text-align: center; min-height: 90px; padding: 10px 7px 9px; border-radius: 10px; }
+.lab-stage-number { font-size: 20px; }
+.lab-stage-name { align-self: center; font-size: 13px; line-height: 1.5; padding-top: 4px; word-break: keep-all; }
+.lab-stage-stamp { position: absolute; right: 4px; top: 1px; font-size: 12px; }
+.lab-chapter-title h2 { font-size: 15px; }
+.lab-ratings { padding: 13px 10px 15px; }
+.lab-rating-options { gap: 6px; }
+.lab-rating-options button { gap: 4px; padding: 8px; font-size: 10px; }
+.lab-rating-options button > span { font-size: 14px; }
+.lab-play-world { font-size: 11px; }
+.lab-play .lab-top { margin-bottom: 15px; }
+.lab-play-heading { margin-bottom: 13px; align-items: start; gap: 5px; }
+.lab-play-heading h1 { font-size: 24px; }
+.lab-play-heading .lab-eyebrow { font-size: 10px; }
+.lab-done-tag { font-size: 9px; padding: 3px 7px; margin-top: 2px; }
+.lab-play-goal { gap: 7px; padding: 10px; }
+.lab-play-goal p { font-size: 14px; }
+.lab-play-goal > button { font-size: 12px; padding: 4px 6px; }
+.lab-play-goal > button span { margin-left: 2px; }
+.lab-play-rules > p { font-size: 14px; }
+.lab-play-status { font-size: 10px; }
+.lab-play-status > span:last-child { font-size: 9px; }
+.lab-play-canvas { margin-top: 19px; }
+.lab-feedback-line { font-size: 14px; padding: 8px; min-height: 48px; }
+.lab-tools { gap: 7px; }
+.lab-tools button { gap: 5px; padding: 8px 5px; font-size: 13px; }
+.lab-tools button > span:first-child { font-size: 20px; }
+.lab-clear { padding: 18px 15px; gap: 10px; grid-template-columns: 43px 1fr; }
+.lab-clear-stamp { width: 40px; height: 40px; font-size: 26px; }
+.lab-clear h2 { font-size: 17px; }
+.lab-clear p:not(.lab-eyebrow) { font-size: 11px; }
+.lab-clear .lab-eyebrow { font-size: 10px; }
+.lab-clear-actions { gap: 8px; }
+.lab-solid-button, .lab-outline-button { font-size: 12px; padding: 9px 12px; }
+.lab-neighbor-nav { gap: 4px; }
+.lab-neighbor-nav button { font-size: 11px; padding: 8px; }
 }
-/* Sound toggle: same setting as the main game. */
 .lab-mute { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid #d9d0bc; border-radius: 12px; background: #fffcf4; color: var(--lab-accent, #6b604c); }
 .lab-mute svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lab-mute[aria-pressed="true"] { color: #9b9284; }
 .lab-play-goal button.is-new { animation: lab-nudge 1.8s ease-in-out 3; }
 @keyframes lab-nudge { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(-2px) scale(1.04); } 90% { transform: none; } }
-
-/* Win moment: the finished board glows and sparkles; nothing here takes pointer input. */
 .lab-play-canvas { position: relative; }
 .lab-play-canvas.is-won > :first-child { animation: lab-won-glow 1.1s ease-out; border-radius: 22px; }
 @keyframes lab-won-glow { 0% { box-shadow: 0 0 0 0 #ffe08a00; transform: scale(1); } 30% { box-shadow: 0 0 0 10px #ffe08acc; transform: scale(1.02); } 100% { box-shadow: 0 0 0 22px #ffe08a00; transform: scale(1); } }
@@ -273,20 +264,17 @@
 @keyframes lab-cheer { 0% { opacity: 0; transform: translate(-50%, -30%) scale(.7); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); } 25% { transform: translate(-50%, -50%) scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -70%) scale(.96); } }
 .lab-clear { animation: lab-clear-in .35s ease-out; }
 @keyframes lab-clear-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@media (max-width: 430px) { .lab-cheer { font-size: 15px; padding: 9px 14px; } .lab-mute { width: 34px; height: 34px; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .lab *, .lab *::before, .lab *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-  /* Without its fade-out the cheer would cover the board for good; the status line below says it instead. */
-  .lab-celebrate { display: none; }
+@media (max-width: 430px) {.lab-cheer { font-size: 15px; padding: 9px 14px; }
+.lab-mute { width: 34px; height: 34px; }
 }
-
-@media (max-width: 350px) {
-  .lab-hero { grid-template-columns: 1fr; padding-left: 5px; }
-  .lab-hero-art { display: none; }
-  .lab-hero h1 { white-space: normal; }
-  .lab-welcome-strip { flex-wrap: wrap; justify-content: center; gap: 6px 14px; }
-  .lab-top { flex-wrap: wrap; }
-  .lab-tools button { flex-direction: column; gap: 3px; padding: 8px 4px; }
-  .lab-clear-actions { flex-direction: column; }
+@media (prefers-reduced-motion: reduce) {.lab *, .lab *::before, .lab *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+.lab-celebrate { display: none; }
+}
+@media (max-width: 350px) {.lab-hero { grid-template-columns: 1fr; padding-left: 5px; }
+.lab-hero-art { display: none; }
+.lab-hero h1 { white-space: normal; }
+.lab-welcome-strip { flex-wrap: wrap; justify-content: center; gap: 6px 14px; }
+.lab-top { flex-wrap: wrap; }
+.lab-tools button { flex-direction: column; gap: 3px; padding: 8px 4px; }
+.lab-clear-actions { flex-direction: column; }
 }

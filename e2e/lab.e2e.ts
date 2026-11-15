@@ -26,7 +26,7 @@ async function enterLab(page: Page) {
   await page.goto('/');
   await page.locator('.lab-entry').click();
   await expect(page.getByRole('heading', { name: '상상 실험실', exact: true })).toBeFocused();
-  await expect(page.locator('.lab-concept')).toHaveCount(10);
+  await expect(page.locator('.lab-concept')).toHaveCount(2);
 }
 
 async function selectKind(page: Page, kind: Stage['kind']) {
@@ -43,32 +43,9 @@ async function openStage(page: Page, number: number) {
 async function move(page: Page, stage: Stage, state: State, action: number, touch = false): Promise<State> {
   const next = act(stage, state, action);
   expect(next, `${stage.id}: fixture action ${action} is legal`).not.toBeNull();
-  const cell = Math.floor(action / 3), value = action % 3;
   const activate = (control: Locator) => touch ? control.tap() : control.click();
-  switch (stage.kind) {
-    case 'acorn': case 'twins':
-      await activate(page.getByRole('button', { name: directions[action], exact: true })); break;
-    case 'lights': await activate(page.locator('.lb-lantern-cell').nth(action)); break;
-    case 'coral':
-      await activate(page.locator('.lb-color-button').nth([...new Set(stage.start)].sort((a, b) => a - b).indexOf(action))); break;
-    case 'cloud': case 'balance':
-      for (let n = 0; n < (value - state[cell] + 3) % 3; n++) {
-        await activate(page.locator(stage.kind === 'cloud' ? '.lb-stitch-cell' : '.lb-candy-card').nth(cell));
-      }
-      break;
-    case 'moon':
-      await activate(page.locator('.lb-moon-cell').nth(Math.floor(action / state.length)));
-      await activate(page.locator('.lb-moon-cell').nth(action % state.length)); break;
-    case 'mosaic': await activate(page.locator('.lb-mosaic-cell').nth(action)); break;
-    case 'bee': await activate(page.locator('.lb-bee-cell').nth(action)); break;
-    case 'bridges':
-      for (let n = 0; n < (value - state[cell] + 3) % 3; n++) {
-        const [a, b] = stage.edges![cell];
-        await activate(page.locator('.lb-island').nth(a));
-        await activate(page.locator('.lb-island').nth(b));
-      }
-      break;
-  }
+  if (stage.kind === 'twins') await activate(page.getByRole('button', { name: directions[action], exact: true }));
+  else await activate(page.locator('.lb-bee-cell').nth(action));
   return next!;
 }
 
@@ -164,15 +141,9 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 360, height: 640 }
       await fits();
       await openStage(page, 30);
       await fits();
-      if (kind === 'cloud' || kind === 'twins') {
-        await page.getByRole('button', { name: kind === 'cloud' ? '자수 칸 크게 보기' : '숲 크게 보기', exact: true }).click();
+      if (kind === 'twins') {
+        await page.getByRole('button', { name: '숲 크게 보기', exact: true }).click();
         await fits();
-        if (kind === 'cloud' && viewport.width === 320) {
-          const scroll = page.getByRole('region', { name: '확대한 자수판. 좌우로 밀어 볼 수 있어요.', exact: true });
-          expect(await scroll.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
-          await scroll.evaluate(el => { el.scrollLeft = el.scrollWidth; });
-          expect(await scroll.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
-        }
       }
       if (viewport.width === 320) await page.screenshot({ path: info.outputPath(`${kind}-320px.png`), fullPage: true });
       await page.locator('.lab-top .lab-back').click();
@@ -182,8 +153,8 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 360, height: 640 }
 }
 
 test('keyboard movement, undo, rules and stage navigation', async ({ page }) => {
-  await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 15);
-  const stage = allStages.find(s => s.kind === 'acorn' && s.number === 15)!;
+  await enterLab(page); await selectKind(page, 'twins'); await openStage(page, 15);
+  const stage = allStages.find(s => s.kind === 'twins' && s.number === 15)!;
   const undo = page.getByRole('button', { name: '되돌리기', exact: true });
   await page.keyboard.press(arrows[stage.solution[0]]);
   await expect(undo).toBeEnabled();
@@ -200,11 +171,11 @@ test('keyboard movement, undo, rules and stage navigation', async ({ page }) => 
   await page.keyboard.press('Space');
   await expect(page.getByRole('region', { name: '게임 규칙', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '← 이전 판', exact: true }).click();
-  await expect(page.locator('.lab-play h1')).toHaveText(allStages.find(s => s.kind === 'acorn' && s.number === 14)!.title);
+  await expect(page.locator('.lab-play h1')).toHaveText(allStages.find(s => s.kind === 'twins' && s.number === 14)!.title);
 });
 
 test('a blocked move explains the rule and completion can be undone and retried', async ({ page }) => {
-  await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+  await enterLab(page); await selectKind(page, 'twins'); await openStage(page, 1);
   await page.keyboard.press('ArrowLeft');
   await expect(page.locator('.lab-feedback-line')).toContainText('앞이 막혀 있어요');
   await expect(page.getByRole('button', { name: '되돌리기', exact: true })).toBeDisabled();
@@ -240,18 +211,18 @@ test.describe('mobile touch', () => {
 });
 
 test('stamps and ratings survive reloads and synchronize between tabs', async ({ page, context }) => {
-  await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+  await enterLab(page); await selectKind(page, 'twins'); await openStage(page, 1);
   await page.getByRole('button', { name: directions[1], exact: true }).click();
   await expect(page.locator('.lab-clear')).toBeVisible();
   await page.locator('.lab-top .lab-back').click();
   await page.getByRole('button', { name: '또 하고 싶어요', exact: true }).click();
   const second = await context.newPage();
-  await enterLab(second); await selectKind(second, 'acorn');
+  await enterLab(second); await selectKind(second, 'twins');
   await expect(second.getByRole('button', { name: '또 하고 싶어요', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(second.locator('.lab-stage').first()).toHaveAttribute('aria-label', /완료/);
   await second.getByRole('button', { name: '다듬으면 좋아요', exact: true }).click();
   await expect(page.getByRole('button', { name: '다듬으면 좋아요', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await enterLab(page); await selectKind(page, 'acorn');
+  await enterLab(page); await selectKind(page, 'twins');
   await expect(page.getByRole('button', { name: '다듬으면 좋아요', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.lab-stage').first()).toHaveAttribute('aria-label', /완료/);
 });
@@ -264,7 +235,7 @@ test('storage failures show a notice without interrupting play', async ({ page }
       set.call(this, name, value);
     };
   }, LAB_PROGRESS_KEY);
-  await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+  await enterLab(page); await selectKind(page, 'twins'); await openStage(page, 1);
   await page.getByRole('button', { name: directions[1], exact: true }).click();
   await expect(page.locator('.lab-clear')).toBeVisible();
   await expect(page.locator('.lab-storage-notice')).toBeVisible();
@@ -291,7 +262,7 @@ test('a fresh offline reload can lazy-load every board and run hint Workers', as
 test.describe('win celebration with motion', () => {
   test.use({ reducedMotion: 'no-preference', viewport: { width: 320, height: 568 } });
   test('the board celebrates first, then the result card appears and takes focus', async ({ page }) => {
-    await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+    await enterLab(page); await selectKind(page, 'twins'); await openStage(page, 1);
     await expect(page.getByRole('region', { name: '게임 규칙', exact: true })).toHaveCount(0);
     await page.keyboard.press('ArrowRight');
     await expect(page.locator('.lab-cheer')).toContainText('도토리가 모두 새싹 자리에 쏙!');
@@ -308,7 +279,7 @@ test.describe('win celebration with motion', () => {
 });
 
 test('reduced motion: no celebration layer over the board, card at once', async ({ page }) => {
-  await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+  await enterLab(page); await selectKind(page, 'twins'); await openStage(page, 1);
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('.lab-clear h2')).toBeFocused();
   await expect(page.locator('.lab-celebrate')).toBeHidden();

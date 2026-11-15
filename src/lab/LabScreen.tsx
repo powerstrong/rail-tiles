@@ -1,6 +1,6 @@
 import { type CSSProperties, type ReactNode, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { CONCEPTS, type Concept, conceptById } from './catalog';
-import { act, isWon, neighbor, type Kind, type Stage, type State } from './model';
+import { act, isWon, type Kind, type Stage, type State } from './model';
 import { LabBoard } from './LabBoard';
 import { LAB_STAGES, stagesFor } from './stages';
 import { completeLabStage, LAB_PROGRESS_KEY, loadLabProgress, rateLabConcept, saveLabProgress, type LabProgress } from './storage';
@@ -22,18 +22,7 @@ const doneIn = (progress: LabProgress, stages: Stage[]) => stages.filter(s => pr
 /** The thumbnails are little rule diagrams, not screenshots of unreleased board positions. */
 function ConceptScene({ kind }: { kind: Kind }) {
   let content: ReactNode;
-  const rect = (x: number, y: number, color: string, key: number, text?: string) => (
-    <g key={key}><rect x={x} y={y} width={25} height={25} rx={6} fill={color} />{text && <text x={x + 12.5} y={y + 17} textAnchor="middle" fill="#fffaf1" fontWeight="800" fontSize={13}>{text}</text>}</g>
-  );
-  if (kind === 'acorn') content = <>
-    <path d="M26 91 H154" stroke="#8fad79" strokeWidth={4} strokeLinecap="round" />
-    <path d="M40 84 V39 M29 53 L40 37 L52 54 M123 85 V53 M111 65 L123 50 L135 65" fill="none" stroke="#659466" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
-    <rect x={64} y={64} width={24} height={24} rx={6} fill="#b97c45" />
-    <path d="M66 69 Q76 59 86 69" stroke="#745135" strokeWidth={5} fill="none" />
-    <path d="M94 77 H108 M102 71 L108 77 L102 83" stroke="#387358" fill="none" strokeWidth={3} strokeLinecap="round" />
-    <path d="M119 83 Q104 70 119 69 Q134 71 119 83 M119 85 V76" fill="#85b25f" />
-  </>;
-  else if (kind === 'twins') content = <>
+  if (kind === 'twins') content = <>
     <path d="M90 22 V97" stroke="#b0a1c3" strokeWidth={2} strokeDasharray="5 5" />
     {[49, 131].map((x, i) => <g key={x}>
       <ellipse cx={x - 7} cy={44} rx={5} ry={17} fill={i ? '#dabbea' : '#fffaf5'} stroke="#9c81b5" strokeWidth={2} />
@@ -45,38 +34,6 @@ function ConceptScene({ kind }: { kind: Kind }) {
     <path d="M28 98 H62 M118 98 H152" stroke="#a389ba" strokeWidth={3} strokeLinecap="round" />
     <path d="M30 93 L24 98 L30 103 M150 93 L156 98 L150 103" fill="none" stroke="#a389ba" strokeWidth={3} strokeLinecap="round" />
   </>;
-  else if (kind === 'lights') content = <>
-    <rect x={38} y={18} width={104} height={91} rx={16} fill="#4b4d48" />
-    {Array.from({ length: 9 }, (_, i) => <g key={i}>
-      <circle cx={58 + i % 3 * 32} cy={36 + Math.floor(i / 3) * 28} r={10} fill={[1, 3, 4, 5, 7].includes(i) ? '#f9d96c' : '#75766a'} />
-      {[1, 3, 4, 5, 7].includes(i) && <circle cx={56 + i % 3 * 32} cy={33 + Math.floor(i / 3) * 28} r={3} fill="#fff9d9" />}
-    </g>)}
-  </>;
-  else if (kind === 'coral') content = <>
-    {Array.from({ length: 16 }, (_, i) => rect(36 + i % 4 * 28, 10 + Math.floor(i / 4) * 28, ['#dc777c', '#d5ab47', '#71a98b', '#6c9cbc'][(i % 4 + Math.floor(i / 4) * 2) % 4], i, ['●', '◆', '▲', '■'][(i % 4 + Math.floor(i / 4) * 2) % 4]))}
-    <circle cx={38} cy={12} r={6} fill="#fffaf1" stroke="#276f88" strokeWidth={2} />
-  </>;
-  else if (kind === 'cloud') content = <>
-    <path d="M20 104 Q28 88 43 96 Q54 81 69 96 H144 Q159 104 146 110 H30 Z" fill="#fffaf1" />
-    {Array.from({ length: 16 }, (_, i) => rect(46 + i % 4 * 22, 14 + Math.floor(i / 4) * 22, [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14].includes(i) ? '#7fa7ce' : '#f8f5ec', i))}
-    <path d="M38 22 H29 M38 46 H29 M38 70 H29 M38 92 H29" stroke="#628eb9" strokeWidth={3} strokeLinecap="round" />
-  </>;
-  else if (kind === 'balance') content = <>
-    <path d="M90 37 V100 M67 102 H113 M40 39 H140" stroke="#9c6678" strokeWidth={5} strokeLinecap="round" />
-    <path d="M40 41 L23 78 H57 Z M140 41 L123 78 H157 Z" stroke="#b88996" strokeWidth={2} fill="none" />
-    <path d="M20 77 Q40 98 60 77 M120 77 Q140 98 160 77" fill="#daa9b8" stroke="#9c6678" strokeWidth={2} />
-    <path d="M40 54 L44 63 L54 64 L46 71 L48 81 L40 76 L31 81 L33 71 L26 64 L36 63 Z" fill="#d0a645" />
-    <rect x={132} y={61} width={16} height={19} rx={4} fill="#fffaf1" /><text x={140} y={75} textAnchor="middle" fontSize={13} fill="#9c6678">3</text>
-  </>;
-  else if (kind === 'moon') content = <>
-    <circle cx={143} cy={32} r={16} fill="#f7dc87" /><circle cx={150} cy={26} r={14} fill="#ecebfc" />
-    <path d="M41 72 Q75 26 111 69" stroke="#9390bd" strokeWidth={3} fill="none" strokeDasharray="5 5" />
-    <path d="M103 67 L114 71 L113 59" stroke="#9390bd" strokeWidth={3} fill="none" strokeLinecap="round" />
-    {[40, 76, 112].map((x, i) => <g key={x}><ellipse cx={x} cy={88} rx={15} ry={6} fill="#bcb9d9" /><circle cx={x} cy={79} r={11} fill={i === 2 ? '#f9efd2' : '#8e89b6'} stroke="#7772a0" strokeWidth={2} />{i === 2 && <text x={x} y={84} textAnchor="middle" fill="#b18d33" fontSize={15}>★</text>}</g>)}
-  </>;
-  else if (kind === 'mosaic') content = <>
-    {Array.from({ length: 9 }, (_, i) => rect(47 + i % 3 * 29, 18 + Math.floor(i / 3) * 29, i === 7 ? '#e4d5bc' : ['#c88750', '#d6a86a', '#b57549'][i % 3], i, i === 7 ? undefined : String(i === 8 ? 8 : i + 1)))}
-  </>;
   else if (kind === 'bee') content = <>
     <path d="M35 84 H72 V44 H112 V84 H148" fill="none" stroke="#a2a263" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
     {[[35, 84], [72, 84], [72, 44], [112, 44], [112, 84], [148, 84]].map(([x, y], i) => <g key={i}>
@@ -84,12 +41,6 @@ function ConceptScene({ kind }: { kind: Kind }) {
     </g>)}
     <ellipse cx={31} cy={48} rx={7} ry={10} fill="#fffaf1" /><ellipse cx={43} cy={48} rx={7} ry={10} fill="#fffaf1" />
     <ellipse cx={37} cy={58} rx={14} ry={10} fill="#e9bf55" /><path d="M34 49 V67 M42 50 V66" stroke="#6e6250" strokeWidth={4} /><circle cx={27} cy={56} r={2} fill="#4a4949" />
-  </>;
-  else content = <>
-    <path d="M45 36 H133 V91 H45 Z M45 40 H133 M129 36 V91" stroke="#a88e60" strokeWidth={4} strokeLinecap="round" fill="none" />
-    {[[45, 36, '3'], [133, 36, '4'], [45, 91, '2'], [133, 91, '3']].map(([x, y, label], i) => <g key={i}>
-      <circle cx={Number(x)} cy={Number(y)} r={17} fill="#a3c9a0" stroke="#5e9a85" strokeWidth={2} /><text x={Number(x)} y={Number(y) + 5} textAnchor="middle" fontSize={15} fontWeight="800" fill="#356b5d">{label}</text>
-    </g>)}
   </>;
   return <svg className="lab-scene" viewBox="0 0 180 124" aria-hidden="true">{content}</svg>;
 }
@@ -174,14 +125,14 @@ export function LabScreen({ onBack }: { onBack: () => void }) {
   }
   const totalDone = doneIn(progress, LAB_STAGES);
   return <main className="lab lab-home">
-    <header className="lab-top"><BackButton onClick={onBack}>돌아가기</BackButton><span className="lab-tag">새 게임 10개 · 모두 열려 있어요</span></header>
+    <header className="lab-top"><BackButton onClick={onBack}>돌아가기</BackButton><span className="lab-tag">새 게임 2개 · 모두 열려 있어요</span></header>
     <StorageNotice failed={saveFailed} />
     <section className="lab-hero">
-      <div className="lab-hero-copy"><p className="lab-eyebrow"><span className="lab-spark" aria-hidden="true">✦</span> 작은 생각이 자라는 곳</p><h1 tabIndex={-1} ref={heading}>상상 실험실</h1><p className="lab-hero-lead">아직 지도에 없는<br /><strong>열 가지 여행.</strong></p><p className="lab-hero-description">밀고, 밝히고, 이어 보세요.<br />마음에 드는 세계부터 자유롭게 떠나요.</p></div>
+      <div className="lab-hero-copy"><p className="lab-eyebrow"><span className="lab-spark" aria-hidden="true">✦</span> 작은 생각이 자라는 곳</p><h1 tabIndex={-1} ref={heading}>상상 실험실</h1><p className="lab-hero-lead">아직 지도에 없는<br /><strong>두 가지 여행.</strong></p><p className="lab-hero-description">함께 움직이고, 꽃길을 이어 보세요.<br />마음에 드는 세계부터 자유롭게 떠나요.</p></div>
       <div className="lab-hero-art" aria-hidden="true"><span className="lab-orbit lab-orbit-one">✦</span><span className="lab-orbit lab-orbit-two">✧</span><svg viewBox="0 0 220 210"><path d="M45 172 Q110 145 178 172 L164 185 Q109 166 58 185 Z" fill="#d4c6ad" /><path d="M67 35 H151 V47 H137 V94 L173 153 Q182 173 158 175 H61 Q39 173 48 153 L82 94 V47 H67 Z" fill="#fffcf4" stroke="#74746b" strokeWidth={4} strokeLinejoin="round" /><path d="M70 128 Q91 111 111 128 T153 128 L169 155 Q176 170 157 170 H62 Q46 170 53 156 Z" fill="#a6c2a3" /><path d="M80 142 Q100 130 120 143 T160 142" stroke="#e6f0cd" strokeWidth={4} fill="none" /><circle cx={91} cy={109} r={7} fill="#e8bf68" /><circle cx={124} cy={87} r={5} fill="#b0cbbd" /><circle cx={112} cy={63} r={3} fill="#d0b3c4" /><path d="M105 152 L109 145 L113 152 L121 154 L115 159 L116 167 L109 163 L102 167 L103 159 L97 154 Z" fill="#fbefbc" /><path d="M54 71 L57 62 L60 71 L69 74 L60 77 L57 86 L54 77 L45 74 Z M173 98 L176 89 L179 98 L188 101 L179 104 L176 113 L173 104 L164 101 Z" fill="#c7a55c" /><path d="M64 39 H153" stroke="#77756d" strokeWidth={6} strokeLinecap="round" /></svg><span className="lab-art-caption">오늘은 어떤 생각을 해 볼까?</span></div>
     </section>
     <div className="lab-welcome-strip"><span>🔓 모든 판 자유 선택</span><span>↶ 마음껏 되돌리기</span><span>💡 막히면 힌트</span></div>
-    <div className="lab-section-heading"><div><p className="lab-eyebrow">골라 떠나는 생각 여행</p><h2>열 개의 작은 세계</h2></div><span className="lab-total-stamps">모은 도장 <b>{totalDone}</b> / {LAB_STAGES.length}</span></div>
+    <div className="lab-section-heading"><div><p className="lab-eyebrow">골라 떠나는 생각 여행</p><h2>두 개의 작은 세계</h2></div><span className="lab-total-stamps">모은 도장 <b>{totalDone}</b> / {LAB_STAGES.length}</span></div>
     <section className="lab-concept-grid" aria-label="실험 게임 고르기">{CONCEPTS.map((concept, i) => {
       const count = doneIn(progress, stagesFor(concept.id));
       const opinion = RATINGS.find(r => r.value === progress.ratings[concept.id]);
@@ -196,7 +147,7 @@ export function LabScreen({ onBack }: { onBack: () => void }) {
 }
 
 /** Sound of one accepted move, per game. Win, undo and blocked moves have their own sounds. */
-const MOVE_SFX: Record<Kind, Sfx> = { acorn: 'slide', twins: 'swish', lights: 'pop', coral: 'splash', cloud: 'place', balance: 'place', moon: 'pop', mosaic: 'slide', bee: 'swish', bridges: 'place' };
+const MOVE_SFX: Record<Kind, Sfx> = { twins: 'swish', bee: 'swish' };
 /** How long the board celebrates before the result card takes focus (0 with reduced motion). */
 const CELEBRATE_MS = 900;
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -205,13 +156,8 @@ interface PlayState { history: State[]; note: string; fx: { kind: 'move' | 'deny
 type PlayEvent = { type: 'move'; action: number } | { type: 'direction'; direction: number } | { type: 'undo' } | { type: 'reset' } | { type: 'clear-note' };
 function invalidNote(kind: Kind): string {
   switch (kind) {
-    case 'acorn': return '앞이 막혀 있어요. 도토리를 밀 자리도 한 칸 필요해요.';
     case 'twins': return '두 토끼 모두 막혀 있어요. 다른 방향을 찾아볼까요?';
-    case 'moon': return '달돌 하나를 뛰어넘은 바로 다음 빈칸으로 뛰어요.';
     case 'bee': return '아직 가지 않은 이웃 꽃을 골라요. 벌집은 맨 마지막이에요.';
-    case 'bridges': return '다리가 서로 교차해요. 다른 길로 이어 볼까요?';
-    case 'mosaic': return '빈칸 바로 옆의 조각을 골라 주세요.';
-    case 'coral': return '지금과 다른 색을 골라 물결을 넓혀 보세요.';
     default: return '다른 칸을 골라 다시 해 봐요.';
   }
 }
@@ -228,7 +174,7 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
     if (isWon(stage, now)) return current;
     // Resolve directional moves against reducer state, including multiple batched key events.
     const action = event.type === 'direction'
-      ? stage.kind === 'mosaic' ? neighbor(stage, now.indexOf(0), event.direction) : event.direction
+      ? event.direction
       : event.action;
     if (action < 0) return current;
     const next = act(stage, now, action);
@@ -280,13 +226,13 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
     return () => window.removeEventListener('keydown', key);
   }, []);
   useEffect(() => {
-    if (!['acorn', 'twins', 'mosaic'].includes(stage.kind) || won) return;
+    if (!(stage.kind === 'twins') || won) return;
     const arrow = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
       if (target?.isContentEditable || target?.matches('input,textarea,select')) return;
       // Focused boards already handle arrows. Tools and the entry heading need this fallback.
-      if (target?.closest('.lb-movement, .lb-mosaic')) return;
+      if (target?.closest('.lb-movement')) return;
       const direction = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'].indexOf(event.key);
       if (direction < 0) return;
       event.preventDefault();
@@ -296,12 +242,7 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
     return () => window.removeEventListener('keydown', arrow);
   }, [stage.kind, won]);
   const total = stagesFor(stage.kind).length;
-  const progressText = stage.kind === 'lights' ? `반짝이는 등 ${state.filter(Boolean).length} / ${state.length}`
-    : stage.kind === 'coral' ? `색 ${new Set(state).size}가지가 남았어요`
-    : stage.kind === 'moon' ? `남은 달돌 ${state.filter(Boolean).length}개`
-    : stage.kind === 'bee' ? `방문한 꽃길 ${state.length} / ${stage.terrain!.filter(Boolean).length}`
-    : stage.kind === 'balance' ? `접시에 올린 별사탕 ${state.filter(Boolean).length} / ${state.length}`
-    : `${moves}번 움직였어요`;
+  const progressText = stage.kind === 'bee' ? `방문한 꽃길 ${state.length} / ${stage.terrain!.filter(Boolean).length}` : `${moves}번 움직였어요`;
   return <main className={`lab lab-play lab-${concept.id}`} style={theme(concept)}>
     <header className="lab-top"><BackButton onClick={onBack}>스테이지 고르기</BackButton><span className="lab-play-world"><span aria-hidden="true">{concept.icon}</span>{concept.title}</span>
       <button className="lab-mute" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 H7.5 L12 5.5 V18.5 L7.5 14.5 H4 Z" />{muted ? <path d="M16 9.5 L21 14.5 M21 9.5 L16 14.5" /> : <path d="M15.5 9 Q17.5 12 15.5 15 M18 6.5 Q22 12 18 17.5" />}</svg></button></header>

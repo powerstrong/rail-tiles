@@ -11,7 +11,7 @@ const renderBoard = (s: Stage, v: State, hint: number | null, disabled = false) 
 const replay = (s: Stage) => s.solution.reduce((v, a) => act(s, v, a)!, s.start);
 
 describe('experimental board render contract', () => {
-  it('renders all 300 initial boards with a visible hint and descriptive controls', () => {
+  it('renders all 60 initial boards with a visible hint and descriptive controls', () => {
     for (const s of LAB_STAGES) {
       const html = renderBoard(s, s.start, s.solution[0]);
       expect(html, s.id).not.toMatch(/(?:NaN|undefined|残り)/);
@@ -39,30 +39,13 @@ describe('experimental board render contract', () => {
       expect(renderBoard(s, v, path[0]), s.id).toMatch(/lb-hint(?:[ "-])/);
     }
   });
-  it('does not mark an empty planting bed complete just because the squirrel stands on it', () => {
-    const s = stagesFor('acorn')[0];
-    const html = renderBoard(s, [s.goal[0], ...s.start.slice(1)], null);
-    expect(html).not.toContain('lb-cell-check');
-    expect(renderBoard(s, replay(s), null, true)).toContain('lb-cell-check');
-  });
-  it('keeps introductory coral choices to the three shapes taught on that stage', () => {
-    const s = stagesFor('coral')[0];
-    const html = renderBoard(s, s.start, null);
-    expect((html.match(/class="lb-color-button/g) ?? []).length).toBe(3);
-  });
-  it('reads each candy destination with the correct Korean particle', () => {
-    const s = stagesFor('balance')[0];
-    const html = renderBoard(s, [0, 1, 2], null);
-    for (const destination of ['왼쪽 접시로', '오른쪽 접시로', '쟁반으로']) {
-      expect(html).toContain(`누르면 ${destination} 옮겨요.`);
-    }
-  });
-  it('shows all ten experiment entries without touching unavailable storage', () => {
+
+  it('shows all two experiment entries without touching unavailable storage', () => {
     const warn = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const html = renderToStaticMarkup(createElement(LabScreen, { onBack: () => {} }));
-      expect((html.match(/<button[^>]*class="lab-concept /g) ?? []).length).toBe(10);
-      expect(html).toContain('300');
+      expect((html.match(/<button[^>]*class="lab-concept /g) ?? []).length).toBe(2);
+      expect(html).toContain('60');
       expect(html).toContain('상상 실험실');
       expect(html).not.toContain('NaN');
     } finally { warn.mockRestore(); }
