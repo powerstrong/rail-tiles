@@ -3,6 +3,8 @@ import { type Pose, type TrackPath, poseAt } from '../engine/geometry';
 export interface RunOptions {
   /** Cruising speed in cells per second. */
   speed: number;
+  /** Scales the animation clock, including acceleration, braking and station dwell. */
+  timeScale?: () => number;
   /** Ease to a stop at the end (arrival). Without it the train halts abruptly (crash). */
   brake: boolean;
   onPose: (pose: Pose) => void;
@@ -37,7 +39,7 @@ export function runTrain(path: TrackPath, opts: RunOptions): () => void {
   let waiting = 0;
 
   const tick = (now: number) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
+    const dt = Math.min(0.05, (now - last) / 1000) * (opts.timeScale?.() ?? 1);
     last = now;
     if (waiting > 0) {
       waiting -= dt;

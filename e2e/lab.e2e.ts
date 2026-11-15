@@ -1,6 +1,8 @@
 import { test as base, expect, type Locator, type Page } from '@playwright/test';
 import { act, KINDS, type Stage, type State } from '../src/lab/model';
-import { stagesFor } from '../src/lab/stages';
+import { readFileSync } from 'node:fs';
+const stages: Stage[] = JSON.parse(readFileSync(new URL('../src/lab/stages.generated.json', import.meta.url), 'utf8'));
+const stagesFor = (kind: Stage['kind']) => stages.filter(s => s.kind === kind);
 import { explore } from '../src/lab/reachability';
 import { PROGRESS_KEY } from '../src/storage';
 

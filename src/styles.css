@@ -3334,3 +3334,7 @@ body:has(.world-clock) {
 }
 
 /* A separate door into experiments; shipped world progress stays untouched. */
+
+.run-tools { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+.run-tools button { padding: 10px 14px; border: 1px solid #bba98b; border-radius: 10px; background: #fff9e9; color: #544d41; font: inherit; font-size: 14px; }
+.ice-stuck button { display: block; margin: 8px auto 0; padding: 8px 12px; border: 1px solid #8cb7d3; border-radius: 9px; background: #f6fcff; color: #335b73; font: inherit; }

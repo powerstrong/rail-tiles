@@ -94,6 +94,9 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   const hideCars = () => wagonRefs.current.forEach((el) => el?.setAttribute('display', 'none'));
   const [editor, setEditor] = useState(createEditor);
   const [tool, setTool] = useState<Tool>(() => RAIL_KINDS.find((k) => stage.inventory[k] > 0) ?? 'eraser');
+  const [attempts, setAttempts] = useState(0);
+  const [fast, setFast] = useState(false);
+  const fastRef = useRef(false);
   const [mode, setMode] = useState<Mode>('edit');
   const [result, setResult] = useState<Trace | null>(null);
   const [restPose, setRestPose] = useState(() => startPose(stage));
@@ -155,6 +158,8 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
 
   /** Leave the result view: train back in the station, failure mark and passengers cleared. */
   const backToEdit = useCallback(() => {
+    fastRef.current = false;
+    setFast(false);
     setMode('edit');
     setResult(null);
     setPicked(new Set());
@@ -255,11 +260,14 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
   };
 
 
-  const start = () => {
+  const start = (quick = false) => {
     if (running) return;
     cancelRun.current?.();
     celebrationTimers.current.forEach(clearTimeout);
     celebrationTimers.current = [];
+    fastRef.current = quick;
+    setFast(quick);
+    setAttempts(n => n + 1);
     const trace = simulate(stage, editor.placed);
     const path = traceToPath(trace.steps);
     // The train stops in the middle of each passenger's tile (first visit only) to let them board.
@@ -313,6 +321,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     play('depart');
     cancelRun.current = runTrain(path, {
       speed: TRAIN_SPEED,
+      timeScale: () => fastRef.current ? 6 : 1,
       brake: trace.success,
       stops: pickups.map((p) => p.at),
       dwell: BOARDING_DWELL,
@@ -326,7 +335,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
           return;
         }
         play('thanks');
-        celebrationTimers.current.push(window.setTimeout(() => play('pickup'), 480));
+        celebrationTimers.current.push(window.setTimeout(() => play('pickup'), fastRef.current ? 80 : 480));
         if (rider) setRiders((prev) => ({ ...prev, [rider.id]: rider.event === 'board' ? 1 : 2 }));
         else if (key) setPicked((prev) => new Set(prev).add(key));
       },
@@ -375,6 +384,17 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
     });
   };
 
+  const cancelAndEdit = () => {
+    cancelRun.current?.();
+    cancelRun.current = null;
+    celebrationTimers.current.forEach(clearTimeout);
+    celebrationTimers.current = [];
+    smokeRef.current?.replaceChildren();
+    // A one-departure bonus starts a new attempt, preserving its single-departure rule.
+    if (stage.oneShot) restartStage();
+    else backToEdit();
+    say(stage.oneShot ? '새 도전이에요. 출발 전에 길을 다시 놓아 봐요.' : '기차를 세웠어요. 레일을 바로 고쳐 보세요.');
+  };
   const doUndo = () => !running && applyEdit(undo(editor)) && play('rotate');
   const doReset = () => !running && applyEdit(resetBoard(editor)) && play('erase');
   const showHint = () => {
@@ -509,7 +529,7 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
             </>
           ) : running ? (
             <span>
-              칙칙폭폭…
+              {fast ? '빠르게 확인하는 중…' : '칙칙폭폭…'}
               {stage.waypoints.length > 0 && (
                 <span className="riders">
                   {' '}
@@ -572,12 +592,19 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
             );
           })}
         </div>
-        <button className="go-btn" onClick={start} disabled={running}>
+        <button className="go-btn" onClick={() => start()} disabled={running}>
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M8 5 L19 12 L8 19 Z" />
           </svg>
           출발
         </button>
+      </div>
+
+      <div className="run-tools" aria-label="운행 확인 도구">
+        {running ? <>
+          {(attempts > 1 || bestStars > 0) && !fast && <button onClick={() => { fastRef.current = true; setFast(true); }}>빠르게 확인</button>}
+          <button onClick={cancelAndEdit}>{stage.oneShot ? '운행 취소 후 새 도전' : '운행 취소 후 바로 수정'}</button>
+        </> : (attempts > 0 || bestStars > 0) && !(stage.oneShot && failure) && <button onClick={() => start(true)}>빠르게 확인</button>}
       </div>
 
       {stage.oneShot && failure && (
