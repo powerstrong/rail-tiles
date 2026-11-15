@@ -1,4 +1,5 @@
 import { TwinsScene, BeeScene } from './story/GardenScene';
+import { FlowScene } from '../flow/FlowArt';
 import type { ComponentType } from 'react';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
 import type { SceneProps } from './story/kit';
@@ -35,6 +36,11 @@ export const farewellId = (world: string) => `${world}:bye`;
 
 /** One story per world, by world id (`src/ui/stories.test.ts` checks every world has one). */
 export const STORIES: Record<string, Story> = {
+  flow: {
+    friend: '실타래 솔솔', tail: 52, Scene: FlowScene,
+    lines: ['실바람 마을 잔치에 걸 조각보를 만들자!', '색과 무늬가 같은 단추끼리 실로 이어 줘.', '겹치면 실이 끊겨. 언제든 다시 이을 수 있어!'],
+    farewell: { tail: 52, Scene: FlowScene, lines: ['모든 조각보가 포근하게 이어졌어!', '우리가 함께 만든 잔치 깃발을 선물할게.', '다음 잔치에도 놀러 와. 안녕!'] },
+  },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,
     lines: ['거울 숲에 온 걸 환영해!', '같은 버튼을 눌러도 옆으로는 반대로 움직여.', '벽에서 기다리며 두 집에 함께 도착해 보자!'],
