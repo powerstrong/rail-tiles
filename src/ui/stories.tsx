@@ -1,3 +1,4 @@
+import { PiecesScene } from '../pieces/Art';
 import { TwinsScene, BeeScene } from './story/GardenScene';
 import type { ComponentType } from 'react';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
@@ -35,6 +36,11 @@ export const farewellId = (world: string) => `${world}:bye`;
 
 /** One story per world, by world id (`src/ui/stories.test.ts` checks every world has one). */
 export const STORIES: Record<string, Story> = {
+  pieces: {
+    friend: '그림 조각 모모', tail: 50, Scene: PiecesScene,
+    lines: ['그림 공방에 온 걸 환영해!', '조각을 돌려서 빈 틀을 채워 줄래?', '틀을 다 채우면 숨어 있던 그림이 나타나!'],
+    farewell: { tail: 50, Scene: PiecesScene, lines: ['서른 개 그림을 모두 찾아냈구나!', '네가 만든 그림책을 선물할게.', '또 새로운 모양을 찾으러 와. 안녕!'] },
+  },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,
     lines: ['거울 숲에 온 걸 환영해!', '같은 버튼을 눌러도 옆으로는 반대로 움직여.', '벽에서 기다리며 두 집에 함께 도착해 보자!'],
