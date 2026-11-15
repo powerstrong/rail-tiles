@@ -1,9 +1,10 @@
-import { type CSSProperties, type ReactNode, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
+import { type CSSProperties, type ReactNode, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CONCEPTS, type Concept, conceptById } from './catalog';
 import { act, isWon, type Kind, type Stage, type State } from './model';
 import { LabBoard } from './LabBoard';
 import { LAB_STAGES, stagesFor } from './stages';
 import { completeLabStage, LAB_PROGRESS_KEY, loadLabProgress, rateLabConcept, saveLabProgress, type LabProgress } from './storage';
+import { explore, lastSolvable, reachability } from './reachability';
 import { useLabHint } from './useLabHint';
 import { isMuted, play, setMuted, type Sfx } from '../ui/sound';
 import './lab.css';
@@ -153,7 +154,7 @@ const CELEBRATE_MS = 900;
 const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 interface PlayState { history: State[]; note: string; fx: { kind: 'move' | 'deny' | 'undo' | 'reset'; seq: number } | null }
-type PlayEvent = { type: 'move'; action: number } | { type: 'direction'; direction: number } | { type: 'undo' } | { type: 'reset' } | { type: 'clear-note' };
+type PlayEvent = { type: 'move'; action: number } | { type: 'direction'; direction: number } | { type: 'undo' } | { type: 'reset' } | { type: 'clear-note' } | { type: 'recover'; index: number };
 function invalidNote(kind: Kind): string {
   switch (kind) {
     case 'twins': return '두 토끼 모두 막혀 있어요. 다른 방향을 찾아볼까요?';
@@ -168,6 +169,7 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
   const [game, dispatch] = useReducer((current: PlayState, event: PlayEvent): PlayState => {
     if (event.type === 'clear-note') return current.note ? { ...current, note: '' } : current;
     const fx = (kind: NonNullable<PlayState['fx']>['kind']) => ({ kind, seq: (current.fx?.seq ?? 0) + 1 });
+    if (event.type === 'recover') return { history: current.history.slice(0, event.index + 1), note: '풀 수 있던 자리로 돌아왔어요. 다른 꽃길을 골라 봐요.', fx: fx('undo') };
     if (event.type === 'reset') return { history: [[...stage.start]], note: '처음 자리로 돌아왔어요. 다른 생각으로 다시 떠나요.', fx: fx('reset') };
     if (event.type === 'undo') return current.history.length > 1 ? { history: current.history.slice(0, -1), note: '한 걸음 되돌렸어요. 천천히 생각해도 좋아요.', fx: fx('undo') } : current;
     const now = current.history.at(-1)!;
@@ -178,9 +180,16 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
       : event.action;
     if (action < 0) return current;
     const next = act(stage, now, action);
+    if (next && stage.kind === 'bee' && next.length < now.length) return { history: current.history.slice(0, -1), note: '꽃길 한 칸을 되짚었어요.', fx: fx('undo') };
     return next ? { history: [...current.history, next], note: '', fx: fx('move') } : { ...current, note: invalidNote(stage.kind), fx: fx('deny') };
   }, { history: [[...stage.start]], note: '', fx: null });
   const state = game.history.at(-1)!, won = isWon(stage, state), moves = game.history.length - 1;
+  const graph = useMemo(() => {
+    if (stage.kind !== 'bee') return null;
+    try { return explore(stage); } catch { return null; }
+  }, [stage]);
+  const stuck = reachability(graph, state) === 'impossible';
+  const recoveryIndex = lastSolvable(graph, game.history);
   // The board comes first: rules are on the stage list and one tap away here, so they never push the board off a phone screen.
   const [helpOpen, setHelpOpen] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
@@ -253,6 +262,9 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
     <div className={`lab-play-canvas${won ? ' is-won' : ''}`}><LabBoard stage={stage} state={state} onAction={action => dispatch({ type: 'move', action })} hint={hint.hint} disabled={won} />
       {won && <div className="lab-celebrate" aria-hidden="true">{Array.from({ length: 10 }, (_, i) => <span key={i} className="lab-spark-burst" style={{ '--i': i } as CSSProperties}>{i % 3 ? '✦' : '★'}</span>)}<p className="lab-cheer"><span>{concept.icon}</span>{concept.cheer}</p></div>}
     </div>
+    {stuck && <div className="lab-stuck" role="status">이 꽃길에서는 모든 꽃을 만나기 어려워요. 괜찮아요, 되짚어 볼까요?
+      {recoveryIndex >= 0 && <button onClick={() => { hint.clear(); dispatch({ type: 'recover', index: recoveryIndex }); }}>마지막으로 풀 수 있던 지점으로 되돌리기</button>}
+    </div>}
     <div className="lab-play-status"><span>{progressText}</span><span>서두르지 않아도 괜찮아요</span></div>
     <div className={`lab-feedback-line${game.note || hint.text ? ' has-message' : ''}`} role="status" aria-live="polite">{game.note || hint.text || (won ? `${concept.cheer} 오늘도 새로운 생각을 찾았어요.` : '궁금하면 눌러 보고, 언제든 한 걸음 되돌려요.')}</div>
     <div className="lab-tools" aria-label="퍼즐 도움 도구">

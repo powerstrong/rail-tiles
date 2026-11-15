@@ -3,6 +3,8 @@ import { writeFileSync } from 'node:fs';
 import { act,  DIRS, isWon, keyOf, KINDS, neighbor, type Kind, type Stage, type State } from '../src/lab/model';
 import { solve } from '../src/lab/solver';
 
+import { beeIntro } from '../src/lab/beeIntros';
+
 let seed = 0x51ab2026;
 function random() { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return (seed >>> 0) / 4294967296; }
 const int = (n: number) => Math.floor(random() * n);
@@ -59,6 +61,7 @@ function makeTwins(n:number):Stage {
   throw new Error(`twins ${n}: no candidate`);
 }
 function makeBee(n:number):Stage {
+  if (n <= 3) return beeIntro(n);
   const size=n<=5?3:n<=20?4:5;
   const length=n<=5?4+n:n<=10?7+Math.floor(n/2):n<=20?11+Math.floor((n-11)/2):16+Math.floor((n-21)/2);
   for(let attempt=0;attempt<5000;attempt++) {

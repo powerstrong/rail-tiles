@@ -20,7 +20,7 @@ describe('lab mechanics: behavior at the boundaries of each rule', () => {
   it('bee visits each flower once and the hive strictly last', () => {
     const s = stage('bee', { cols: 2, rows: 2, terrain: [1, 1, 1, 1], start: [0], goal: [1] });
     expect(act(s, [0], 1)).toBeNull();
-    expect(act(s, [0, 2], 0)).toBeNull();
+    expect(act(s, [0, 2], 0)).toEqual([0]);
     expect(isWon(s, replay(s, [2, 3, 1]))).toBe(true);
   });
 

@@ -101,3 +101,6 @@ button.lb-tile:disabled { cursor: default; opacity: 1; }
 @keyframes lb-lamp-dim { from { transform: scale(1.06); } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {.lb-toy-bunny, .lb-toy-bee, .lb-cell-check { animation: none; }
 }
+.lb-bee-grid { touch-action: none; user-select: none; }
+.lb-hive-lock { position: absolute; bottom: 1px; font-size: clamp(8px, 2.1vw, 12px); background: #fff7df; border-radius: 4px; }
+.lb-bee-retrace { outline: 2px dashed #a17a38; outline-offset: -4px; }

@@ -278,3 +278,5 @@
 .lab-tools button { flex-direction: column; gap: 3px; padding: 8px 4px; }
 .lab-clear-actions { flex-direction: column; }
 }
+.lab-stuck { padding: 12px; margin-top: 16px; border: 1px solid #d7b77d; border-radius: 12px; background: #fff7df; color: #69533a; font-size: 14px; }
+.lab-stuck button { display: block; margin-top: 8px; border: 1px solid #bb985b; border-radius: 8px; padding: 9px; background: #fffcf3; color: inherit; font: inherit; }

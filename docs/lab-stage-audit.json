@@ -1,5 +1,4 @@
 {
-  "seed": "0x51ab2026",
   "count": 60,
   "stages": [
     {
@@ -7,480 +6,600 @@
       "kind": "twins",
       "number": 1,
       "par": 1,
-      "visited": 4,
-      "metric": 1
+      "reachable": 9,
+      "finishable": 9,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-2",
       "kind": "twins",
       "number": 2,
       "par": 4,
-      "visited": 24,
-      "metric": 4
+      "reachable": 41,
+      "finishable": 41,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-3",
       "kind": "twins",
       "number": 3,
       "par": 3,
-      "visited": 19,
-      "metric": 3
+      "reachable": 24,
+      "finishable": 24,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-4",
       "kind": "twins",
       "number": 4,
       "par": 6,
-      "visited": 45,
-      "metric": 6
+      "reachable": 53,
+      "finishable": 53,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-5",
       "kind": "twins",
       "number": 5,
       "par": 6,
-      "visited": 26,
-      "metric": 6
+      "reachable": 35,
+      "finishable": 35,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-6",
       "kind": "twins",
       "number": 6,
       "par": 5,
-      "visited": 35,
-      "metric": 5
+      "reachable": 46,
+      "finishable": 46,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-7",
       "kind": "twins",
       "number": 7,
       "par": 6,
-      "visited": 28,
-      "metric": 6
+      "reachable": 36,
+      "finishable": 36,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-8",
       "kind": "twins",
       "number": 8,
       "par": 6,
-      "visited": 39,
-      "metric": 6
+      "reachable": 51,
+      "finishable": 51,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-9",
       "kind": "twins",
       "number": 9,
       "par": 8,
-      "visited": 36,
-      "metric": 8
+      "reachable": 38,
+      "finishable": 38,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-10",
       "kind": "twins",
       "number": 10,
       "par": 9,
-      "visited": 49,
-      "metric": 9
+      "reachable": 49,
+      "finishable": 49,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-11",
       "kind": "twins",
       "number": 11,
       "par": 7,
-      "visited": 80,
-      "metric": 7
+      "reachable": 155,
+      "finishable": 155,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-12",
       "kind": "twins",
       "number": 12,
       "par": 7,
-      "visited": 93,
-      "metric": 7
+      "reachable": 120,
+      "finishable": 120,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-13",
       "kind": "twins",
       "number": 13,
       "par": 9,
-      "visited": 94,
-      "metric": 9
+      "reachable": 96,
+      "finishable": 96,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-14",
       "kind": "twins",
       "number": 14,
       "par": 9,
-      "visited": 109,
-      "metric": 9
+      "reachable": 115,
+      "finishable": 115,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-15",
       "kind": "twins",
       "number": 15,
       "par": 8,
-      "visited": 130,
-      "metric": 8
+      "reachable": 163,
+      "finishable": 163,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-16",
       "kind": "twins",
       "number": 16,
       "par": 9,
-      "visited": 133,
-      "metric": 9
+      "reachable": 166,
+      "finishable": 166,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-17",
       "kind": "twins",
       "number": 17,
       "par": 10,
-      "visited": 181,
-      "metric": 10
+      "reachable": 191,
+      "finishable": 191,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-18",
       "kind": "twins",
       "number": 18,
       "par": 9,
-      "visited": 101,
-      "metric": 9
+      "reachable": 101,
+      "finishable": 101,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-19",
       "kind": "twins",
       "number": 19,
       "par": 11,
-      "visited": 113,
-      "metric": 11
+      "reachable": 113,
+      "finishable": 113,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-20",
       "kind": "twins",
       "number": 20,
       "par": 10,
-      "visited": 110,
-      "metric": 10
+      "reachable": 110,
+      "finishable": 110,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-21",
       "kind": "twins",
       "number": 21,
       "par": 10,
-      "visited": 287,
-      "metric": 10
+      "reachable": 402,
+      "finishable": 402,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-22",
       "kind": "twins",
       "number": 22,
       "par": 11,
-      "visited": 291,
-      "metric": 11
+      "reachable": 307,
+      "finishable": 307,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-23",
       "kind": "twins",
       "number": 23,
       "par": 12,
-      "visited": 323,
-      "metric": 12
+      "reachable": 345,
+      "finishable": 345,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-24",
       "kind": "twins",
       "number": 24,
       "par": 13,
-      "visited": 269,
-      "metric": 13
+      "reachable": 294,
+      "finishable": 294,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-25",
       "kind": "twins",
       "number": 25,
       "par": 12,
-      "visited": 342,
-      "metric": 12
+      "reachable": 348,
+      "finishable": 348,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-26",
       "kind": "twins",
       "number": 26,
       "par": 12,
-      "visited": 404,
-      "metric": 12
+      "reachable": 420,
+      "finishable": 420,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-27",
       "kind": "twins",
       "number": 27,
       "par": 13,
-      "visited": 371,
-      "metric": 13
+      "reachable": 388,
+      "finishable": 388,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-28",
       "kind": "twins",
       "number": 28,
       "par": 13,
-      "visited": 420,
-      "metric": 13
+      "reachable": 455,
+      "finishable": 455,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-29",
       "kind": "twins",
       "number": 29,
       "par": 15,
-      "visited": 411,
-      "metric": 15
+      "reachable": 422,
+      "finishable": 422,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-twins-30",
       "kind": "twins",
       "number": 30,
       "par": 15,
-      "visited": 304,
-      "metric": 15
+      "reachable": 304,
+      "finishable": 304,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-1",
       "kind": "bee",
       "number": 1,
       "par": 4,
-      "visited": 7,
-      "metric": 4
+      "reachable": 5,
+      "finishable": 5,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-2",
       "kind": "bee",
       "number": 2,
       "par": 5,
-      "visited": 5,
-      "metric": 5
+      "reachable": 6,
+      "finishable": 6,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-3",
       "kind": "bee",
       "number": 3,
       "par": 6,
-      "visited": 6,
-      "metric": 6
+      "reachable": 7,
+      "finishable": 7,
+      "deadEnds": 0,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-4",
       "kind": "bee",
       "number": 4,
       "par": 7,
-      "visited": 19,
-      "metric": 7
+      "reachable": 20,
+      "finishable": 8,
+      "deadEnds": 12,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-5",
       "kind": "bee",
       "number": 5,
       "par": 8,
-      "visited": 18,
-      "metric": 8
+      "reachable": 41,
+      "finishable": 17,
+      "deadEnds": 24,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-6",
       "kind": "bee",
       "number": 6,
       "par": 9,
-      "visited": 35,
-      "metric": 9
+      "reachable": 36,
+      "finishable": 10,
+      "deadEnds": 26,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-7",
       "kind": "bee",
       "number": 7,
       "par": 9,
-      "visited": 9,
-      "metric": 9
+      "reachable": 44,
+      "finishable": 10,
+      "deadEnds": 34,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-8",
       "kind": "bee",
       "number": 8,
       "par": 10,
-      "visited": 28,
-      "metric": 10
+      "reachable": 29,
+      "finishable": 11,
+      "deadEnds": 18,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-9",
       "kind": "bee",
       "number": 9,
       "par": 10,
-      "visited": 54,
-      "metric": 10
+      "reachable": 55,
+      "finishable": 11,
+      "deadEnds": 44,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-10",
       "kind": "bee",
       "number": 10,
       "par": 11,
-      "visited": 31,
-      "metric": 11
+      "reachable": 121,
+      "finishable": 23,
+      "deadEnds": 98,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-11",
       "kind": "bee",
       "number": 11,
       "par": 10,
-      "visited": 25,
-      "metric": 10
+      "reachable": 32,
+      "finishable": 11,
+      "deadEnds": 21,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-12",
       "kind": "bee",
       "number": 12,
       "par": 10,
-      "visited": 10,
-      "metric": 10
+      "reachable": 82,
+      "finishable": 11,
+      "deadEnds": 71,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-13",
       "kind": "bee",
       "number": 13,
       "par": 11,
-      "visited": 23,
-      "metric": 11
+      "reachable": 83,
+      "finishable": 21,
+      "deadEnds": 62,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-14",
       "kind": "bee",
       "number": 14,
       "par": 11,
-      "visited": 42,
-      "metric": 11
+      "reachable": 84,
+      "finishable": 12,
+      "deadEnds": 72,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-15",
       "kind": "bee",
       "number": 15,
       "par": 12,
-      "visited": 48,
-      "metric": 12
+      "reachable": 169,
+      "finishable": 25,
+      "deadEnds": 144,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-16",
       "kind": "bee",
       "number": 16,
       "par": 12,
-      "visited": 107,
-      "metric": 12
+      "reachable": 155,
+      "finishable": 13,
+      "deadEnds": 142,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-17",
       "kind": "bee",
       "number": 17,
       "par": 13,
-      "visited": 91,
-      "metric": 13
+      "reachable": 168,
+      "finishable": 14,
+      "deadEnds": 154,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-18",
       "kind": "bee",
       "number": 18,
       "par": 13,
-      "visited": 24,
-      "metric": 13
+      "reachable": 109,
+      "finishable": 27,
+      "deadEnds": 82,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-19",
       "kind": "bee",
       "number": 19,
       "par": 14,
-      "visited": 137,
-      "metric": 14
+      "reachable": 581,
+      "finishable": 71,
+      "deadEnds": 510,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-20",
       "kind": "bee",
       "number": 20,
       "par": 14,
-      "visited": 235,
-      "metric": 14
+      "reachable": 588,
+      "finishable": 39,
+      "deadEnds": 549,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-21",
       "kind": "bee",
       "number": 21,
       "par": 15,
-      "visited": 102,
-      "metric": 15
+      "reachable": 500,
+      "finishable": 31,
+      "deadEnds": 469,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-22",
       "kind": "bee",
       "number": 22,
       "par": 15,
-      "visited": 15,
-      "metric": 15
+      "reachable": 116,
+      "finishable": 16,
+      "deadEnds": 100,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-23",
       "kind": "bee",
       "number": 23,
       "par": 16,
-      "visited": 16,
-      "metric": 16
+      "reachable": 152,
+      "finishable": 17,
+      "deadEnds": 135,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-24",
       "kind": "bee",
       "number": 24,
       "par": 16,
-      "visited": 16,
-      "metric": 16
+      "reachable": 1002,
+      "finishable": 49,
+      "deadEnds": 953,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-25",
       "kind": "bee",
       "number": 25,
       "par": 17,
-      "visited": 21,
-      "metric": 17
+      "reachable": 1496,
+      "finishable": 126,
+      "deadEnds": 1370,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-26",
       "kind": "bee",
       "number": 26,
       "par": 17,
-      "visited": 55,
-      "metric": 17
+      "reachable": 132,
+      "finishable": 18,
+      "deadEnds": 114,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-27",
       "kind": "bee",
       "number": 27,
       "par": 18,
-      "visited": 60,
-      "metric": 18
+      "reachable": 116,
+      "finishable": 37,
+      "deadEnds": 79,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-28",
       "kind": "bee",
       "number": 28,
       "par": 18,
-      "visited": 34,
-      "metric": 18
+      "reachable": 409,
+      "finishable": 46,
+      "deadEnds": 363,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-29",
       "kind": "bee",
       "number": 29,
       "par": 19,
-      "visited": 81,
-      "metric": 19
+      "reachable": 862,
+      "finishable": 39,
+      "deadEnds": 823,
+      "truncated": false
     },
     {
       "id": "lab-v1-bee-30",
       "kind": "bee",
       "number": 30,
       "par": 19,
-      "visited": 23,
-      "metric": 19
+      "reachable": 181,
+      "finishable": 57,
+      "deadEnds": 124,
+      "truncated": false
     }
   ]
 }

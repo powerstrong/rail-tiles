@@ -46,6 +46,7 @@ export function act(s: Stage, v: State, action: number): State | null {
       return same(out, v) ? null : out;
     }
     case 'bee': {
+      if (v.length > 1 && action === v[v.length - 2]) return v.slice(0, -1);
       if (action >= s.cols * s.rows || !s.terrain![action] || v.includes(action)) return null;
       if (!DIRS.some((_, d) => neighbor(s, v.at(-1)!, d) === action)) return null;
       if (action === s.goal[0] && v.length + 1 !== s.terrain!.filter(Boolean).length) return null;

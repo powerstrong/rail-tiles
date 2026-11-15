@@ -1,4 +1,5 @@
-import { act, actions, isWon, keyOf, type Stage, type State } from './model';
+import { forward } from './reachability';
+import { actions, isWon, keyOf, type Stage, type State } from './model';
 export interface SearchResult { path: number[] | null; visited: number; exhausted: boolean }
 /** Bounded BFS for push, simultaneous motion and flood puzzles. Runs in a Worker in the UI. */
 export function breadthFirst(s: Stage, start: State, budget = 160_000): SearchResult {
@@ -12,7 +13,7 @@ export function breadthFirst(s: Stage, start: State, budget = 160_000): SearchRe
       return { path: path.reverse(), visited: seen.size, exhausted: false };
     }
     for (const action of actions(s, v)) {
-      const next = act(s, v, action);
+      const next = forward(s, v, action);
       if (!next) continue;
       const key = keyOf(next);
       if (seen.has(key)) continue;
@@ -31,7 +32,7 @@ function depthFirst(s: Stage, start: State, budget: number): SearchResult {
     if (seen.has(key)) return null;
     seen.add(key);
     for (const action of actions(s, v)) {
-      const next = act(s, v, action);
+      const next = forward(s, v, action);
       if (!next) continue;
       const tail = walk(next);
       if (tail) return [action, ...tail];
