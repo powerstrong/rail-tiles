@@ -1,3 +1,4 @@
+import { MemoryScene } from './story/MemoryScene';
 import { TwinsScene, BeeScene } from './story/GardenScene';
 import type { ComponentType } from 'react';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
@@ -35,6 +36,11 @@ export const farewellId = (world: string) => `${world}:bye`;
 
 /** One story per world, by world id (`src/ui/stories.test.ts` checks every world has one). */
 export const STORIES: Record<string, Story> = {
+  memory: {
+    friend: '탐험 역장님', tail: 50, Scene: MemoryScene,
+    lines: ['미지의 세계에 온 걸 환영해요!', '같은 그림 두 장을 찾아 주세요.', '짝을 찾으며 새로운 풍경을 만나요.'],
+    farewell: { tail: 50, Scene: MemoryScene, lines: ['서른 번의 여행을 모두 해냈어요!', '발견한 풍경이 하나의 세계로 이어졌어요.', '다음에도 함께 찾아요. 안녕!'] },
+  },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,
     lines: ['거울 숲에 온 걸 환영해!', '같은 버튼을 눌러도 옆으로는 반대로 움직여.', '벽에서 기다리며 두 집에 함께 도착해 보자!'],

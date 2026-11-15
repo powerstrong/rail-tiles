@@ -1,0 +1,36 @@
+import type { ReactNode } from 'react';
+import type { Face } from './model';
+
+/** Original, simple silhouettes; both copies use exactly the same drawing. */
+const ART: Record<Face, ReactNode> = {
+  leaf: <><path d="M10 55Q0 9 55 6Q64 54 10 55Z" fill="#72a953"/><path d="M9 59L46 18M22 44L18 27M31 35L48 37" fill="none" strokeWidth="3"/></>,
+  mushroom: <><path d="M25 28L20 59Q33 65 45 59L39 28" fill="#f4dbad"/><path d="M4 32Q6 1 32 4Q58 1 61 32Q32 42 4 32Z" fill="#c55c45"/><circle cx="20" cy="20" r="5" fill="#fff1cf"/><circle cx="43" cy="17" r="6" fill="#fff1cf"/></>,
+  acorn: <><path d="M13 28Q9 51 32 63Q55 51 51 28Z" fill="#b8803e"/><path d="M7 31Q7 10 32 13Q57 10 57 31Z" fill="#725339"/><path d="M30 14Q29 5 38 3M17 24L22 18M30 27L37 19M45 28L49 23" fill="none" stroke="#e3bc79" strokeWidth="3"/></>,
+  flower: <><path d="M32 30V63M32 53Q10 55 12 39Q29 38 32 53M33 59Q52 60 53 45Q40 43 33 59" fill="#679d54"/><path d="M24 10C26-1 39-1 41 10C55 3 64 17 53 26C64 39 49 49 40 39C31 53 17 46 20 34C3 35 0 18 14 15C10 4 20 2 24 10" fill="#e99a58"/><circle cx="33" cy="24" r="10" fill="#f8dc76"/></>,
+  octopus: <><path d="M13 33Q8 4 32 4Q57 4 52 33L60 49Q64 63 51 59L44 44L45 59Q40 67 35 59L32 45L28 60Q20 67 19 57L21 44L12 58Q0 64 4 51Z" fill="#ac85be"/><circle cx="24" cy="24" r="3"/><circle cx="40" cy="24" r="3"/><path d="M28 32Q32 36 36 32" fill="none"/></>,
+  crab: <><path d="M18 38L6 29L3 10L12 17L20 7L22 25L18 32M46 38L58 29L61 10L52 17L44 7L42 25L46 32" fill="#e4784f"/><ellipse cx="32" cy="42" rx="20" ry="14" fill="#e4784f"/><path d="M20 48L7 55M23 53L15 63M44 48L57 55M41 53L49 63M24 30L22 23M40 30L42 23" fill="none" strokeWidth="4"/><circle cx="22" cy="22" r="3"/><circle cx="42" cy="22" r="3"/></>,
+  turtle: <><path d="M11 40L4 48L15 46M21 40L18 59H27L31 44M39 41L40 59H49L48 41" fill="#80a962"/><path d="M9 42Q8 10 31 10Q51 10 50 42Z" fill="#5e9b91"/><path d="M16 30L26 21L39 23L45 34L33 42L19 39Z" fill="#a4c28e"/><path d="M46 37Q48 19 58 23Q67 28 60 40Z" fill="#80a962"/><circle cx="58" cy="29" r="2"/></>,
+  lighthouse: <><path d="M23 24L12 61H53L42 24" fill="#f5edd1"/><path d="M19 36H45L48 46H16Z" fill="#d36a58"/><path d="M18 24V12H46V24Z" fill="#f9d572"/><path d="M13 12L32 2L51 12Z" fill="#4e8193"/><path d="M7 62H58M32 14V23M28 61V52H37V61" fill="none" strokeWidth="3"/></>,
+  rocket: <><path d="M23 41L8 56L9 32L22 26M41 41L56 56L55 32L42 26" fill="#d16454"/><path d="M23 49L26 65L32 58L38 65L41 49" fill="#edbc4e"/><path d="M21 50Q9 23 32 2Q55 23 43 50Z" fill="#dbe9ef"/><path d="M23 13L32 2L41 13Z" fill="#d16454"/><circle cx="32" cy="29" r="8" fill="#688cb9"/></>,
+  planet: <><circle cx="32" cy="32" r="21" fill="#d6ad66"/><path d="M17 20Q32 24 48 18M12 33Q28 38 51 31M20 46Q35 50 48 42" fill="none" stroke="#b18556" strokeWidth="4"/><path d="M13 27C-16 49 10 63 48 35C76 15 58 5 49 12L54 18C66 20 25 57 9 46Q6 42 15 36" fill="#9a89bd" strokeWidth="3"/></>,
+  robot: <><path d="M10 34H3V52H12M54 34H61V52H52M21 52V64H28V52M38 52V64H45V52" fill="#729aa8" strokeWidth="3"/><rect x="14" y="31" width="38" height="24" rx="3" fill="#92b8c1"/><path d="M32 9V3"/><circle cx="32" cy="3" r="3" fill="#de9b59"/><rect x="10" y="9" width="44" height="25" rx="5" fill="#b9cbd1"/><rect x="18" y="17" width="8" height="8" fill="#526679"/><rect x="38" y="17" width="8" height="8" fill="#526679"/><path d="M27 43H39" stroke="#f7db76" strokeWidth="4"/></>,
+  telescope: <><path d="M31 36L15 63M31 36L48 63M31 36V64" fill="none" strokeWidth="4"/><path d="M7 29L48 7L58 25L18 46Z" fill="#6883af"/><path d="M43 8L50 4L62 25L55 29ZM6 30L12 27L21 43L15 47Z" fill="#dbb665"/><path d="M29 28L35 39" stroke="#c9d9e7" strokeWidth="4"/></>,
+  apple: <><path d="M32 22C10 10 5 36 19 51Q26 58 32 52Q40 59 49 47C61 27 49 12 32 22Z" fill="#e45d56"/><path d="M32 22Q29 12 35 8" fill="none"/><path d="M35 16Q38 4 49 9Q48 20 35 16" fill="#65904c"/></>,
+  banana: <><path d="M12 16Q15 49 50 32Q46 60 25 53Q5 46 12 16Z" fill="#f3c747"/><path d="M15 25Q21 47 44 38" fill="none" stroke="#b98b30"/><path d="M10 16L14 13M48 33L52 30"/></>,
+  grapes: <><path d="M32 16V7M32 12Q44 4 49 12Q40 20 32 12" fill="#77a359"/>{[[22,25],[41,25],[15,38],[32,37],[49,38],[23,49],[40,49],[32,58]].map(([x,y])=><circle key={`${x}-${y}`} cx={x} cy={y} r="8" fill="#9470b5"/>)}</>,
+  strawberry: <><path d="M12 24Q31 9 52 24Q53 42 32 57Q11 42 12 24" fill="#e77c87"/><path d="M16 18L27 20L32 9L37 20L49 18L40 28L32 24L24 28Z" fill="#67994e"/><path d="M23 34l1 2m15-2l1 2m-9 8l1 2" stroke="#fff2cd" strokeWidth="4"/></>,
+  rabbit: <><ellipse cx="23" cy="19" rx="7" ry="16" fill="#fff6e8"/><ellipse cx="41" cy="19" rx="7" ry="16" fill="#fff6e8"/><path d="M23 9V24M41 9V24" stroke="#e4a3ac" strokeWidth="4"/><ellipse cx="32" cy="42" rx="23" ry="18" fill="#fff6e8"/><circle cx="24" cy="40" r="2"/><circle cx="40" cy="40" r="2"/><path d="M29 47H35L32 50Z" fill="#cd7d86"/></>,
+  bear: <><circle cx="15" cy="16" r="10" fill="#b78355"/><circle cx="49" cy="16" r="10" fill="#b78355"/><circle cx="32" cy="35" r="25" fill="#c99a68"/><ellipse cx="32" cy="44" rx="12" ry="9" fill="#f4d6a6"/><circle cx="23" cy="31" r="2"/><circle cx="41" cy="31" r="2"/><path d="M28 40H36L32 44Z"/></>,
+  fish: <><path d="M45 31L59 17V47L45 37" fill="#e5a34b"/><path d="M6 32Q27 3 48 32Q27 61 6 32" fill="#62a8c7"/><path d="M28 19Q36 32 28 45" fill="none" stroke="#e9f6f2" strokeWidth="4"/><circle cx="17" cy="29" r="2"/></>,
+  butterfly: <><path d="M30 30C6-9-6 32 24 37C0 57 25 69 31 42M34 30C58-9 70 32 40 37C64 57 39 69 33 42" fill="#de98c1"/><path d="M32 27V48M31 25L24 16M33 25L40 16" fill="none" strokeWidth="4"/><circle cx="17" cy="24" r="5" fill="#fbe5ac"/><circle cx="47" cy="24" r="5" fill="#fbe5ac"/></>,
+  train: <><rect x="8" y="8" width="48" height="45" rx="12" fill="#648db6"/><rect x="15" y="17" width="34" height="16" rx="3" fill="#e1f4ee"/><path d="M32 17V33M18 57L13 62M46 57L51 62" fill="none"/><circle cx="19" cy="43" r="4" fill="#f7d168"/><circle cx="45" cy="43" r="4" fill="#f7d168"/><path d="M20 51H44"/></>,
+  boat: <><path d="M8 41H57L48 55H18Z" fill="#cf8f58"/><path d="M33 7V40H9Z" fill="#f2c96c"/><path d="M38 13L55 35H38Z" fill="#e8f0df"/><path d="M6 60Q13 55 20 60T34 60T48 60T62 60" fill="none" stroke="#659baa"/></>,
+  umbrella: <><path d="M5 31Q9-4 32 6Q55-4 59 31Q48 22 41 31Q32 22 23 31Q13 22 5 31" fill="#79b3a0"/><path d="M32 7V51Q32 64 43 55" fill="none" strokeWidth="4"/><path d="M23 28Q22 11 32 7Q42 11 41 28" fill="none" stroke="#e3f0d4"/></>,
+  key: <><path d="M26 34L50 58L58 50L52 44L47 49L43 45L48 40L36 28" fill="#e5b953"/><circle cx="23" cy="21" r="17" fill="#e5b953"/><circle cx="23" cy="21" r="7" fill="#fff9ec"/></>,
+};
+export function MemoryArt({ face }: { face: Face }) {
+  return <svg viewBox="0 0 64 68" aria-hidden="true" focusable="false" stroke="#514a41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{ART[face]}</svg>;
+}
+export function CardBack() {
+  return <svg viewBox="0 0 64 68" aria-hidden="true" focusable="false"><rect x="14" y="16" width="28" height="34" rx="7" fill="none" stroke="currentColor" strokeWidth="2" transform="rotate(-12 28 33)"/><rect x="25" y="18" width="28" height="34" rx="7" fill="#397d79" stroke="currentColor" strokeWidth="2"/><path d="M39 26L42 33L49 35L42 38L39 45L36 38L29 35L36 33Z" fill="currentColor"/></svg>;
+}

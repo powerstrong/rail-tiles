@@ -27,15 +27,16 @@ export const isPlaza = (id: string): id is PlazaId => id in PLAZA;
 
 /** Station discs, hand-placed for the shipped worlds (a phone is 360 wide). */
 const PLACED: Record<string, Pt> = {
-  train: [180, 222],
-  twins: [62, 222],
-  bee: [298, 222],
-  ice: [62, 344],
-  machine: [62, 470],
-  volcano: [62, 596],
-  space: [180, 344],
-  clock: [180, 470],
-  depot: [298, 400],
+  twins: [62, 236],
+  bee: [298, 236],
+  train: [120, 358],
+  memory: [240, 358],
+  ice: [62, 484],
+  machine: [62, 610],
+  volcano: [62, 736],
+  space: [180, 484],
+  clock: [180, 610],
+  depot: [298, 540],
 };
 const ROW = 126;
 

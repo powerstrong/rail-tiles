@@ -1,3 +1,5 @@
+import { MemoryScreen } from './memory/MemoryScreen';
+import { MEMORY_CHAPTERS, MEMORY_STAGES } from './memory/stages';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { CONCEPTS } from './lab/catalog';
 import { stagesFor } from './lab/stages';
@@ -137,6 +139,11 @@ export const WORLDS: World[] = [
     chapters: concept.chapters.map((title, i) => ({ number: i + 1, title, blurb: concept.goal, color: concept.color, start: i * 10, count: 10 })),
     Game: PuzzleScreen,
   })),
+  world({
+    id: 'memory', title: '미지의 세계', blurb: '짝을 찾으며 새로운 풍경을 만나요',
+    color: '#397d79', emblem: 'memory', theme: 'world-memory',
+    stages: MEMORY_STAGES, chapters: MEMORY_CHAPTERS, Game: MemoryScreen,
+  }),
   world({
     id: 'ice',
     title: '펭귄 얼음 나라',

@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { Chapter } from '../stages/stages';
 import type { Stars } from '../engine/stars';
 import { withObject } from './korean';
@@ -33,6 +33,7 @@ interface Props {
   /** Replays the farewell (only once the world is all cleared). */
   onFarewell?: () => void;
   daily?: DailyCardProps;
+  collection?: ReactNode;
 }
 
 interface DailyCardProps {
@@ -104,7 +105,7 @@ export function StarRow({ count, className }: { count: number; className?: strin
   );
 }
 
-export function StageSelect({ stages, heading = '스테이지 선택', theme, chapters, stars, cleared, allCleared, onPick, onBack, onStory, onFarewell, daily }: Props) {
+export function StageSelect({ stages, heading = '스테이지 선택', theme, chapters, stars, cleared, allCleared, onPick, onBack, onStory, onFarewell, daily, collection }: Props) {
   const totalStars = stages.reduce((sum, s) => sum + (stars[s.id] ?? 0), 0);
   return (
     <main className={`select ${theme ?? ''}`}>
@@ -124,6 +125,7 @@ export function StageSelect({ stages, heading = '스테이지 선택', theme, ch
           ★ {totalStars} / {stages.length * 3}
         </span>
       </header>
+      {collection}
       {allCleared && (
         <div className="all-clear">
           <p role="status">

@@ -1,4 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { MemoryCollection } from './memory/MemoryCollection';
+import { memoryChapterNote } from './memory/stages';
 import { continueTarget } from './continue';
 import { dailyStreak, dateKey } from './engine/generate';
 import type { Stars } from './engine/stars';
@@ -318,6 +320,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
         stages={stageCards(world)}
         chapters={world.chapters}
         stars={progress.stars}
+        collection={world.id === 'memory' ? <MemoryCollection stars={progress.stars}/> : undefined}
         cleared={cleared}
         allCleared={world.stages.every((s) => cleared.has(s.id))}
         onPick={(index) => playStage(world, index)}
@@ -374,7 +377,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
       // "Next" is only offered after a clear, which unlocks the following stage.
       onNext={() => (hasNext ? playStage(world, next) : toList())}
       onCleared={onCleared}
-      clearNote={openedNote(stage.id, progress)}
+      clearNote={world.id === 'memory' ? memoryChapterNote(stage.id, cleared) : openedNote(stage.id, progress)}
     />
   );
 }

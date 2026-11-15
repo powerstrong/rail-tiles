@@ -10,5 +10,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    // Solver-heavy suites otherwise compete for CPU and memory on small runners.
+    maxWorkers: 1,
+    // Full graph audits can exceed five seconds even without competing workers.
+    testTimeout: 10_000,
   },
 });

@@ -43,3 +43,19 @@ describe('continue', () => {
     expect(loadProgress(store({ schemaVersion: 2, stars: {}, last: { world: 3 } })).last).toBeUndefined();
   });
 });
+
+describe('memory continue integration', () => {
+  it('resumes the unfinished stage, advances after one star and crosses chapters and stops after all thirty', () => {
+    const world = worldById('memory')!;
+    const last = { world: world.id, stage: world.stages[0].id };
+    expect(continueTarget({ stars: {}, last })).toMatchObject({ index: 0, resume: true });
+    expect(continueTarget({ stars: { [last.stage]: 1 }, last })).toMatchObject({ index: 1, resume: false });
+    for (const boundary of [9, 19]) {
+      const stars = Object.fromEntries(world.stages.slice(0, boundary + 1).map(s => [s.id, 1 as const]));
+      expect(continueTarget({ stars, last: { world: world.id, stage: world.stages[boundary].id } })).toMatchObject({ index: boundary + 1, resume: false });
+    }
+    const stars = Object.fromEntries(world.stages.slice(0, 29).map(s => [s.id, 1 as const]));
+    expect(continueTarget({ stars, last: { world: world.id, stage: world.stages[28].id } })).toMatchObject({ index: 29 });
+    expect(continueTarget({ stars: { ...stars, [world.stages[29].id]: 1 }, last: { world: world.id, stage: world.stages[29].id } })).toBeNull();
+  });
+});
