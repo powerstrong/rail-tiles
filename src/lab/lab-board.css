@@ -226,6 +226,14 @@ button.lb-tile:disabled { cursor: default; opacity: 1; }
 .lb-scroll-note { color: #776c7d; font-size: 12px; line-height: 1.7; text-align: center; margin: 0 0 10px; }
 .lb-toy-squirrel, .lb-toy-bunny, .lb-toy-acorn, .lb-toy-bee, .lb-cell-check { animation: lb-piece-arrive .16s ease-out; }
 @keyframes lb-piece-arrive { from { transform: scale(.88); } to { transform: scale(1); } }
+/* A lantern that just lit up flares once; a coral cell that just joined the region pops. */
+.lb-lantern-on { box-shadow: inset 0 -2px 0 #283a40, 0 0 16px #f0ca6655; }
+.lb-lantern-on .lb-toy-lamp { animation: lb-lamp-flare .38s ease-out; filter: drop-shadow(0 0 6px #ffd96a); }
+@keyframes lb-lamp-flare { 0% { transform: scale(.8); filter: drop-shadow(0 0 0 #ffd96a00); } 55% { transform: scale(1.12); filter: drop-shadow(0 0 12px #ffd96a); } 100% { transform: scale(1); } }
+.lb-lantern-cell:not(.lb-lantern-on) .lb-toy-lamp { animation: lb-lamp-dim .25s ease-out; }
+@keyframes lb-lamp-dim { from { transform: scale(1.06); } to { transform: scale(1); } }
+.lb-coral-owned { animation: lb-coral-join .32s ease-out; }
+@keyframes lb-coral-join { 0% { transform: scale(.9); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {
-  .lb-toy-squirrel, .lb-toy-bunny, .lb-toy-acorn, .lb-toy-bee, .lb-cell-check { animation: none; }
+  .lb-toy-squirrel, .lb-toy-bunny, .lb-toy-acorn, .lb-toy-bee, .lb-cell-check, .lb-lantern-cell .lb-toy-lamp, .lb-coral-owned { animation: none; }
 }

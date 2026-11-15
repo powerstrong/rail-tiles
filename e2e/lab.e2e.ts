@@ -192,11 +192,13 @@ test('keyboard movement, undo, rules and stage navigation', async ({ page }) => 
   await page.getByRole('button', { name: '처음부터', exact: true }).focus();
   await page.keyboard.press(arrows[stage.solution[0]]);
   await expect(undo).toBeEnabled();
-  const rules = page.getByRole('button', { name: /규칙 접기/ });
-  await rules.focus(); await page.keyboard.press('Enter');
+  // Rules start folded so the board is the first thing on a phone screen.
   await expect(page.getByRole('region', { name: '게임 규칙', exact: true })).toHaveCount(0);
-  await page.keyboard.press('Space');
+  const rules = page.getByRole('button', { name: /규칙 보기/ });
+  await rules.focus(); await page.keyboard.press('Enter');
   await expect(page.getByRole('region', { name: '게임 규칙', exact: true })).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(page.getByRole('region', { name: '게임 규칙', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '← 이전 판', exact: true }).click();
   await expect(page.locator('.lab-play h1')).toHaveText(allStages.find(s => s.kind === 'acorn' && s.number === 14)!.title);
 });
@@ -284,4 +286,31 @@ test('a fresh offline reload can lazy-load every board and run hint Workers', as
     await page.locator('.lab-top .lab-back').click();
     await page.locator('.lab-top .lab-back').click();
   }
+});
+
+test.describe('win celebration with motion', () => {
+  test.use({ reducedMotion: 'no-preference', viewport: { width: 320, height: 568 } });
+  test('the board celebrates first, then the result card appears and takes focus', async ({ page }) => {
+    await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+    await expect(page.getByRole('region', { name: '게임 규칙', exact: true })).toHaveCount(0);
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.lab-cheer')).toContainText('도토리가 모두 새싹 자리에 쏙!');
+    // No card yet, so nothing invisible can be tabbed to or pressed.
+    await expect(page.locator('.lab-clear')).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    await expect(page.locator('.lab-clear h2')).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    // Undo during or after the celebration removes both.
+    await page.getByRole('button', { name: '되돌리기', exact: true }).click();
+    await expect(page.locator('.lab-clear')).toHaveCount(0);
+    await expect(page.locator('.lab-celebrate')).toHaveCount(0);
+  });
+});
+
+test('reduced motion: no celebration layer over the board, card at once', async ({ page }) => {
+  await enterLab(page); await selectKind(page, 'acorn'); await openStage(page, 1);
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.lab-clear h2')).toBeFocused();
+  await expect(page.locator('.lab-celebrate')).toBeHidden();
+  await expect(page.locator('.lab-feedback-line')).toContainText('도토리가 모두 새싹 자리에 쏙!');
 });

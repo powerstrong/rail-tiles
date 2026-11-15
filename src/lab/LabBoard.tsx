@@ -178,7 +178,7 @@ function LightsBoard({ stage, state, onAction, hint, disabled }: LabBoardProps) 
       <span className="lb-festival-string" aria-hidden="true" />
       <div className="lb-grid lb-lantern-grid" style={boardStyle(stage)} role="group" aria-label="반딧불 등">
         {state.map((on, cell) => <button key={cell} type="button" className={`lb-tile lb-lantern-cell${on ? ' lb-lantern-on' : ''}${affected.includes(cell) ? ' lb-lantern-preview' : ''}${hint === cell ? ' lb-hint' : ''}`} aria-label={`${location(stage, cell)}, ${on ? '켜진 등' : '꺼진 등'}. 누르면 이 등과 상하좌우 등이 바뀌어요.`} aria-pressed={!!on} onClick={() => onAction(cell)} disabled={disabled} onPointerEnter={() => setPreview(cell)} onPointerLeave={() => setPreview(null)} onFocus={() => setPreview(cell)} onBlur={() => setPreview(null)}>
-          <Toy kind="lamp" /><span className="lb-lamp-state">{on ? 'ON' : 'OFF'}</span>
+          <Toy kind="lamp" /><span className="lb-lamp-state">{on ? '켜짐' : '꺼짐'}</span>
         </button>)}
       </div>
     </div>

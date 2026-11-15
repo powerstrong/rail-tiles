@@ -5,6 +5,7 @@ import { LabBoard } from './LabBoard';
 import { LAB_STAGES, stagesFor } from './stages';
 import { completeLabStage, LAB_PROGRESS_KEY, loadLabProgress, rateLabConcept, saveLabProgress, type LabProgress } from './storage';
 import { useLabHint } from './useLabHint';
+import { isMuted, play, setMuted, type Sfx } from '../ui/sound';
 import './lab.css';
 
 type View = { name: 'home' } | { name: 'select'; kind: Kind } | { name: 'play'; kind: Kind; index: number };
@@ -194,7 +195,13 @@ export function LabScreen({ onBack }: { onBack: () => void }) {
   </main>;
 }
 
-interface PlayState { history: State[]; note: string }
+/** Sound of one accepted move, per game. Win, undo and blocked moves have their own sounds. */
+const MOVE_SFX: Record<Kind, Sfx> = { acorn: 'slide', twins: 'swish', lights: 'pop', coral: 'splash', cloud: 'place', balance: 'place', moon: 'pop', mosaic: 'slide', bee: 'swish', bridges: 'place' };
+/** How long the board celebrates before the result card takes focus (0 with reduced motion). */
+const CELEBRATE_MS = 900;
+const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+interface PlayState { history: State[]; note: string; fx: { kind: 'move' | 'deny' | 'undo' | 'reset'; seq: number } | null }
 type PlayEvent = { type: 'move'; action: number } | { type: 'direction'; direction: number } | { type: 'undo' } | { type: 'reset' } | { type: 'clear-note' };
 function invalidNote(kind: Kind): string {
   switch (kind) {
@@ -214,8 +221,9 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
 }) {
   const [game, dispatch] = useReducer((current: PlayState, event: PlayEvent): PlayState => {
     if (event.type === 'clear-note') return current.note ? { ...current, note: '' } : current;
-    if (event.type === 'reset') return { history: [[...stage.start]], note: '처음 자리로 돌아왔어요. 다른 생각으로 다시 떠나요.' };
-    if (event.type === 'undo') return current.history.length > 1 ? { history: current.history.slice(0, -1), note: '한 걸음 되돌렸어요. 천천히 생각해도 좋아요.' } : current;
+    const fx = (kind: NonNullable<PlayState['fx']>['kind']) => ({ kind, seq: (current.fx?.seq ?? 0) + 1 });
+    if (event.type === 'reset') return { history: [[...stage.start]], note: '처음 자리로 돌아왔어요. 다른 생각으로 다시 떠나요.', fx: fx('reset') };
+    if (event.type === 'undo') return current.history.length > 1 ? { history: current.history.slice(0, -1), note: '한 걸음 되돌렸어요. 천천히 생각해도 좋아요.', fx: fx('undo') } : current;
     const now = current.history.at(-1)!;
     if (isWon(stage, now)) return current;
     // Resolve directional moves against reducer state, including multiple batched key events.
@@ -224,14 +232,23 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
       : event.action;
     if (action < 0) return current;
     const next = act(stage, now, action);
-    return next ? { history: [...current.history, next], note: '' } : { ...current, note: invalidNote(stage.kind) };
-  }, { history: [[...stage.start]], note: '' });
+    return next ? { history: [...current.history, next], note: '', fx: fx('move') } : { ...current, note: invalidNote(stage.kind), fx: fx('deny') };
+  }, { history: [[...stage.start]], note: '', fx: null });
   const state = game.history.at(-1)!, won = isWon(stage, state), moves = game.history.length - 1;
-  const [helpOpen, setHelpOpen] = useState(firstVisit);
+  // The board comes first: rules are on the stage list and one tap away here, so they never push the board off a phone screen.
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [muted, setMutedState] = useState(isMuted);
+  const toggleMute = () => { setMuted(!muted); setMutedState(!muted); };
+  useEffect(() => {
+    if (!game.fx) return;
+    if (game.fx.kind === 'move') play(isWon(stage, game.history.at(-1)!) ? 'arrive' : MOVE_SFX[stage.kind]);
+    else play(game.fx.kind === 'deny' ? 'deny' : 'erase');
+  }, [game.fx, stage]);
   const [reviewOpen, setReviewOpen] = useState(false);
   const hint = useLabHint(stage, state);
   const heading = useRef<HTMLHeadingElement>(null), wonHeading = useRef<HTMLHeadingElement>(null);
   const recorded = useRef(false);
+  const [cardShown, setCardShown] = useState(false);
   const completeRef = useRef(onComplete);
   completeRef.current = onComplete;
   useLayoutEffect(() => {
@@ -240,9 +257,18 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
   }, []);
   useEffect(() => {
     if (won && !recorded.current) { recorded.current = true; completeRef.current(stage.id); }
-    if (won) { wonHeading.current?.focus({ preventScroll: true }); wonHeading.current?.scrollIntoView({ block: 'nearest' }); }
-    if (!won) recorded.current = false;
+    if (!won) { recorded.current = false; setCardShown(false); return; }
+    // Let the child see the finished board and its sparkle first. The card (and its buttons) does not exist
+    // until then, so nothing invisible can take a tap or a key press.
+    if (reducedMotion()) { setCardShown(true); return; }
+    const t = window.setTimeout(() => setCardShown(true), CELEBRATE_MS);
+    return () => clearTimeout(t);
   }, [won, stage.id]);
+  useEffect(() => {
+    if (!cardShown) return;
+    wonHeading.current?.focus({ preventScroll: true });
+    wonHeading.current?.scrollIntoView({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+  }, [cardShown]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'z' || event.shiftKey) return;
@@ -277,20 +303,23 @@ function LabPlay({ stage, concept, completed, firstVisit, onComplete, onBack, on
     : stage.kind === 'balance' ? `접시에 올린 별사탕 ${state.filter(Boolean).length} / ${state.length}`
     : `${moves}번 움직였어요`;
   return <main className={`lab lab-play lab-${concept.id}`} style={theme(concept)}>
-    <header className="lab-top"><BackButton onClick={onBack}>스테이지 고르기</BackButton><span className="lab-play-world"><span aria-hidden="true">{concept.icon}</span>{concept.title}</span></header>
+    <header className="lab-top"><BackButton onClick={onBack}>스테이지 고르기</BackButton><span className="lab-play-world"><span aria-hidden="true">{concept.icon}</span>{concept.title}</span>
+      <button className="lab-mute" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 H7.5 L12 5.5 V18.5 L7.5 14.5 H4 Z" />{muted ? <path d="M16 9.5 L21 14.5 M21 9.5 L16 14.5" /> : <path d="M15.5 9 Q17.5 12 15.5 15 M18 6.5 Q22 12 18 17.5" />}</svg></button></header>
     <StorageNotice failed={saveFailed} />
     <div className="lab-play-heading"><div><p className="lab-eyebrow">{concept.chapters[Math.floor((stage.number - 1) / 10)]} · {stage.number} / {total}</p><h1 tabIndex={-1} ref={heading}>{stage.title}</h1></div>{completed && <span className="lab-done-tag">✓ 도장을 받은 판</span>}</div>
-    <div className="lab-play-goal"><span aria-hidden="true">⚑</span><p>{concept.goal}</p><button aria-expanded={helpOpen} aria-controls="lab-play-rules" onClick={() => setHelpOpen(open => !open)}>{helpOpen ? '규칙 접기' : '규칙 보기'} <span aria-hidden="true">{helpOpen ? '−' : '+'}</span></button></div>
+    <div className="lab-play-goal"><span aria-hidden="true">⚑</span><p>{concept.goal}</p><button className={firstVisit && !helpOpen ? 'is-new' : ''} aria-expanded={helpOpen} aria-controls="lab-play-rules" onClick={() => setHelpOpen(open => !open)}>{helpOpen ? '규칙 접기' : '규칙 보기'} <span aria-hidden="true">{helpOpen ? '−' : '+'}</span></button></div>
     {helpOpen && <section className="lab-play-rules" id="lab-play-rules" aria-label="게임 규칙"><p>{concept.story}</p><ol>{concept.rules.map(rule => <li key={rule}>{rule}</li>)}</ol><button className="lab-text-button" onClick={() => setHelpOpen(false)}>알겠어요, 해 볼게요 ↓</button></section>}
-    <div className="lab-play-canvas"><LabBoard stage={stage} state={state} onAction={action => dispatch({ type: 'move', action })} hint={hint.hint} disabled={won} /></div>
+    <div className={`lab-play-canvas${won ? ' is-won' : ''}`}><LabBoard stage={stage} state={state} onAction={action => dispatch({ type: 'move', action })} hint={hint.hint} disabled={won} />
+      {won && <div className="lab-celebrate" aria-hidden="true">{Array.from({ length: 10 }, (_, i) => <span key={i} className="lab-spark-burst" style={{ '--i': i } as CSSProperties}>{i % 3 ? '✦' : '★'}</span>)}<p className="lab-cheer"><span>{concept.icon}</span>{concept.cheer}</p></div>}
+    </div>
     <div className="lab-play-status"><span>{progressText}</span><span>서두르지 않아도 괜찮아요</span></div>
-    <div className={`lab-feedback-line${game.note || hint.text ? ' has-message' : ''}`} role="status" aria-live="polite">{game.note || hint.text || (won ? '멋져요! 오늘도 새로운 생각을 찾았어요.' : '궁금하면 눌러 보고, 언제든 한 걸음 되돌려요.')}</div>
+    <div className={`lab-feedback-line${game.note || hint.text ? ' has-message' : ''}`} role="status" aria-live="polite">{game.note || hint.text || (won ? `${concept.cheer} 오늘도 새로운 생각을 찾았어요.` : '궁금하면 눌러 보고, 언제든 한 걸음 되돌려요.')}</div>
     <div className="lab-tools" aria-label="퍼즐 도움 도구">
       <button onClick={() => dispatch({ type: 'undo' })} disabled={moves === 0}><span aria-hidden="true">↶</span><span>되돌리기</span></button>
       <button onClick={() => { hint.clear(); dispatch({ type: 'reset' }); }}><span aria-hidden="true">↻</span><span>처음부터</span></button>
       <button onClick={() => { dispatch({ type: 'clear-note' }); hint.request(); }} disabled={hint.busy || won} aria-busy={hint.busy}><span aria-hidden="true">{hint.busy ? '◌' : '💡'}</span><span>{hint.busy ? '생각하는 중…' : '한 걸음 힌트'}</span></button>
     </div>
-    {won && <section className="lab-clear" aria-label="스테이지 완료"><span className="lab-clear-stamp" aria-hidden="true">✦</span><div><p className="lab-eyebrow">생각의 도장을 받았어요</p><h2 tabIndex={-1} ref={wonHeading}>{stage.number === total ? '이 세계의 마지막 판도 해냈어요!' : '해냈어요! 한 뼘 자란 생각.'}</h2><p>힌트를 썼어도, 여러 번 되돌렸어도 멋진 완성이에요.</p></div><div className="lab-clear-actions">{stage.number < total ? <button className="lab-solid-button" onClick={() => onPick(stage.number)}>다음 여행으로 →</button> : <button className="lab-solid-button" onClick={onLab}>다른 세계 만나기 →</button>}<button className="lab-outline-button" onClick={onBack}>스테이지 고르기</button></div></section>}
+    {won && cardShown && <section className="lab-clear" aria-label="스테이지 완료"><span className="lab-clear-stamp" aria-hidden="true">✦</span><div><p className="lab-eyebrow">생각의 도장을 받았어요</p><h2 tabIndex={-1} ref={wonHeading}>{stage.number === total ? '이 세계의 마지막 판도 해냈어요!' : '해냈어요! 한 뼘 자란 생각.'}</h2><p>힌트를 썼어도, 여러 번 되돌렸어도 멋진 완성이에요.</p></div><div className="lab-clear-actions">{stage.number < total ? <button className="lab-solid-button" onClick={() => onPick(stage.number)}>다음 여행으로 →</button> : <button className="lab-solid-button" onClick={onLab}>다른 세계 만나기 →</button>}<button className="lab-outline-button" onClick={onBack}>스테이지 고르기</button></div></section>}
     <nav className="lab-neighbor-nav" aria-label="다른 스테이지"><button disabled={stage.number === 1} onClick={() => onPick(stage.number - 2)}>← 이전 판</button><button onClick={onBack}>전체 {total}판 보기</button><button disabled={stage.number === total} onClick={() => onPick(stage.number)}>다음 판 →</button></nav>
     <div className="lab-review-toggle"><button className="lab-text-button" onClick={() => setReviewOpen(open => !open)} aria-expanded={reviewOpen}>{reviewOpen ? '마음 남기기 접기' : '이 게임에 마음 남기기 ♡'}</button></div>
     {reviewOpen && <RatingButtons concept={concept} value={rating} onRate={onRate} />}
