@@ -1,7 +1,7 @@
 import { forward } from './reachability';
 import { actions, isWon, keyOf, type Stage, type State } from './model';
 export interface SearchResult { path: number[] | null; visited: number; exhausted: boolean }
-/** Bounded BFS for push, simultaneous motion and flood puzzles. Runs in a Worker in the UI. */
+/** Bounded BFS for simultaneous rabbit motion. Runs in a Worker in the UI. */
 export function breadthFirst(s: Stage, start: State, budget = 160_000): SearchResult {
   const nodes: { v: State; parent: number; action: number }[] = [{ v: start, parent: -1, action: -1 }];
   const seen = new Set([keyOf(start)]);

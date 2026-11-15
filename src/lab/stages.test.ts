@@ -90,3 +90,26 @@ describe('age-appropriate construction constraints', () => {
   });
 
 });
+
+describe('retained puzzle curation', () => {
+  it('keeps all sixty boards distinct and increases the challenge across chapters', () => {
+    const signatures = LAB_STAGES.map(s => JSON.stringify([s.kind, s.cols, s.rows, s.start, s.goal, s.terrain, s.terrain2]));
+    expect(new Set(signatures).size).toBe(60);
+    for (const kind of KINDS) {
+      const stages = stagesFor(kind);
+      const averages = [0, 1, 2].map(ch => stages.slice(ch * 10, ch * 10 + 10).reduce((sum, s) => sum + s.par, 0) / 10);
+      expect(averages[1]).toBeGreaterThan(averages[0]);
+      expect(averages[2]).toBeGreaterThan(averages[1]);
+    }
+  });
+  it('retains shortest rabbit answers and no forward dead ends in any published rabbit board', async () => {
+    const { explore } = await import('./reachability');
+    const { breadthFirst } = await import('./solver');
+    for (const s of stagesFor('twins')) {
+      expect(breadthFirst(s, s.start).path?.length, s.id).toBe(s.par);
+      const graph = explore(s);
+      expect(graph.truncated).toBe(false);
+      expect(graph.states.size, s.id).toBe(graph.toWin.size);
+    }
+  });
+});

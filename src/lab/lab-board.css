@@ -97,8 +97,6 @@ button.lb-tile:disabled { cursor: default; opacity: 1; }
 .lb-scroll-note { color: #776c7d; font-size: 12px; line-height: 1.7; text-align: center; margin: 0 0 10px; }
 .lb-toy-bunny, .lb-toy-bee, .lb-cell-check { animation: lb-piece-arrive .16s ease-out; }
 @keyframes lb-piece-arrive { from { transform: scale(.88); } to { transform: scale(1); } }
-@keyframes lb-lamp-flare { 0% { transform: scale(.8); filter: drop-shadow(0 0 0 #ffd96a00); } 55% { transform: scale(1.12); filter: drop-shadow(0 0 12px #ffd96a); } 100% { transform: scale(1); } }
-@keyframes lb-lamp-dim { from { transform: scale(1.06); } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {.lb-toy-bunny, .lb-toy-bee, .lb-cell-check { animation: none; }
 }
 .lb-bee-grid { touch-action: none; user-select: none; }

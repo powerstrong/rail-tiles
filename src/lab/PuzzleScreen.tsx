@@ -123,7 +123,7 @@ export function PuzzleScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
     <div className={`lab-play-canvas${won ? ' is-won' : ''}`}><LabBoard stage={stage} state={state} onAction={action => dispatch({ type: 'move', action })} hint={hint.hint} disabled={won} previousState={game.history.at(-2)} lastAction={game.fx?.kind === 'move' ? game.fx.action ?? null : null} />
       {won && <div className="lab-celebrate" aria-hidden="true">{Array.from({ length: 10 }, (_, i) => <span key={i} className="lab-spark-burst" style={{ '--i': i } as CSSProperties}>{i % 3 ? '✦' : '★'}</span>)}<p className="lab-cheer"><span>{concept.icon}</span>{concept.cheer}</p></div>}
     </div>
-    {stuck && <div className="lab-stuck" role="status">이 꽃길에서는 모든 꽃을 만나기 어려워요. 괜찮아요, 되짚어 볼까요?
+    {stuck && <div className="lab-stuck" role="status">이 꽃길은 끝까지 이을 수 없어요. 괜찮아요, 되짚어 볼까요?
       {recoveryIndex >= 0 && <button onClick={() => { hint.clear(); dispatch({ type: 'recover', index: recoveryIndex }); }}>마지막으로 풀 수 있던 지점으로 되돌리기</button>}
     </div>}
     <div className="lab-play-status"><span>{progressText}</span><span>★★★ {stage.par} · ★★ {stage.par + TWO_STAR_SLACK}번 이하{hinted ? ' · 힌트 사용(최대 ★★)' : ''}</span></div>

@@ -170,6 +170,8 @@ test('offline reload can play both worlds and run the bundled hint worker', asyn
   await page.reload();
   await page.getByRole('button', { name: /이어하기/ }).click();
   await hint(page);
+  await open(page, 'twins');
+  await hint(page);
   await context.setOffline(false);
 });
 
@@ -234,4 +236,46 @@ test('device routes live inside Wildflower and preserved boss records still unlo
   await expect(page.locator('.route-station')).toHaveCount(9);
   for (const title of ['기차 차고지', '우주 정거장']) await expect(page.getByRole('button', { name: new RegExp(`^${title}, 별`) })).toBeVisible();
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).stars['t2-busy-crossing'], PROGRESS_KEY)).toBe(3);
+});
+
+test('official world result buttons wait for the card before accepting keyboard focus', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({
+    schemaVersion: 2, stars: { 'last-run': 3 }, stories: ['ice'],
+    last: { world: 'ice', stage: 'ice-first-slide' },
+  })), PROGRESS_KEY);
+  await page.reload();
+  await page.getByRole('button', { name: /이어하기/ }).click();
+  const intro = page.getByRole('button', { name: '알았어요!', exact: true });
+  if (await intro.count()) await intro.click();
+  await page.getByRole('button', { name: '왼쪽으로 밀기', exact: true }).click();
+  await page.getByRole('button', { name: '아래로 밀기', exact: true }).click();
+  const overlay = page.getByRole('dialog', { name: '스테이지 클리어', exact: true });
+  await expect(overlay).toHaveClass('overlay arming');
+  const next = overlay.locator('.result-actions .primary');
+  // Focusing an invisible button used to succeed (including its React autoFocus).
+  await next.evaluate(button => button.focus());
+  await expect(next).not.toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(overlay).toBeVisible();
+  await expect(overlay).toHaveClass('overlay');
+  await expect(next).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(overlay).toHaveCount(0);
+});
+
+
+test.describe('puzzle win celebration', () => {
+  test.use({ reducedMotion: 'no-preference' });
+  test('lets the finished board celebrate before the result card takes focus', async ({ page }) => {
+    const stage = await open(page, 'twins');
+    await move(page, stage, stage.start, stage.solution[0]);
+    await expect(page.locator('.lab-celebrate')).toBeVisible();
+    await expect(page.locator('.lab-clear')).toHaveCount(0);
+    await expect(page.locator('.lab-clear')).toBeVisible();
+    await expect(page.locator('.lab-clear h2')).toBeFocused();
+    await page.keyboard.press('ControlOrMeta+z');
+    await expect(page.locator('.lab-clear')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '위로 움직이기', exact: true })).toBeEnabled();
+  });
 });
