@@ -1,3 +1,5 @@
+import { CloudScreen } from './cloud/CloudScreen';
+import { CLOUD_CHAPTERS, CLOUD_STAGES } from './cloud/stages';
 import { PuzzleScreen } from './lab/PuzzleScreen';
 import { CONCEPTS } from './lab/catalog';
 import { stagesFor } from './lab/stages';
@@ -113,6 +115,11 @@ export interface World<S extends WorldStage = WorldStage> {
 const world = <S extends WorldStage>(w: World<S>) => w as unknown as World;
 
 export const WORLDS: World[] = [
+  world({
+    id: 'cloud', title: '구름 자수 공방', blurb: '숫자 묶음을 풀어 색실 작품을 수놓아요',
+    color: '#4775a1', emblem: 'cloud', theme: 'world-cloud',
+    stages: CLOUD_STAGES, chapters: CLOUD_CHAPTERS, Game: CloudScreen,
+  }),
   world({
     id: 'train',
     title: '들꽃 기차 마을',

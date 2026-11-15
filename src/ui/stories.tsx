@@ -1,3 +1,4 @@
+import { CloudScene } from '../cloud/CloudScene';
 import { TwinsScene, BeeScene } from './story/GardenScene';
 import type { ComponentType } from 'react';
 import { ClockFarewell, ClockScene } from './story/ClockScene';
@@ -35,6 +36,11 @@ export const farewellId = (world: string) => `${world}:bye`;
 
 /** One story per world, by world id (`src/ui/stories.test.ts` checks every world has one). */
 export const STORIES: Record<string, Story> = {
+  cloud: {
+    friend: '구름 공방지기', tail: 50, Scene: CloudScene,
+    lines: ['구름 위 자수 공방에 온 걸 환영해!', '숫자만큼 붙여 수놓고, 묶음 사이는 비워 줘.', '한 땀부터 시작해서 우리 전시회를 열자!'],
+    farewell: { tail: 50, Scene: CloudScene, lines: ['서른 작품에 모두 색실이 피었어!', '네가 수놓은 마음을 기차에 걸어 줄게.', '작품을 보러 언제든 다시 와. 안녕!'] },
+  },
   twins: {
     friend: '루루와 라라', tail: 50, Scene: TwinsScene,
     lines: ['거울 숲에 온 걸 환영해!', '같은 버튼을 눌러도 옆으로는 반대로 움직여.', '벽에서 기다리며 두 집에 함께 도착해 보자!'],
