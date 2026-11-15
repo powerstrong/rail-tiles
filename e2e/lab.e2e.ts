@@ -61,6 +61,7 @@ for (const kind of KINDS) test(`${kind}: all 30 official stages finish through c
   }
   await expect(page.getByRole('button', { name: '다음 스테이지 →', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '스테이지 고르기', exact: true }).last().click();
+  await page.getByRole('button', { name: '건너뛰기', exact: true }).click();
   await expect(page.locator('.stage-card')).toHaveCount(30);
 });
 
@@ -189,4 +190,48 @@ test('penguin warns immediately after the first bad slide and remains movable', 
   await expect(page.getByRole('button', { name: '아래로 밀기', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: '아래로 밀기', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '스테이지 클리어', exact: true })).toBeVisible();
+});
+
+test('rail retry can cancel into editing, preserve rails, and verify quickly', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({ schemaVersion: 2, stars: {},
+    stories: ['train'], last: { world: 'train', stage: 'first-line' },
+  })), PROGRESS_KEY);
+  await page.reload(); await page.getByRole('button', { name: /이어하기/ }).click();
+  const cell = async (x: number, y: number) => {
+    const point = await page.locator('svg.board').evaluate((svg, [x, y]) => {
+      const point = (svg as SVGSVGElement).createSVGPoint(); point.x = (x + 0.5) * 100; point.y = (y + 0.5) * 100;
+      const screen = point.matrixTransform((svg as SVGSVGElement).getScreenCTM()!);
+      return { x: screen.x, y: screen.y };
+    }, [x, y]);
+    await page.mouse.click(point.x, point.y);
+  };
+  for (const x of [1, 2, 3]) await cell(x, 2);
+  await expect(page.locator('.rail-spin')).toHaveCount(3);
+  await expect(page.getByRole('button', { name: '빠르게 확인', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '출발', exact: true }).click();
+  await page.getByRole('button', { name: '운행 취소 후 바로 수정', exact: true }).click();
+  await expect(page.locator('.rail-spin')).toHaveCount(3);
+  await expect(page.getByRole('button', { name: '되돌리기', exact: true })).toBeEnabled();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).stars['first-line'], PROGRESS_KEY)).toBeUndefined();
+  await page.getByRole('button', { name: '빠르게 확인', exact: true }).click();
+  await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).stars['first-line'], PROGRESS_KEY), { timeout: 2000 }).toBe(3);
+});
+
+test('device routes live inside Wildflower and preserved boss records still unlock depot and space', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(key => localStorage.setItem(key, JSON.stringify({ schemaVersion: 2,
+    stars: { 'last-run': 3, 't2-boss-1': 2, 't2-busy-crossing': 3 }, stories: ['train', 'train2'],
+    last: { world: 'train', stage: 'first-line' },
+  })), PROGRESS_KEY);
+  await page.reload(); await page.getByRole('button', { name: /이어하기/ }).click();
+  await page.getByRole('button', { name: '스테이지 목록', exact: true }).click();
+  await page.getByRole('button', { name: '장치 노선 20판', exact: true }).click();
+  await expect(page.locator('.stage-card')).toHaveCount(20);
+  await expect(page.locator('.select h1')).toHaveText('들꽃 장치 노선');
+  await expect(page.locator('.stage-card').nth(3).getByLabel('별 2개')).toBeVisible();
+  await page.getByRole('button', { name: '여행지 목록으로', exact: true }).click();
+  await expect(page.locator('.route-station')).toHaveCount(9);
+  for (const title of ['기차 차고지', '우주 정거장']) await expect(page.getByRole('button', { name: new RegExp(`^${title}, 별`) })).toBeVisible();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).stars['t2-busy-crossing'], PROGRESS_KEY)).toBe(3);
 });

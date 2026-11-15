@@ -92,8 +92,11 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
   /** The place picked on the route map: where the train waits when the map opens. */
   // A world that no longer exists (or nothing played yet): start at the first station.
-  const [focus, setFocus] = useState<string>(() => (progress.last && worldById(progress.last.world) ? progress.last.world : 'train'));
-  const layout = useMemo(() => layoutRoutes(WORLDS.map((w) => ({ id: w.id, parent: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.id }))), []);
+  const [focus, setFocus] = useState<string>(() => (progress.last && worldById(progress.last.world) ? (worldById(progress.last.world)!.routeOf ?? progress.last.world) : 'train'));
+  const layout = useMemo(() => layoutRoutes(WORLDS.filter(w => !w.routeOf).map((w) => {
+    const owner = WORLDS.find(o => o.stages.some(s => s.id === w.unlockAfter));
+    return { id: w.id, parent: owner?.routeOf ?? owner?.id };
+  })), []);
   const resume = continueTarget(progress);
   const cleared = useMemo(() => new Set(Object.keys(progress.stars)), [progress]);
   const stars = totalStars(progress);
@@ -125,7 +128,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
     const id = w.stages[index]?.id;
     if (!id) return;
     setProgress((p) => (p.last?.world === w.id && p.last.stage === id ? p : { ...p, last: { world: w.id, stage: id } }));
-    setFocus(w.id);
+    setFocus(w.routeOf ?? w.id);
     setScreen({ name: 'game', world: w.id, index });
   };
   const playContinue = () => resume && playStage(resume.world, resume.index);
@@ -224,7 +227,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
   }
 
   if (screen.name === 'worlds') {
-    const stations: StationInfo[] = WORLDS.map((w) => {
+    const stations: StationInfo[] = WORLDS.filter(w => !w.routeOf).map((w) => {
       const locked = !!w.unlockAfter && !cleared.has(w.unlockAfter);
       const d = dailyState(w);
       return {
@@ -304,6 +307,11 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
     const entry = dailies[world.id];
     const todays = entry?.date === today ? entry : null;
     return (
+      <>
+      {(world.id === 'train' || world.routeOf === 'train') && <nav className="course-picker" aria-label="들꽃 노선 고르기">
+        <button aria-pressed={world.id === 'train'} onClick={() => enter(worldById('train')!)}>기본 노선 40판</button>
+        <button aria-pressed={world.id === 'train2'} disabled={!cleared.has('last-run')} onClick={() => enter(worldById('train2')!)}>장치 노선 20판{!cleared.has('last-run') ? ' · 기본 1장 보스 뒤에 열려요' : ''}</button>
+      </nav>}
       <StageSelect
         heading={world.title}
         theme={world.theme}
@@ -329,6 +337,7 @@ function Screens({ progress, setProgress, look }: { progress: Progress; setProgr
           }
         }
       />
+      </>
     );
   }
 

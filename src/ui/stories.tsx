@@ -91,7 +91,7 @@ export const STORIES: Record<string, Story> = {
   },
   train2: {
     friend: '기관사',
-    lines: ['강바람 철도에 온 걸 환영해요!', '여기에는 차단기, 도개교, 급수탑 같은 장치가 있어요.', '장치를 잘 써서 강 건너 마을까지 달려 봐요!'],
+    lines: ['들꽃의 장치 노선에 온 걸 환영해요!', '여기에는 차단기, 도개교, 급수탑 같은 장치가 있어요.', '장치를 잘 써서 강 건너 마을까지 달려 봐요!'],
     Scene: RiverScene,
     tail: 37,
     farewell: {

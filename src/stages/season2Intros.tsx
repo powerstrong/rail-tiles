@@ -24,16 +24,8 @@ export const S2_INTROS: Record<string, Intro> = {
     text: '버튼을 지나가면 같은 색 차단기가 올라가요. 차단기가 닫혀 있으면 기차가 못 지나가요!',
     art: pair(tile(<ButtonArt color={1} pressed={false} />), tile(<GateArt color={1} open={false} across={0} />)),
   },
-  't2-bonus-1': {
-    title: '보너스: 한 번에 출발',
-    text: '출발은 딱 한 번! 레일을 다 놓고 잘 살펴본 다음 출발해요. 실패해도 다음 판은 열려 있어요.',
-    art: <TrainArt />,
-  },
-  't2-two-colors': {
-    title: '두 가지 색',
-    text: '빨강 버튼은 빨강 차단기, 파랑 버튼은 파랑 차단기만 열어요.',
-    art: pair(tile(<ButtonArt color={2} pressed={false} />), tile(<GateArt color={2} open={false} across={0} />)),
-  },
+
+
   't2-drawbridge': {
     title: '레버와 도개교',
     text: '레버를 지나가면 같은 색 다리가 내려와요. 한 번 더 지나가면 다시 올라가요!',

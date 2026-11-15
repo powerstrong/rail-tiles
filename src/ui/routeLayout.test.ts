@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { WORLDS } from '../worlds';
 import { MAP_W, layoutRoutes, locate, pathBetween, poseOn, rerouteTo, runLength, runThrough } from './routeLayout';
 
-const links = WORLDS.map((w) => ({ id: w.id, parent: WORLDS.find((o) => o.stages.some((s) => s.id === w.unlockAfter))?.id }));
+const links = WORLDS.filter(w => !w.routeOf).map(w => {
+  const owner = WORLDS.find(o => o.stages.some(s => s.id === w.unlockAfter));
+  return { id: w.id, parent: owner?.routeOf ?? owner?.id };
+});
 const layout = layoutRoutes(links);
 
 describe('route map layout', () => {
   it('places every world inside a phone-wide map, apart from each other', () => {
-    for (const w of WORLDS) {
+    for (const w of WORLDS.filter(w => !w.routeOf)) {
       const [x, y] = layout.discs[w.id];
       expect(x, w.id).toBeGreaterThanOrEqual(40);
       expect(x, w.id).toBeLessThanOrEqual(MAP_W - 40);
@@ -29,7 +32,7 @@ describe('route map layout', () => {
 
   it('runs the train along the track from place to place, ending on the stop', () => {
     const path = pathBetween(layout, 'garage', 'clock')!;
-    expect(path).toEqual(['garage', 'board', 'train', 'train2', 'space', 'clock']);
+    expect(path).toEqual(['garage', 'board', 'train', 'space', 'clock']);
     const run = runThrough(layout, path);
     const end = poseOn(run, runLength(run));
     expect([end.x, end.y]).toEqual([...layout.stops.clock]);

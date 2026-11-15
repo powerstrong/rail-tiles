@@ -33,10 +33,9 @@ const PLACED: Record<string, Pt> = {
   ice: [62, 344],
   machine: [62, 470],
   volcano: [62, 596],
-  train2: [180, 344],
-  space: [180, 470],
-  clock: [180, 596],
-  depot: [298, 486],
+  space: [180, 344],
+  clock: [180, 470],
+  depot: [298, 400],
 };
 const ROW = 126;
 

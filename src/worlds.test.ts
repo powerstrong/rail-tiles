@@ -53,11 +53,11 @@ describe('world registry', () => {
 
   it('names the worlds a stage opens on its clear card, until the player has been there', () => {
     const fresh = { stars: {}, stories: [] };
-    expect(openedNote('last-run', fresh)).toBe('🚂 새 정거장이 열렸어요! 펭귄 얼음 나라 · 강바람 철도');
+    expect(openedNote('last-run', fresh)).toBe('🚂 새 정거장이 열렸어요! 펭귄 얼음 나라 · 들꽃 장치 노선');
     // Seen the arrival story, or played a stage there: no longer new.
-    expect(openedNote('last-run', { stars: {}, stories: ['ice'] })).toBe('🚂 새 정거장이 열렸어요! 강바람 철도');
+    expect(openedNote('last-run', { stars: {}, stories: ['ice'] })).toBe('🚂 새 정거장이 열렸어요! 들꽃 장치 노선');
     const ice1 = worldById('ice')!.stages[0].id;
-    expect(openedNote('last-run', { stars: { [ice1]: 1 }, stories: [] })).toBe('🚂 새 정거장이 열렸어요! 강바람 철도');
+    expect(openedNote('last-run', { stars: { [ice1]: 1 }, stories: [] })).toBe('🚂 새 정거장이 열렸어요! 들꽃 장치 노선');
     expect(openedNote('last-run', { stars: { [ice1]: 1 }, stories: ['train2'] })).toBeUndefined();
     // A stage that opens no world.
     expect(openedNote('first-passenger', fresh)).toBeUndefined();
@@ -131,7 +131,7 @@ describe('world registry', () => {
 
   it('marks the bonus stages each world has', () => {
     const bonuses = Object.fromEntries(WORLDS.map((w) => [w.id, stageCards(w).filter((c) => c.bonus).length]));
-    expect(bonuses).toEqual({ twins: 0, bee: 0, train: 0, train2: 5, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3 });
+    expect(bonuses).toEqual({ twins: 0, bee: 0, train: 0, train2: 0, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3 });
   });
 
   for (const w of WORLDS) {
@@ -205,5 +205,16 @@ describe('stage unlocks', () => {
     expect(isUnlocked(cards, cleared, 1)).toBe(true);
     expect(isUnlocked(cards, cleared, 2)).toBe(true);
     expect(isUnlocked(cards, cleared, 3)).toBe(true);
+  });
+});
+
+describe('device course integration', () => {
+  it('keeps train2 saves and t2-boss-1 unlocks while presenting the course inside Wildflower', () => {
+    const course = worldById('train2')!;
+    expect(course.routeOf).toBe('train');
+    expect(course.stages).toHaveLength(20);
+    expect(course.stages[3].id).toBe('t2-boss-1');
+    expect(worldById('depot')!.unlockAfter).toBe('t2-boss-1');
+    expect(worldById('space')!.unlockAfter).toBe('t2-boss-1');
   });
 });

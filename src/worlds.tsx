@@ -90,6 +90,8 @@ export interface World<S extends WorldStage = WorldStage> {
   emblem: WorldCard['emblem'];
   /** Extra class on the stage list for the world's colour theme. */
   theme?: string;
+  /** A selectable course inside this world, omitted from the lobby map. Id remains stable for saves. */
+  routeOf?: string;
   stages: S[];
   chapters: Chapter[];
   intros?: Record<string, Intro>;
@@ -114,7 +116,7 @@ export const WORLDS: World[] = [
   world({
     id: 'train',
     title: '들꽃 기차 마을',
-    blurb: '레일을 깔아 기차를 도착역까지',
+    blurb: '기본 노선 · 선택형 장치 노선',
     color: '#E5584F',
     emblem: 'train',
     stages: STAGES,
@@ -189,11 +191,12 @@ export const WORLDS: World[] = [
   }),
   world({
     id: 'train2',
-    title: '강바람 철도',
-    blurb: '차단기, 도개교, 급수탑, 회전판, 화물칸!',
+    title: '들꽃 장치 노선',
+    blurb: '들꽃에서 골라 떠나는 장치 노선 20판',
     color: '#2FA38C',
     emblem: 'train',
     theme: 'world-train2',
+    routeOf: 'train',
     stages: S2_STAGES,
     chapters: S2_CHAPTERS,
     intros: S2_INTROS,
@@ -216,7 +219,7 @@ export const WORLDS: World[] = [
     intros: DEPOT_INTROS,
     isBonus: (s) => s.limit !== undefined,
     unlockAfter: 't2-boss-1',
-    lockNote: '강바람 철도 1장 보스(1-10)를 깨면 열려요',
+    lockNote: '들꽃 장치 노선 1장 보스(1-4)를 깨면 열려요',
     Game: DepotScreen,
     daily: {
       prefix: DEPOT_DAILY_PREFIX,
@@ -240,7 +243,7 @@ export const WORLDS: World[] = [
     isBonus: (s) => s.limit !== undefined,
     // Opened with the depot (it used to follow it).
     unlockAfter: 't2-boss-1',
-    lockNote: '강바람 철도 1장 보스(1-10)를 깨면 열려요',
+    lockNote: '들꽃 장치 노선 1장 보스(1-4)를 깨면 열려요',
     Game: SpaceScreen,
     daily: {
       prefix: SPACE_DAILY_PREFIX,
