@@ -1,5 +1,5 @@
 import { type Intro, IntroCard } from '../ui/IntroCard';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dir } from '../engine/dir';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { withTo } from '../ui/korean';
@@ -9,8 +9,9 @@ import { sample, timeline } from './animate';
 import { PENGUIN_COLORS, PenguinArt } from './IceArt';
 import { ICE_CELL, IceBoard } from './IceBoard';
 import type { PenguinStage, Push } from './model';
-import { type IceState, initialState, isWon, slide } from './slide';
-import { hintFrom } from './solver';
+import { type IceState, initialState, isWon, slide, stateKey } from './slide';
+import { explore, hintFrom } from './solver';
+import { iceReachability, lastSolvableIce } from './recovery';
 import { useFitBoard } from '../ui/useFitBoard';
 import { ResultOverlay } from '../ui/ResultOverlay';
 
@@ -66,7 +67,12 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
   }, [toast]);
 
   const say = (text: string) => setToast({ text, n: ++counter.current });
-  const stateTag = `${state.pos.join(',')}|${state.fish}|${state.broken}`;
+  const graph = useMemo(() => {
+    try { return explore(stage); } catch { return null; }
+  }, [stage]);
+  const stuck = iceReachability(graph, state) === 'impossible';
+  const recoveryIndex = lastSolvableIce(graph, history);
+  const stateTag = stateKey(state);
   const shownHint = hint && hint.at === stateTag ? hint.push : null;
   const fishLeft = stage.fish.length - popcount(busy ? liveFish : state.fish);
 
@@ -155,6 +161,15 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
     setState(history[history.length - 1]);
     setHistory((h) => h.slice(0, -1));
     setMoves((m) => m - 1);
+    play('rotate');
+  };
+  const recover = () => {
+    if (busy || won || recoveryIndex < 0) return;
+    setState(history[recoveryIndex]);
+    setHistory(history.slice(0, recoveryIndex));
+    setMoves(recoveryIndex);
+    setHint(null);
+    say('풀 수 있던 자리로 돌아왔어요. 다른 방향을 골라 봐요.');
     play('rotate');
   };
   const restart = (keepHint = false) => {
@@ -257,6 +272,10 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
       </header>
 
       <p className="tip">{stage.tip}</p>
+      {stuck && !won && <div className="tip ice-stuck" role="status">
+        이 자리에서는 완성할 수 없어요. 괜찮아요, 다른 길을 찾아봐요.
+        {recoveryIndex >= 0 && <button onClick={recover} disabled={busy}>마지막으로 풀 수 있던 지점으로 되돌리기</button>}
+      </div>}
 
       <div className="board-wrap">
         <IceBoard
