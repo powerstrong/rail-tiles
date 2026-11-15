@@ -1,6 +1,6 @@
+import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
-import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { createRound, FACE_NAMES, isComplete, memoryReducer, memoryStarsFor, starLimits, type MemoryStage } from './model';
 import { MemoryBoard } from './MemoryBoard';
@@ -10,12 +10,12 @@ import { MemoryPostcard } from './MemoryPostcard';
 import { PostcardArt } from './PostcardArt';
 import './memory.css';
 const newSeed = () => crypto.getRandomValues(new Uint32Array(1))[0];
-export function MemoryScreen({ stage, bestStars, hasNext, allCleared, clearNote, onCleared, onBack, onNext }: GameProps<MemoryStage>) {
+export function MemoryScreen({ stage, bestStars, hasNext, onCleared, onBack, onNext }: GameProps<MemoryStage>) {
   const [state, dispatch] = useReducer(memoryReducer, stage, s => createRound(s, newSeed()));
   const [manualCover, setManualCover] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
   const [rulesOpen, setRulesOpen] = useState(false);
-  const heading = useRef<HTMLHeadingElement>(null), resultHeading = useRef<HTMLHeadingElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const recordedRound = useRef<number | null>(null);
   const completed = isComplete(state), pairs = stage.faces.length, limits = starLimits(pairs);
   const rating = memoryStarsFor(state.misses, pairs, state.hinted);
@@ -46,8 +46,7 @@ export function MemoryScreen({ stage, bestStars, hasNext, allCleared, clearNote,
     if (!completed || recordedRound.current === state.roundId) return;
     recordedRound.current = state.roundId;
     callbacks.current(stage.id, rating);
-    resultHeading.current?.focus({ preventScroll: true });
-    resultHeading.current?.closest('section')?.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+
   }, [completed, state.roundId, stage.id, rating]);
   const lastFace = state.lastMatch && state.deck[state.lastMatch[0]];
   return <main className="memory-screen world-memory">
@@ -59,7 +58,7 @@ export function MemoryScreen({ stage, bestStars, hasNext, allCleared, clearNote,
     <div className="memory-shelf" role="status"><span>찾은 짝 <strong>{state.matched.length / 2} / {pairs}</strong></span>{stage.postcard ? <div className="memory-place"><MemoryPostcard id={stage.id} pairs={pairs} matched={state.matched.length / 2}/>{bestStars > 0 && <small>이미 모은 엽서</small>}</div> : lastFace && <span className="memory-collected"><MemoryArt face={lastFace}/>{FACE_NAMES[lastFace]} 짝꿍!</span>}</div>
     <MemoryBoard stage={stage} state={state} onFlip={index => dispatch({ type: 'flip', index })}/>
     <p className="memory-note" role="status">{state.note || (completed ? '모든 짝이 제자리를 찾았어요!' : state.pendingMismatch ? '다음 카드를 누르면 바로 이어져요.' : '천천히 기억해요. 몇 번이든 괜찮아요.')}</p>
-    {completed && <section className="memory-result" aria-label="스테이지 완료"><StarRow count={rating}/><h2 tabIndex={-1} ref={resultHeading}>모두 찾았어요!</h2><p>{allCleared ? '미지의 세계 30판을 모두 해냈어요!' : clearNote ?? (stage.chapter === 3 ? '이번 장소 발견' : '짝꿍들이 만나서 기뻐해요.')}</p>{stage.postcard && <figure className="memory-result-postcard"><PostcardArt id={stage.id}/><figcaption>{stage.title} · 엽서에 담았어요</figcaption></figure>}<div>{hasNext && <button className="memory-primary" onClick={onNext}>다음 스테이지 →</button>}<button onClick={onBack}>스테이지 고르기</button></div></section>}
+    {completed && <StageCompletion className="memory-result" stars={rating} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="memory-primary">{stage.postcard && <figure className="memory-result-postcard"><PostcardArt id={stage.id}/></figure>}</StageCompletion>}
     <div className="memory-tools"><button onClick={() => dispatch({ type: 'restart', stage, seed: newSeed() })}>↻ 새로 섞어 시작</button><button disabled={completed} onClick={() => dispatch({ type: 'hint' })}>본 짝 알려주기 · 사용하면 최대 ★★</button></div>
     <label className="memory-observe"><input type="checkbox" checked={manualCover} onChange={e => setManualCover(e.target.checked)}/>다음 카드를 누를 때 덮기</label>
     <button className="memory-rules-toggle" aria-expanded={rulesOpen} aria-controls="memory-rules" onClick={() => setRulesOpen(!rulesOpen)}>{rulesOpen ? '규칙 접기 −' : '규칙 보기 +'}</button>

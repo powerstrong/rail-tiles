@@ -1,7 +1,7 @@
+import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { GameProps } from '../worlds';
 import { starsFor } from '../engine/stars';
-import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { COLORS, MARKS, Picture, Tiles } from './Art';
 import { nextHint, reduceGame, startGame, type Hint } from './game';
@@ -10,7 +10,7 @@ import { PIECES_CHAPTERS } from './stages';
 import './pieces.css';
 interface Drag { index: number; anchor: Cell; turn: number; flip: boolean; fromBoard: boolean; startX: number; startY: number; moved: boolean }
 const origin = { turn: 0, flip: false };
-export function PiecesScreen({ stage, bestStars, hasNext, allCleared, clearNote, onBack, onNext, onCleared }: GameProps<PiecesStage>) {
+export function PiecesScreen({ stage, bestStars, hasNext, clearNote, onBack, onNext, onCleared }: GameProps<PiecesStage>) {
   const [game, dispatch] = useReducer((g: ReturnType<typeof startGame>, a: Parameters<typeof reduceGame>[2]) => reduceGame(stage, g, a), stage, startGame);
   const layout = game.history.at(-1)!, moves = game.history.length - 1, won = isComplete(stage, layout);
   const [selected, setSelected] = useState<number | null>(null);
@@ -22,11 +22,11 @@ export function PiecesScreen({ stage, bestStars, hasNext, allCleared, clearNote,
   const [muted, setMutedState] = useState(isMuted);
   const [floating, setFloating] = useState<{ x: number; y: number } | null>(null);
   const drag = useRef<Drag | null>(null), board = useRef<SVGSVGElement>(null);
-  const title = useRef<HTMLHeadingElement>(null), winTitle = useRef<HTMLHeadingElement>(null);
+  const title = useRef<HTMLHeadingElement>(null);
   const reported = useRef(false), clear = useRef(onCleared); clear.current = onCleared;
   useLayoutEffect(() => { title.current?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, []);
   useEffect(() => {
-    if (won && !reported.current) { reported.current = true; clear.current(stage.id, starsFor(moves, stage.par, game.hinted)); play('arrive'); winTitle.current?.focus({ preventScroll: true }); }
+    if (won && !reported.current) { reported.current = true; clear.current(stage.id, starsFor(moves, stage.par, game.hinted)); play('arrive'); }
     if (!won) reported.current = false;
   }, [won, moves, game.hinted, stage]);
   const undo = () => { drag.current = null; setFloating(null); setHover(null); setHint(null); setSelected(null); dispatch({ type: 'undo' }); setNote('한 번 되돌렸어요. 다른 자리에 놓아 봐요.'); play('erase'); };
@@ -135,7 +135,7 @@ export function PiecesScreen({ stage, bestStars, hasNext, allCleared, clearNote,
     {hint && <button className="pieces-hint-apply" onClick={() => { if (hint.remove) remove(hint.index); else put(hint.index, hint.pose); }}>{hint.remove ? '이 조각 꺼내기' : '힌트대로 놓기'}</button>}
     <div className="pieces-count"><span>놓기·꺼내기 {moves}번 · ★★★ {stage.par}번</span><span>{game.hinted ? '힌트 사용 · 최대 ★★' : '천천히 생각해도 좋아요'}</span></div>
     <div className="pieces-tools"><button onClick={undo} disabled={moves === 0}>↶ 되돌리기</button><button onClick={() => { drag.current = null; setFloating(null); dispatch({ type: 'reset' }); setOrient(stage.pieces.map(() => ({ ...origin }))); setHint(null); setSelected(null); setHover(null); setNote('바구니에 모두 모았어요. 새로 시작해요.'); }}>처음부터</button><button onClick={requestHint} disabled={won}>한 조각 힌트</button></div>
-    {won && <section className="pieces-clear" aria-label="스테이지 완료"><StarRow count={starsFor(moves, stage.par, game.hinted)} /><h2 tabIndex={-1} ref={winTitle}>{allCleared ? '서른 개 그림을 모두 찾았어요!' : '조각이 모여 그림이 짠!'}</h2><p>{clearNote || '생각을 돌리고, 바꿔 보고, 멋지게 완성했어요.'}</p>{hasNext && <button onClick={onNext}>다음 스테이지 →</button>}<button onClick={onBack}>스테이지 고르기</button></section>}
+    {won && <StageCompletion className="pieces-clear" stars={starsFor(moves, stage.par, game.hinted)} hasNext={hasNext} onNext={onNext} onBack={onBack} note={clearNote} />}
     {floating && selected !== null && <svg className="pieces-floating" style={{ left: floating.x + 12, top: floating.y - 65 }} width="100" height="100" viewBox="-2 -2 124 124" aria-hidden="true"><Tiles cells={shape(stage.pieces[selected], drag.current?.turn ?? orient[selected].turn, drag.current?.flip ?? orient[selected].flip)} index={selected} unit={24} /></svg>}
   </main>;
 }

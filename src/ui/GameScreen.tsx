@@ -11,7 +11,7 @@ import { CHIMNEY } from './art/TrainArt';
 import { Board, type Flash, type Tool } from './Board';
 import { type Intro, IntroCard } from './IntroCard';
 import { makePuff, useLook } from './look';
-import { StarRow } from './StageSelect';
+import { StageCompletion } from './StageCompletion';
 import { isMuted, play, setMuted } from './sound';
 import { poseTransform, runTrain } from './trainRunner';
 import { useFitBoard } from './useFitBoard';
@@ -84,7 +84,7 @@ function ToolIcon({ tool }: { tool: Tool }) {
   );
 }
 
-export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNext, onCleared, clearNote, intro }: Props) {
+export function GameScreen({ stage, hasNext, bestStars, onBack, onNext, onCleared, clearNote, intro }: Props) {
   const gameRef = useFitBoard<HTMLDivElement>();
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const [towersHit, setTowersHit] = useState<ReadonlySet<string>>(() => new Set());
@@ -633,76 +633,14 @@ export function GameScreen({ stage, hasNext, allCleared, bestStars, onBack, onNe
 
       {success && (
         <ResultOverlay label="스테이지 클리어">
-          <div className="result-card">
+          <StageCompletion className="result-card" stars={earned} hasNext={hasNext} onNext={onNext} onBack={onBack}
+            nextClassName="primary" backClassName={hasNext ? 'secondary' : 'primary'} actionsClassName="result-actions" note={clearNote} overlay>
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
                 <i key={i} style={{ '--i': i } as CSSProperties} />
               ))}
             </div>
-            <button className="icon-btn result-close" onClick={onBack} aria-label="스테이지 목록으로">
-              <svg viewBox="0 0 24 24" aria-hidden>
-                <path d="M6 6 L18 18 M18 6 L6 18" />
-              </svg>
-            </button>
-            <p className="result-kicker">{stage.label ?? `STAGE ${stage.number}`}</p>
-            <StarRow count={earned} className="result-stars" />
-            {!hasNext && allCleared ? (
-              <>
-                <h2>모든 노선 완성!</h2>
-                <p className="result-sub">마지막 기차까지 무사히 도착했어요. 끝까지 함께해 줘서 고마워요!</p>
-              </>
-            ) : (
-              <>
-                <h2>도착 완료!</h2>
-                <p className="result-sub">
-                  레일 {usedCount(editor.placed)}개 사용 · ★★★ {stage.par}개 · ★★ {stage.par + TWO_STAR_SLACK}개
-                  {earned < 3 && !hinted && (
-                    <>
-                      <br />
-                      레일 {stage.par}개로 다시 도전해 보세요!
-                    </>
-                  )}
-                  {hinted && (
-                    <>
-                      <br />
-                      힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
-                    </>
-                  )}
-                  {clearNote && (
-                    <>
-                      <br />
-                      <strong className="clear-note">{clearNote}</strong>
-                    </>
-                  )}
-                  {bestStars > earned && (
-                    <>
-                      <br />
-                      최고 기록: 별 {bestStars}개
-                    </>
-                  )}
-                </p>
-              </>
-            )}
-            <div className="result-actions">
-              {hasNext ? (
-                <button className="primary" onClick={onNext} autoFocus>
-                  다음 스테이지
-                </button>
-              ) : (
-                <button className="primary" onClick={onBack} autoFocus>
-                  스테이지 목록
-                </button>
-              )}
-              <div className="result-retry">
-                <button className="secondary" onClick={backToEdit}>
-                  배치 고치기
-                </button>
-                <button className="secondary" onClick={restartStage}>
-                  처음부터 다시
-                </button>
-              </div>
-            </div>
-          </div>
+          </StageCompletion>
         </ResultOverlay>
       )}
     </div>

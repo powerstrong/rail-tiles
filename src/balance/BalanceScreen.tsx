@@ -1,7 +1,7 @@
+import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
 import { starsFor, TWO_STAR_SLACK } from '../engine/stars';
-import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { CandyArt, ScaleArt } from './art';
 import { isWon, move, solve, totals, type BalanceStage, type State } from './model';
@@ -21,7 +21,7 @@ export function BalanceScreen({ stage, bestStars, hasNext, onBack, onNext, onCle
   }, { history: [[...stage.start]], hinted: false, hint: null });
   const state = game.history.at(-1)!, sums = totals(stage, state), won = isWon(stage, state), moves = game.history.length - 1;
   const [muted, setMutedState] = useState(isMuted), [rules, setRules] = useState(false);
-  const heading = useRef<HTMLHeadingElement>(null), clearHeading = useRef<HTMLHeadingElement>(null), recorded = useRef(false);
+  const heading = useRef<HTMLHeadingElement>(null), recorded = useRef(false);
   const callback = useRef(onCleared); callback.current = onCleared;
   const stars = starsFor(moves, stage.par, game.hinted);
   const chapter = Math.floor((stage.number - 1) / 10);
@@ -34,7 +34,6 @@ export function BalanceScreen({ stage, bestStars, hasNext, onBack, onNext, onCle
   useEffect(() => {
     if (!won) { recorded.current = false; return; }
     if (!recorded.current) { recorded.current = true; callback.current(stage.id, stars); play('arrive'); }
-    clearHeading.current?.focus({ preventScroll: true });
   }, [won, stage.id, stars]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
@@ -84,6 +83,6 @@ export function BalanceScreen({ stage, bestStars, hasNext, onBack, onNext, onCle
     <p className="balance-star-guide">★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번 이하{game.hinted ? ' · 힌트 사용: 최대 ★★' : ''}</p>
     <button className="balance-rule-toggle" aria-expanded={rules} onClick={() => setRules(!rules)}>{rules ? '규칙 접기 −' : '규칙 보기 +'}</button>
     {rules && <div className="balance-rules"><p>사탕을 누르면 반대 접시로 옮겨져요. 사탕 속 숫자와 점은 무게예요. 모양이 달라도 무게를 모으면 같아져요.</p><p>두 접시의 합이 같으면 성공! 고정 추도 합에 들어가요. ○·◇ 짝꿍은 함께 옮겨지고, 두 저울을 모두 맞춰요.</p><p>누름 수는 되돌리면 함께 줄어요. 시간·실패 제한은 없어요. 힌트는 최대 별 두 개, 처음부터 시작하면 힌트 기록도 지워져요.</p></div>}
-    {won && <section className="balance-clear" aria-label="스테이지 완료"><StarRow count={stars} className="result-stars" /><h2 tabIndex={-1} ref={clearHeading}>{stage.number === 30 ? '별 축제가 열렸어요!' : '딱 맞는 별사탕 한 쌍!'}</h2><p>{moves}번 눌러 완성했어요.</p><div>{hasNext && <button onClick={onNext}>다음 스테이지 →</button>}<button onClick={onBack}>스테이지 고르기</button></div></section>}
+    {won && <StageCompletion className="balance-clear" stars={stars} hasNext={hasNext} onNext={onNext} onBack={onBack} />}
   </main>;
 }

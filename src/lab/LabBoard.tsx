@@ -149,7 +149,7 @@ function BeeBoard({ stage, state, onAction, hint, disabled }: LabBoardProps) {
     {stage.number >= 31 && <p className="lb-bee-discovery">{stage.arrows
       ? '➜ 화살표 꽃에서는 화살표 쪽으로 나가요. 들어오는 쪽은 자유! 되짚기도 돼요.'
       : '두 꽃밭 사이 작은 길! 건너기 전에 이쪽 꽃을 모두 만나 볼까요?'}</p>}
-    <div className="lb-board-note">인사한 꽃길 <b>{state.length} / {flowers}</b><span>{remaining > 0 ? `벌집 🔒 남은 꽃을 먼저 (${remaining}송이)` : '벌집으로 돌아가요'}</span></div>
+    <div className="lb-board-note"><span className="lb-bee-count">인사한 꽃길 <b>{state.length} / {flowers}</b></span><span>{remaining > 0 ? `벌집 🔒 남은 꽃을 먼저 (${remaining}송이)` : '벌집으로 돌아가요'}</span></div>
     <div className="lb-bee-frame">
       <svg className="lb-flower-path" viewBox={`0 0 ${stage.cols * 64} ${stage.rows * 64}`} aria-hidden="true"><polyline points={points} /></svg>
       <div className="lb-grid lb-bee-grid" style={boardStyle(stage)} role="group" aria-label="한 번씩 방문하는 꽃길"

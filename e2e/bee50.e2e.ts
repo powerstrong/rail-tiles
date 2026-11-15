@@ -50,7 +50,9 @@ test.describe('bee 50-stage mobile course', () => {
   });
   test('arrow introduction responds immediately, rejects the wrong exit, and allows retracing', async ({ page }) => {
     const stage = await open(page, 41);
-    await expect(page.locator('.lb-bee-discovery')).toContainText('화살표 쪽으로 나가요');
+    await page.getByRole('button', { name: '규칙 보기', exact: true }).tap();
+    await expect(page.getByRole('region', { name: '게임 규칙' })).toContainText('화살표 쪽으로 나가요');
+    await page.getByRole('button', { name: '규칙 접기', exact: true }).tap();
     await expect(page.locator('[data-bee-cell="0"]')).toHaveAttribute('aria-label', /화살표 꽃.*오른쪽/);
     // Exercise a physical wrong tap despite aria-disabled announcing an unavailable exit.
     await page.locator('[data-bee-cell="5"]').tap({ force: true });
@@ -68,8 +70,8 @@ test.describe('bee 50-stage mobile course', () => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     const stage = await open(page, 50), dead = deadEnd(stage);
-    for (const width of [390, 360, 320]) {
-      await page.setViewportSize({ width, height: 844 });
+    for (const [width, height] of [[390, 844], [360, 740], [320, 568]]) {
+      await page.setViewportSize({ width, height });
       await expect.poll(async () => {
         const cell = await page.locator('.lb-bee-cell').first().boundingBox();
         return Math.min(cell!.width, cell!.height);
@@ -94,7 +96,7 @@ test.describe('bee 50-stage mobile course', () => {
     let state: State = stage.start;
     for (const a of stage.solution) { await tap(page, a); state = act(stage, state, a)!; }
     await expect(page.locator('.lab-clear')).toBeVisible();
-    await expect(page.locator('.lab-clear h2')).toContainText('마지막 판');
+    await expect(page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button')).toHaveText(['스테이지 고르기']);
     await expect(page.getByRole('button', { name: '다음 스테이지 →', exact: true })).toHaveCount(0);
     expect(await saved(page)).toMatchObject({ ...oldStars, [stage.id]: 2 });
     expect(errors).toEqual([]);

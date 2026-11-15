@@ -1,3 +1,4 @@
+import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type { GameProps } from '../worlds';
 import { loadProgress } from '../storage';
@@ -93,7 +94,7 @@ export function CloudScreen({ stage, onBack, onNext, onCleared, hasNext, bestSta
     {hint && <section className="cloud-proof" aria-label="한 줄 힌트의 근거"><p>{lineName(hint.line)}에 놓을 수 있는 모양 {hint.line.candidates.length}가지 <span>(✚ 수놓기 · × 비움)</span></p><div className="cloud-candidates">{hint.line.candidates.map((p, i) => <div key={i} aria-label={p.map(v => v ? '수' : '빈').join(' ')}>{p.map((v, k) => <span key={k} className={hint.line.cells[k] === hint.cell ? 'target' : ''}>{v ? '✚' : '×'}</span>)}</div>)}</div><button onClick={() => mark(hint.cell, hint.value)}>이 칸을 {hint.value === 1 ? '수놓기' : '×로 표시'}</button></section>}
     <div className="cloud-tools"><button onClick={undo} disabled={!moves}>↶ 되돌리기</button><button onClick={() => { setHistory([blank()]); setHinted(false); clearHint(); }}>↻ 처음부터</button><button onClick={askHint} disabled={won}>한 줄 힌트</button></div>
     <p className="cloud-score">{moves}번 표시 · ★★★ {stage.par}번 · ★★ {stage.par + 2}번 이하{hinted ? ' · 힌트 사용: 최대 ★★' : ''}</p>
-    {won && <section className="cloud-clear" aria-label="스테이지 완료"><h2>한 땀 한 땀, 작품 완성!</h2><p className="cloud-stars" aria-label={`별 ${stars}개`}>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</p><Artwork stage={stage} /><p>{stage.title}</p><div>{hasNext && <button className="cloud-primary" onClick={onNext}>다음 스테이지 →</button>}<button onClick={onBack}>스테이지 고르기</button></div></section>}
+    {won && <StageCompletion className="cloud-clear" stars={stars} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="cloud-primary" />}
     <button className="cloud-gallery-button" aria-expanded={gallery} onClick={() => setGallery(v => !v)}>작품 모음 {collected.length} / 30 {gallery ? '접기' : '보기'}</button>
     {gallery && <section className="cloud-gallery" aria-label="작품 모음"><h2>구름 위 작은 전시회</h2><p>완성한 도안에 색실을 입혔어요. 모은 작품은 다음에도 남아요.</p>{!collected.length && <p>첫 작품을 수놓아 여기에 걸어 보세요.</p>}<div>{collected.map(s => <figure key={s.id}><Artwork stage={s} /><figcaption>{s.number}. {s.title}</figcaption></figure>)}</div></section>}
     <details className="cloud-rules"><summary>바느질 규칙 · 별 안내</summary><p>숫자는 이어진 수놓기 칸의 개수예요. 2·1은 ✚✚ × ✚처럼 두 묶음 사이를 최소 한 칸 비워요. 0은 그 줄을 모두 비워요. ×는 확실한 빈칸, ·는 아직 모르는 칸이에요.</p><p>도구를 골라 칸을 눌러요. 같은 도구로 다시 누르면 지워져요. 방향키로 칸을 옮기고 Enter 또는 Space로 표시할 수 있어요. Ctrl/⌘+Z는 되돌리기예요.</p><p>모든 가로·세로 숫자에 맞게 모든 칸을 표시하면 완성이에요. ★★★는 한 칸당 한 번, ★★는 두 번 더 표시할 때까지예요. 되돌린 표시는 횟수에서도 빠져요. 힌트는 이번 판 최대 ★★, 처음부터는 힌트 제한도 새로 시작해요. 시간과 실패 횟수 제한은 없어요.</p></details>

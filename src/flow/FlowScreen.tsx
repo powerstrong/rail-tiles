@@ -1,7 +1,7 @@
+import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
 import { starsFor } from '../engine/stars';
-import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { FLOW_CHAPTERS } from './stages';
 import { feedback, initialPlay, isComplete, reducePlay, threadLength, THREADS, type FlowStage } from './model';
@@ -9,7 +9,7 @@ import { FlowBoard } from './FlowBoard';
 import { Spool } from './FlowArt';
 import './flow.css';
 
-export function FlowScreen({ stage, bestStars, hasNext, onBack, onNext, onCleared, allCleared }: GameProps<FlowStage>) {
+export function FlowScreen({ stage, bestStars, hasNext, onBack, onNext, onCleared }: GameProps<FlowStage>) {
   const [game, dispatch] = useReducer((g: ReturnType<typeof initialPlay>, a: Parameters<typeof reducePlay>[2]) => reducePlay(stage,g,a), stage, initialPlay);
   const [help, setHelp] = useState(false), [muted, setMutedState] = useState(isMuted);
   const heading = useRef<HTMLHeadingElement>(null), complete = useRef(false);
@@ -51,6 +51,6 @@ export function FlowScreen({ stage, bestStars, hasNext, onBack, onNext, onCleare
     <p className="flow-note" role="status" aria-live="polite">{game.note || (won ? '한 땀 한 땀, 마을의 천이 완성됐어요!' : game.active !== null ? `${THREADS[game.active].name} 실을 잇는 중 · 다른 실 위에 그리면 그 실이 끊겨요.` : '단추나 그려 둔 실에서 시작해요. 언제든 고칠 수 있어요.')}</p>
     <div className="flow-tools" aria-label="퍼즐 도움 도구"><button onClick={() => dispatch({ type:'undo' })} disabled={!game.history.length && !game.before}>↶ 되돌리기</button><button onClick={() => dispatch({ type:'reset' })}>↻ 처음부터</button><button onClick={() => dispatch({ type:'hint' })} disabled={won}>✦ 한 줄 힌트</button></div>
     <p className="flow-rating">{game.hinted ? '힌트 사용 · 이번 완성은 최대 ★★' : '몇 번 고쳐도 괜찮아요 · 힌트 없이 완성하면 ★★★'}{bestStars > 0 && ` · 최고 ★${bestStars}`}</p>
-    {won && <section className="flow-clear" aria-label="스테이지 완료"><StarRow count={stars} className="result-stars" /><h2>{allCleared ? '마을 잔치의 조각보 완성!' : '포근하게 이어졌어요!'}</h2><p>내가 찾은 길이 멋진 무늬가 되었어요.</p><div>{hasNext && <button className="flow-next" onClick={onNext}>다음 스테이지 →</button>}<button onClick={onBack}>스테이지 고르기</button></div></section>}
+    {won && <StageCompletion className="flow-clear" stars={stars} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="flow-next" />}
   </main>;
 }

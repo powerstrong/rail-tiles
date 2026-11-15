@@ -1,3 +1,4 @@
+import { StageCompletion } from '../ui/StageCompletion';
 import { type CSSProperties, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { conceptById } from './catalog';
 import { act, isWon, type Kind, type Stage, type State } from './model';
@@ -7,7 +8,6 @@ import { explore, lastSolvable, reachability } from './reachability';
 import { useLabHint } from './useLabHint';
 import { isMuted, play, setMuted, type Sfx } from '../ui/sound';
 import { starsFor, TWO_STAR_SLACK } from '../engine/stars';
-import { StarRow } from '../ui/StageSelect';
 import type { GameProps } from '../worlds';
 import './lab.css';
 
@@ -63,7 +63,7 @@ export function PuzzleScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
     else play(game.fx.kind === 'deny' ? 'deny' : 'erase');
   }, [game.fx, stage]);
   const hint = useLabHint(stage, state);
-  const heading = useRef<HTMLHeadingElement>(null), wonHeading = useRef<HTMLHeadingElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const recorded = useRef(false);
   const [cardShown, setCardShown] = useState(false);
   const completeRef = useRef(onCleared);
@@ -81,11 +81,6 @@ export function PuzzleScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
     const t = window.setTimeout(() => setCardShown(true), CELEBRATE_MS);
     return () => clearTimeout(t);
   }, [won, stage.id, moves, hinted, stage.par]);
-  useEffect(() => {
-    if (!cardShown) return;
-    wonHeading.current?.focus({ preventScroll: true });
-    wonHeading.current?.scrollIntoView({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
-  }, [cardShown]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'z' || event.shiftKey) return;
@@ -114,25 +109,26 @@ export function PuzzleScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
   }, [stage.kind, won]);
   const total = stagesFor(stage.kind).length;
   const progressText = stage.kind === 'bee' ? `방문한 꽃길 ${state.length} / ${stage.terrain!.filter(Boolean).length}` : `${moves}번 움직였어요`;
-  return <main className={`lab lab-play lab-${concept.id}`} style={{ '--lab-accent': concept.color, '--lab-wash': concept.wash } as CSSProperties}>
+  return <main className={`lab lab-play lab-${concept.id}`} style={{ '--lab-accent': concept.color, '--lab-wash': concept.wash, '--lab-board-ratio': stage.cols / stage.rows } as CSSProperties}>
     <header className="lab-top"><button className="lab-back" onClick={onBack}>← 스테이지 고르기</button><span className="lab-play-world"><span aria-hidden="true">{concept.icon}</span>{concept.title}</span>
       <button className="lab-mute" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 H7.5 L12 5.5 V18.5 L7.5 14.5 H4 Z" />{muted ? <path d="M16 9.5 L21 14.5 M21 9.5 L16 14.5" /> : <path d="M15.5 9 Q17.5 12 15.5 15 M18 6.5 Q22 12 18 17.5" />}</svg></button></header>
     <div className="lab-play-heading"><div><p className="lab-eyebrow">{concept.chapters[Math.floor((stage.number - 1) / 10)]} · {stage.number} / {total}</p><h1 tabIndex={-1} ref={heading}>{stage.title}</h1></div>{bestStars > 0 && <span className="lab-done-tag">✓ 최고 별 {bestStars}개</span>}</div>
     <div className="lab-play-goal"><span aria-hidden="true">⚑</span><p>{concept.goal}</p><button className={bestStars === 0 && !helpOpen ? 'is-new' : ''} aria-expanded={helpOpen} aria-controls="lab-play-rules" onClick={() => setHelpOpen(open => !open)}>{helpOpen ? '규칙 접기' : '규칙 보기'} <span aria-hidden="true">{helpOpen ? '−' : '+'}</span></button></div>
-    {helpOpen && <section className="lab-play-rules" id="lab-play-rules" aria-label="게임 규칙"><p>{concept.story}</p><ol>{concept.rules.map(rule => <li key={rule}>{rule}</li>)}</ol><button className="lab-text-button" onClick={() => setHelpOpen(false)}>알겠어요, 해 볼게요 ↓</button></section>}
+    {helpOpen && <section className="lab-play-rules" id="lab-play-rules" aria-label="게임 규칙"><p>{concept.goal} {concept.story}</p>{stage.kind === 'bee' && stage.number >= 31 && <p>{stage.arrows ? '화살표 꽃에서는 화살표 쪽으로 나가요. 들어오는 쪽은 자유! 되짚기도 돼요.' : '두 꽃밭 사이 작은 길! 건너기 전에 이쪽 꽃을 모두 만나 봐요.'}</p>}<ol>{concept.rules.map(rule => <li key={rule}>{rule}</li>)}</ol><button className="lab-text-button" onClick={() => setHelpOpen(false)}>알겠어요, 해 볼게요 ↓</button></section>}
     <div className={`lab-play-canvas${won ? ' is-won' : ''}`}><LabBoard stage={stage} state={state} onAction={action => dispatch({ type: 'move', action })} hint={hint.hint} disabled={won} previousState={game.history.at(-2)} lastAction={game.fx?.kind === 'move' ? game.fx.action ?? null : null} />
       {won && <div className="lab-celebrate" aria-hidden="true">{Array.from({ length: 10 }, (_, i) => <span key={i} className="lab-spark-burst" style={{ '--i': i } as CSSProperties}>{i % 3 ? '✦' : '★'}</span>)}<p className="lab-cheer"><span>{concept.icon}</span>{concept.cheer}</p></div>}
     </div>
-    {stuck && <div className="lab-stuck" role="status">이 꽃길은 끝까지 이을 수 없어요. 괜찮아요, 되짚어 볼까요?
-      {recoveryIndex >= 0 && <button onClick={() => { hint.clear(); dispatch({ type: 'recover', index: recoveryIndex }); }}>마지막으로 풀 수 있던 지점으로 되돌리기</button>}
-    </div>}
     <div className="lab-play-status"><span>{progressText}</span><span>★★★ {stage.par} · ★★ {stage.par + TWO_STAR_SLACK}번 이하{hinted ? ' · 힌트 사용(최대 ★★)' : ''}</span></div>
-    <div className={`lab-feedback-line${game.note || hint.text ? ' has-message' : ''}`} role="status" aria-live="polite">{game.note || hint.text || (won ? `${concept.cheer} 오늘도 새로운 생각을 찾았어요.` : '궁금하면 눌러 보고, 언제든 한 걸음 되돌려요.')}</div>
+    <div className="lab-message-slot">
+      {stuck ? <div className="lab-stuck" role="status">이 꽃길은 끝까지 이을 수 없어요. 되짚어 볼까요?
+        {recoveryIndex >= 0 && <button aria-label="마지막으로 풀 수 있던 지점으로 되돌리기" onClick={() => { hint.clear(); dispatch({ type: 'recover', index: recoveryIndex }); }}>풀 수 있던 곳으로 ↶</button>}
+      </div> : <div className={`lab-feedback-line${game.note || hint.text ? ' has-message' : ''}`} role="status" aria-live="polite">{game.note || hint.text || (won ? `${concept.cheer} 오늘도 새로운 생각을 찾았어요.` : stage.kind === 'bee' ? '이웃 꽃을 잇고, 직전 꽃으로 되짚어요.' : '두 친구를 함께 집으로 데려가요.')}</div>}
+    </div>
     <div className="lab-tools" aria-label="퍼즐 도움 도구">
       <button onClick={() => dispatch({ type: 'undo' })} disabled={moves === 0}><span aria-hidden="true">↶</span><span>되돌리기</span></button>
       <button onClick={() => { hint.clear(); setHinted(false); dispatch({ type: 'reset' }); }}><span aria-hidden="true">↻</span><span>처음부터</span></button>
       <button onClick={() => { dispatch({ type: 'clear-note' }); setHinted(true); hint.request(); }} disabled={hint.busy || won} aria-busy={hint.busy}><span aria-hidden="true">{hint.busy ? '◌' : '💡'}</span><span>{hint.busy ? '생각하는 중…' : '한 걸음 힌트'}</span></button>
     </div>
-    {won && cardShown && <section className="lab-clear" aria-label="스테이지 완료"><StarRow count={starsFor(moves, stage.par, hinted)} className="result-stars" /><div><p className="lab-eyebrow">생각의 별을 모았어요</p><h2 tabIndex={-1} ref={wonHeading}>{stage.number === total ? '이 세계의 마지막 판도 해냈어요!' : '해냈어요! 한 뼘 자란 생각.'}</h2><p>힌트를 썼어도, 여러 번 되돌렸어도 멋진 완성이에요.</p></div><div className="lab-clear-actions">{hasNext && <button className="lab-solid-button" onClick={onNext}>다음 스테이지 →</button>}<button className="lab-outline-button" onClick={onBack}>스테이지 고르기</button></div></section>}
+    {won && cardShown && <StageCompletion className="lab-clear" stars={starsFor(moves, stage.par, hinted)} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="lab-solid-button" backClassName="lab-outline-button" actionsClassName="lab-clear-actions" />}
   </main>;
 }

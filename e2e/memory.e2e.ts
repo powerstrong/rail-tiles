@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test, expect, type Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { MEMORY_STAGES } from '../src/memory/stages';
@@ -76,13 +77,12 @@ test('memory: initial map, thirty stages, one-star unlock, immediate results and
     await solve(page, faces, n === 13 ? async matched => { if (matched === 4) { await page.evaluate(() => window.scrollTo(0, 0)); await shot(page, 'ch23-middle'); } } : n === 8 ? async matched => { if (matched === 1) { await page.evaluate(() => window.scrollTo(0, 0)); await shot(page, '02-one-pair'); } } : undefined);
     const result = page.getByRole('region', { name: '스테이지 완료', exact: true });
     await expect(result).toBeVisible();
-    await expect(result.getByRole('heading')).toBeFocused();
+    await expectCompletion(result);
+    await expect(result.getByRole('button').first()).toBeFocused();
     if (n === 8) { await page.evaluate(() => window.scrollTo(0, 0)); await shot(page, '03-complete'); }
-    if (n === 9) await expect(result).toContainText('첫 짝꿍 10판을 해냈어요!');
-    if (n === 19) await expect(result).toContainText('열 장의 풍경을 발견했어요!');
     if (n === 29) {
-      await expect(result).toContainText('미지의 세계 30판을 모두 해냈어요!');
-      await expect(result).toContainText('엽서에 담았어요');
+      await expect(result.getByRole('button')).toHaveText(['스테이지 고르기']);
+      await expect(result.locator('.memory-result-postcard svg')).toBeVisible();
       await result.evaluate(node => node.scrollIntoView({ block: 'end', behavior: 'auto' })); await shot(page, 'ch23-final-complete');
     }
     await expect.poll(() => page.evaluate(({ key, id }) => JSON.parse(localStorage.getItem(key) ?? '{}').stars?.[id], { key: PROGRESS_KEY, id: stage.id })).toBeGreaterThanOrEqual(1);
@@ -225,10 +225,10 @@ test('memory: legacy save, partial rewards, storage event and 8/10-pair responsi
   await expect(page.locator('.memory-limits')).toContainText('힌트 사용');
   await solve(page, faces);
   const result = page.getByRole('region', { name: '스테이지 완료', exact: true });
-  await expect(result).toContainText('이번 장소 발견');
+  await expect(result.getByRole('button')).toHaveText(['스테이지 고르기']);
   await expect(result).not.toContainText('탐험 지도 완성');
   await expect(result).not.toContainText('30판을 모두');
-  await expect(result).toContainText('엽서에 담았어요');
+  await expect(result.locator('.memory-result-postcard svg')).toBeVisible();
   await expect(page.getByRole('button', { name: '다음 스테이지 →', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '스테이지 고르기', exact: true }).click();
   await page.getByRole('button', { name: '발견한 엽서 2 / 20 +', exact: true }).click();

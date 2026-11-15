@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { count, Reef, type CoralStage } from '../src/coral/model';
@@ -40,7 +41,8 @@ test('coral: initial station, sequential unlocks, all 30 solutions and official 
       state = reef.move(state, c)!;
     }
     await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
-    await expect(page.locator('.coral-clear h2')).toBeFocused();
+    await expectCompletion(page.getByRole('region', { name: '스테이지 완료', exact: true }));
+    await expect(page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button').first()).toBeFocused();
     await expect.poll(() => saved(page, s)).toBe(3);
     if (s.number < 30) await page.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
   }

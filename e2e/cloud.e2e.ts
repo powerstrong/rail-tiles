@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 const patterns = JSON.parse(readFileSync(new URL('../src/cloud/patterns.json', import.meta.url), 'utf8')) as { id: string; number: number; title: string; rows: number; cols: number }[];
@@ -31,7 +32,8 @@ test('cloud opens from the fresh map, teaches one stitch, saves a coloured work 
   await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
   await expect(page.locator('.cloud-board')).toHaveClass(/is-finished/);
   await expect(page.locator('[data-cell="0"]')).toHaveCSS('color', 'rgb(83, 126, 173)');
-  await expect(page.getByRole('img', { name: '실 한 땀 완성 작품' })).toBeVisible();
+  await expect(page.locator('.cloud-clear').getByRole('button').first()).toBeFocused();
+  await expect(page.locator('.cloud-clear').getByRole('button')).toHaveText(['다음 스테이지 →', '스테이지 고르기']);
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('rail-tiles:progress')!).stars['lab-v1-cloud-1'])).toBe(3);
   await page.getByRole('button', { name: /작품 모음/ }).click();
   await expect(page.locator('.cloud-gallery figure')).toHaveCount(1);
@@ -46,7 +48,8 @@ test('cloud all thirty proofs finish through board controls and persist stars an
     await expect(page.locator('.cloud-heading h1')).toHaveText(stage.title);
     await finish(page, stage.number);
     await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
-    await expect(page.locator('.cloud-stars')).toHaveAttribute('aria-label', '별 3개');
+    await expectCompletion(page.getByRole('region', { name: '스테이지 완료', exact: true }));
+    await expect(page.locator('.cloud-clear .star-row')).toHaveAttribute('aria-label', '별 3개');
     await expect.poll(() => page.evaluate(id => JSON.parse(localStorage.getItem('rail-tiles:progress')!).stars[id], stage.id)).toBe(3);
     if (stage.number < 30) await page.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
   }
@@ -68,13 +71,13 @@ test('cloud touch lessons explain 2·1, contradictions, undo, erasing, hint star
   await expect(page.locator('.cloud-hint-cell')).toHaveCount(1);
   await expect(page.getByRole('region', { name: '한 줄 힌트의 근거' })).toBeVisible();
   await finish(page, 3, true);
-  await expect(page.locator('.cloud-stars')).toHaveAttribute('aria-label', '별 2개');
+  await expect(page.locator('.cloud-clear .star-row')).toHaveAttribute('aria-label', '별 2개');
   await page.getByRole('button', { name: '↶ 되돌리기', exact: true }).tap();
   await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '↻ 처음부터', exact: true }).tap();
   await expect(page.locator('.cloud-score')).not.toContainText('힌트 사용');
   await finish(page, 3, true);
-  await expect(page.locator('.cloud-stars')).toHaveAttribute('aria-label', '별 3개');
+  await expect(page.locator('.cloud-clear .star-row')).toHaveAttribute('aria-label', '별 3개');
   await context.close();
 });
 test('cloud last board keeps phone cells at least 44px and supports zoom, line emphasis, keyboard and touch completion', async ({ browser }) => {
@@ -97,6 +100,8 @@ test('cloud last board keeps phone cells at least 44px and supports zoom, line e
   await expect(page.locator('[data-cell="1"]')).toBeFocused(); await page.keyboard.press('Enter');
   await page.keyboard.press('Control+z'); await expect(page.locator('[data-cell="1"]')).toHaveAttribute('data-mark', '0');
   await finish(page, 30, true);
+  await expectCompletion(page.locator('.cloud-clear'));
+  await page.getByRole('button', { name: /작품 모음/ }).click();
   await expect(page.getByRole('img', { name: '마음을 수놓아요 완성 작품' })).toBeVisible();
   await context.close();
 });

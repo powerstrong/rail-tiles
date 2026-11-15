@@ -3350,3 +3350,5 @@ body:has(.world-clock) {
 .course-picker { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; padding: 12px; background: #f3ead9; }
 .course-picker button { padding: 10px 14px; border: 1px solid #b9aa8c; border-radius: 14px; background: #fffaf0; font: inherit; font-size: 14px; }
 .course-picker button[aria-pressed="true"] { background: #dfefde; border-color: #6a956b; font-weight: 800; }
+
+.result-card > .clear-note { display: block; margin: 4px 0 12px; font-size: 12px; line-height: 1.4; }

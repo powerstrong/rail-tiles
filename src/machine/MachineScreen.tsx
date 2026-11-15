@@ -1,7 +1,7 @@
 import { type Intro, IntroCard } from '../ui/IntroCard';
 import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
-import { StarRow } from '../ui/StageSelect';
+import { StageCompletion } from '../ui/StageCompletion';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { light } from './beam';
 import { BEAM, BulbArt, DoorArt, FilterArt, FloorTile, LaserArt, MC, MirrorArt, RobotArt, SensorArt, WallArt } from './MachineArt';
@@ -303,64 +303,14 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
 
       {won && (
         <ResultOverlay label="스테이지 클리어">
-          <div className="result-card">
+          <StageCompletion className="result-card" stars={earned} hasNext={hasNext} onNext={onNext} onBack={onBack}
+            nextClassName="primary" backClassName={hasNext ? 'secondary' : 'primary'} actionsClassName="result-actions" note={clearNote} overlay>
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
                 <i key={i} style={{ '--i': i } as CSSProperties} />
               ))}
             </div>
-            <button className="icon-btn result-close" onClick={onBack} aria-label="스테이지 목록으로">
-              <svg viewBox="0 0 24 24" aria-hidden>
-                <path d="M6 6 L18 18 M18 6 L6 18" />
-              </svg>
-            </button>
-            <p className="result-kicker">{stage.label}</p>
-            <StarRow count={earned} className="result-stars" />
-            <h2>{bonus ? '로봇 구출 성공!' : stage.boss ? '보스 격파!' : hasNext ? '불이 켜졌어요!' : '로봇 공장 여행 완료!'}</h2>
-            <p className="result-sub">
-              누르기 {taps}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
-              {earned < 3 && !hinted && (
-                <>
-                  <br />
-                  {stage.par}번 만에 도전해 보세요!
-                </>
-              )}
-              {hinted && (
-                <>
-                  <br />
-                  힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
-                </>
-              )}
-              {clearNote && (
-                <>
-                  <br />
-                  <strong className="clear-note">{clearNote}</strong>
-                </>
-              )}
-              {bestStars > earned && (
-                <>
-                  <br />
-                  최고 기록: 별 {bestStars}개
-                </>
-              )}
-            </p>
-            <div className="result-actions">
-              {hasNext ? (
-                <button className="primary" onClick={onNext} autoFocus>
-                  다음 스테이지
-                </button>
-              ) : (
-                <button className="primary" onClick={onBack} autoFocus>
-                  스테이지 목록
-                </button>
-              )}
-              <div className="result-retry">
-                <button className="secondary" onClick={() => restart(false)}>
-                  처음부터 다시
-                </button>
-              </div>
-            </div>
-          </div>
+          </StageCompletion>
         </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}

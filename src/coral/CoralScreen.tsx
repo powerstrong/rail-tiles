@@ -1,9 +1,10 @@
+import { StarRow } from '../ui/StageSelect';
+import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
 import { COLOR_NAMES, COLORS, SYMBOLS, Reef, count, type CoralStage, type CoralState } from './model';
 import { CORAL_CHAPTERS } from './stages';
 import { CoralEmblem, Pigment } from './art';
 import { starsFor, TWO_STAR_SLACK } from '../engine/stars';
-import { StarRow } from '../ui/StageSelect';
 import { isMuted, play, setMuted } from '../ui/sound';
 import type { GameProps } from '../worlds';
 import './coral.css';
@@ -11,7 +12,7 @@ import './coral.css';
 interface Game { history: CoralState[]; hinted: boolean; hint: number | null; revision: number; note: string; waveFrom: number | null }
 type Event = { type: 'move'; color: number } | { type: 'undo' } | { type: 'reset' } | { type: 'hint-request' } | { type: 'hint-result'; color: number | null; revision: number };
 
-export function CoralScreen({ stage, hasNext, bestStars, allCleared, onBack, onNext, onCleared, clearNote }: GameProps<CoralStage>) {
+export function CoralScreen({ stage, hasNext, bestStars, onBack, onNext, onCleared, clearNote }: GameProps<CoralStage>) {
   const reef = useMemo(() => new Reef(stage), [stage]);
   const [game, dispatch] = useReducer((g: Game, e: Event): Game => {
     if (e.type === 'hint-request') return { ...g, hinted: true, hint: null, note: '다음 물결을 찾고 있어요. 계속 골라도 괜찮아요.' };
@@ -28,7 +29,7 @@ export function CoralScreen({ stage, hasNext, bestStars, allCleared, onBack, onN
   const [busy, setBusy] = useState(false);
   const worker = useRef<Worker | null>(null), timeout = useRef<ReturnType<typeof setTimeout>>();
   const hintRequest = useRef(0);
-  const heading = useRef<HTMLHeadingElement>(null), result = useRef<HTMLHeadingElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const recorded = useRef(false), completion = useRef(onCleared);
   completion.current = onCleared;
   const chapter = CORAL_CHAPTERS[Math.floor((stage.number - 1) / 10)];
@@ -44,8 +45,6 @@ export function CoralScreen({ stage, hasNext, bestStars, allCleared, onBack, onN
       recorded.current = true;
       completion.current(stage.id, starsFor(moves, stage.par, game.hinted));
       play('arrive');
-      result.current?.focus({ preventScroll: true });
-      result.current?.scrollIntoView({ block: 'nearest' });
     }
   }, [won, moves, stage.id, stage.par, game.hinted]);
   useEffect(() => {
@@ -99,6 +98,6 @@ export function CoralScreen({ stage, hasNext, bestStars, allCleared, onBack, onN
     </div>
     <div className="coral-feedback" role="status" aria-live="polite">{won ? '모든 산호가 한 색! 무지개 정원이 반짝여요.' : game.note || '어떤 색이 더 멀리 이어질까요? +숫자를 살펴봐요.'}{game.hinted && <small>힌트 사용 · 이번 완성은 최대 ★★</small>}</div>
     <div className="coral-tools" aria-label="퍼즐 도움 도구"><button disabled={!moves} onClick={() => { play('erase'); dispatch({ type: 'undo' }); }}>↶ 되돌리기</button><button onClick={() => dispatch({ type: 'reset' })}>↻ 처음부터</button><button disabled={won || busy} aria-busy={busy} onClick={requestHint}>{busy ? '찾는 중…' : '한 걸음 힌트'}</button></div>
-    {won && <section className="coral-clear" aria-label="스테이지 완료"><StarRow count={starsFor(moves, stage.par, game.hinted)} className="result-stars" /><h2 ref={result} tabIndex={-1}>{allCleared ? '온 바다에 무지개가 피었어요!' : '멋진 물결을 만들었어요!'}</h2><p>{moves}번 만에 완성! {starsFor(moves, stage.par, game.hinted) < 3 ? '다른 순서로 별 세 개에도 도전해 봐요.' : '생각의 별 세 개를 모았어요.'}</p>{clearNote && <p>{clearNote}</p>}<div>{hasNext && <button className="coral-primary" onClick={onNext}>다음 스테이지 →</button>}<button onClick={onBack}>스테이지 고르기</button></div></section>}
+    {won && <StageCompletion className="coral-clear" stars={starsFor(moves, stage.par, game.hinted)} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="coral-primary" note={clearNote} />}
   </main>;
 }

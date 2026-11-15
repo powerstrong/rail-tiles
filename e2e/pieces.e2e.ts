@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test, expect, type Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
@@ -28,8 +29,9 @@ test('pieces: all thirty stages replay through controls, save stars and unlock t
     if (stage.number < 21) await expect(page.getByRole('button', { name: '↔ 뒤집기', exact: true })).toHaveCount(0);
     for (const [index, pose] of stage.solution.entries()) await place(page, stage, index, pose);
     await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
+    await expectCompletion(page.getByRole('region', { name: '스테이지 완료', exact: true }));
     await expect(page.locator('.pieces-picture')).toBeVisible();
-    await expect(page.locator('.pieces-clear h2')).toBeFocused();
+    await expect(page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button').first()).toBeFocused();
     await expect.poll(() => page.evaluate(id => JSON.parse(localStorage.getItem('rail-tiles:progress')!).stars[id], stage.id)).toBe(3);
     if (stage.number < 30) await page.getByRole('button', { name: '다음 스테이지 →' }).click();
   }

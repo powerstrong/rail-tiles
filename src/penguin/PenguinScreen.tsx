@@ -3,7 +3,7 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import type { Dir } from '../engine/dir';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { withTo } from '../ui/korean';
-import { StarRow } from '../ui/StageSelect';
+import { StageCompletion } from '../ui/StageCompletion';
 import { isMuted, play, setMuted } from '../ui/sound';
 import { sample, timeline } from './animate';
 import { PENGUIN_COLORS, PenguinArt } from './IceArt';
@@ -32,7 +32,7 @@ interface Props {
 
 const DIR_LABEL = ['위', '오른쪽', '아래', '왼쪽'];
 
-export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
+export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext, onCleared, clearNote }: Props) {
   const gameRef = useFitBoard<HTMLDivElement>();
   const [showIntro, setShowIntro] = useState(!!intro && bestStars === 0);
   const [state, setState] = useState<IceState>(() => initialState(stage));
@@ -352,64 +352,14 @@ export function PenguinScreen({ stage, hasNext, allCleared, bestStars, intro, on
 
       {won && (
         <ResultOverlay label="스테이지 클리어">
-          <div className="result-card">
+          <StageCompletion className="result-card" stars={earned} hasNext={hasNext} onNext={onNext} onBack={onBack}
+            nextClassName="primary" backClassName={hasNext ? 'secondary' : 'primary'} actionsClassName="result-actions" note={clearNote} overlay>
             <div className="confetti" aria-hidden>
               {Array.from({ length: 18 }, (_, i) => (
                 <i key={i} style={{ '--i': i } as CSSProperties} />
               ))}
             </div>
-            <button className="icon-btn result-close" onClick={onBack} aria-label="스테이지 목록으로">
-              <svg viewBox="0 0 24 24" aria-hidden>
-                <path d="M6 6 L18 18 M18 6 L6 18" />
-              </svg>
-            </button>
-            <p className="result-kicker">{stage.label}</p>
-            <StarRow count={earned} className="result-stars" />
-            <h2>{!hasNext && allCleared && !clearNote ? '얼음 나라 여행 완료!' : '도착 성공!'}</h2>
-            <p className="result-sub">
-              밀기 {moves}번 · ★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번
-              {earned < 3 && !hinted && (
-                <>
-                  <br />
-                  {stage.par}번 만에 도전해 보세요!
-                </>
-              )}
-              {hinted && (
-                <>
-                  <br />
-                  힌트 없이 처음부터 다시 하면 ★★★에 도전할 수 있어요.
-                </>
-              )}
-              {clearNote && (
-                <>
-                  <br />
-                  <strong className="clear-note">{clearNote}</strong>
-                </>
-              )}
-              {bestStars > earned && (
-                <>
-                  <br />
-                  최고 기록: 별 {bestStars}개
-                </>
-              )}
-            </p>
-            <div className="result-actions">
-              {hasNext ? (
-                <button className="primary" onClick={onNext} autoFocus>
-                  다음 스테이지
-                </button>
-              ) : (
-                <button className="primary" onClick={onBack} autoFocus>
-                  스테이지 목록
-                </button>
-              )}
-              <div className="result-retry">
-                <button className="secondary" onClick={() => restart(false)}>
-                  처음부터 다시
-                </button>
-              </div>
-            </div>
-          </div>
+          </StageCompletion>
         </ResultOverlay>
       )}
       {showIntro && intro && <IntroCard intro={intro} onClose={() => setShowIntro(false)} />}

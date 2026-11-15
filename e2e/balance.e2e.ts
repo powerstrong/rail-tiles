@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { move, totals, type BalanceStage, type State } from '../src/balance/model';
@@ -35,7 +36,8 @@ test('balance: all 30 stages replay their minimum solutions and save three stars
       await press(page, group); state = move(stage, state, group); await checkTotals(page, stage, state);
     }
     await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
-    await expect(page.locator('.balance-clear h2')).toBeFocused();
+    await expectCompletion(page.getByRole('region', { name: '스테이지 완료', exact: true }));
+    await expect(page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button').first()).toBeFocused();
     await expect.poll(() => page.evaluate(([key, id]) => JSON.parse(localStorage.getItem(key)!).stars[id], [key, stage.id])).toBe(3);
     if (stage.number < 30) await page.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
   }

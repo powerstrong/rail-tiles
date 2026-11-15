@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import type { FlowStage } from '../src/flow/model';
@@ -26,6 +27,7 @@ test('flow: all 30 stages complete by dragging, sequential unlock, stars, and ex
     await expect(page.locator('.flow-heading h1')).toHaveText(s.title);
     for(const path of s.solution)await drag(page,path);
     await expect(page.getByRole('region',{name:'스테이지 완료',exact:true})).toBeVisible();
+    await expectCompletion(page.getByRole('region',{name:'스테이지 완료',exact:true}));
     await expect.poll(()=>page.evaluate(({key,id})=>JSON.parse(localStorage.getItem(key)!).stars[id],{key,id:s.id})).toBe(3);
     if(s.number<30)await page.getByRole('button',{name:'다음 스테이지 →',exact:true}).click();
   }

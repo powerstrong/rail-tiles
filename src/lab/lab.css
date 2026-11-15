@@ -121,3 +121,48 @@
 }
 .lab-stuck { padding: 12px; margin-top: 16px; border: 1px solid #d7b77d; border-radius: 12px; background: #fff7df; color: #69533a; font-size: 14px; }
 .lab-stuck button { display: block; margin-top: 8px; border: 1px solid #bb985b; border-radius: 8px; padding: 9px; background: #fffcf3; color: inherit; font: inherit; }
+
+/* Keep recovery in the same space as ordinary feedback: no board/tool movement. */
+.lab-message-slot { min-height: 92px; display: grid; align-items: center; }
+.lab-message-slot .lab-stuck { margin: 0; padding: 4px 8px; text-align: center; font-size: 12px; line-height: 1.4; }
+.lab-stuck button { min-height: 44px; margin: 2px auto 0; padding: 4px 12px; font-weight: 750; }
+.lab-clear { display: flex; flex-direction: column; align-items: center; }
+.lab-clear-actions { flex-wrap: wrap; justify-content: center; }
+
+@media (max-width: 600px) {
+  .lab.lab-play { position: relative; padding: 6px 8px 8px; }
+  .lab-play .lab-top { min-height: 44px; margin-bottom: 0; gap: 4px; }
+  .lab-play .lab-back { min-height: 44px; font-size: 12px; padding: 4px 0; }
+  .lab-play .lab-play-world { font-size: 10px; }
+  .lab-play .lab-mute { width: 44px; height: 44px; flex-shrink: 0; }
+  .lab-play .lab-play-heading { min-height: 40px; margin: 2px 82px 2px 0; align-items: center; }
+  .lab-play .lab-play-heading h1 { font-size: 18px; line-height: 1.25; }
+  .lab-play .lab-play-heading .lab-eyebrow { font-size: 10px; line-height: 1.3; letter-spacing: 0; }
+  .lab-play .lab-done-tag { display: none; }
+  .lab-play .lab-play-goal { position: absolute; top: 52px; right: 8px; border: 0; padding: 0; background: none; }
+  .lab-play-goal > span, .lab-play-goal > p { display: none; }
+  .lab-play-goal > button { min-height: 44px; font-size: 12px; }
+  .lab-play .lab-play-rules { position: absolute; z-index: 8; top: 98px; left: 8px; right: 8px; max-height: calc(100dvh - 112px); overflow: auto; margin: 0; border: 1px solid #d3c8b3; border-radius: 12px; box-shadow: 0 6px 20px #393d3c33; }
+  .lab-play .lab-play-canvas { margin: 4px auto 6px; width: 100%; }
+  .lab-bee .lb-bee { max-width: min(480px, calc((100dvh - 280px) * var(--lab-board-ratio) + 10px)); }
+  .lab-bee .lb-bee-frame { padding: 3px; border-radius: 15px; }
+  .lab-bee .lb-bee-grid { gap: 0; }
+  .lab-bee .lb-flower-path { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); }
+  .lab-bee .lb-board-note { min-height: 18px; margin-bottom: 4px; gap: 2px 6px; font-size: 11px; line-height: 1.4; }
+  .lab-bee .lb-board-note b, .lab-bee .lb-board-note > span { font-size: 11px; }
+  .lab-bee .lb-bee-count, .lab-bee .lb-bee-discovery, .lab-bee .lb-caption { display: none; }
+  .lab-play .lab-play-status { min-height: 16px; font-size: 10px; line-height: 1.4; gap: 4px; }
+  .lab-play-status > span:last-child { font-size: 9px; text-align: right; }
+  .lab-play .lab-message-slot { height: 72px; min-height: 72px; margin: 2px 0; }
+  .lab-play .lab-feedback-line { min-height: 0; max-height: 72px; overflow: auto; margin: 0; padding: 4px 8px; font-size: 12px; line-height: 1.4; }
+  .lab-play .lab-stuck { font-size: 12px; }
+  .lab-play .lab-tools { gap: 5px; padding: 0; }
+  .lab-play .lab-tools button { height: 44px; min-height: 44px; padding: 4px 2px; font-size: 11px; line-height: 1.2; white-space: nowrap; gap: 3px; }
+  .lab-play .lab-tools button > span:first-child { font-size: 18px; }
+  .lab-play .lab-clear { position: fixed; z-index: 10; bottom: max(8px, env(safe-area-inset-bottom)); left: 8px; right: 8px; width: fit-content; max-width: calc(100% - 16px); margin: 0 auto; padding: 12px; gap: 4px; box-shadow: 0 5px 24px #393d3c44; }
+  .lab-twins .lb-board-note { margin-bottom: 4px; font-size: 12px; }
+  .lab-twins .lb-view-options { margin: 0 0 4px; }
+  .lab-twins .lb-home-rule, .lab-twins .lb-caption { font-size: 11px; line-height: 1.4; }
+  .lab-twins .lb-dpad { margin-top: 10px; }
+  .lab-twins .lb-rabbit-reaction { font-size: 11px; }
+}

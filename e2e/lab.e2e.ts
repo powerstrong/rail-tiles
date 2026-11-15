@@ -1,3 +1,4 @@
+import { expectCompletion } from './assertCompletion';
 import { test as base, expect, type Locator, type Page } from '@playwright/test';
 import { act, KINDS, type Stage, type State } from '../src/lab/model';
 import { readFileSync } from 'node:fs';
@@ -55,7 +56,14 @@ for (const kind of KINDS) test(`${kind}: all official stages finish through cont
     let state = stage.start;
     for (const action of stage.solution) state = await move(page, stage, state, action);
     await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
-    await expect(page.locator('.lab-clear h2')).toBeFocused();
+    await expectCompletion(page.getByRole('region', { name: '스테이지 완료', exact: true }));
+    await expect(page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button').first()).toBeFocused();
+    const focusedButton = await page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button').first().boundingBox();
+    expect(focusedButton!.y).toBeGreaterThanOrEqual(0);
+    expect(focusedButton!.y + focusedButton!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+    const card = await page.locator('.lab-clear').boundingBox();
+    expect(card!.y).toBeGreaterThanOrEqual(0);
+    expect(card!.y + card!.height).toBeLessThanOrEqual(page.viewportSize()!.height + 1);
     await expect.poll(() => page.evaluate(([key, id]) => JSON.parse(localStorage.getItem(key) ?? '{}').stars?.[id], [PROGRESS_KEY, stage.id])).toBe(3);
     if (stage.number < stagesFor(kind).length) await page.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
   }
@@ -280,6 +288,7 @@ test('official world result buttons wait for the card before accepting keyboard 
   await expect(overlay).toBeVisible();
   await expect(overlay).toHaveClass('overlay');
   await expect(next).toBeFocused();
+  await expectCompletion(overlay.getByRole('region', { name: '스테이지 완료' }));
   await page.keyboard.press('Enter');
   await expect(overlay).toHaveCount(0);
 });
@@ -293,7 +302,7 @@ test.describe('puzzle win celebration', () => {
     await expect(page.locator('.lab-celebrate')).toBeVisible();
     await expect(page.locator('.lab-clear')).toHaveCount(0);
     await expect(page.locator('.lab-clear')).toBeVisible();
-    await expect(page.locator('.lab-clear h2')).toBeFocused();
+    await expect(page.getByRole('region', { name: '스테이지 완료', exact: true }).getByRole('button').first()).toBeFocused();
     await page.keyboard.press('ControlOrMeta+z');
     await expect(page.locator('.lab-clear')).toHaveCount(0);
     await expect(page.getByRole('button', { name: '위로 움직이기', exact: true })).toBeEnabled();
