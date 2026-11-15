@@ -1,6 +1,7 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from 'react';
 import { act, location, type Stage, type State } from './model';
 import { withTo } from '../ui/korean';
+import { ArrowFlower } from './bee50/ArrowFlower';
 import './lab-board.css';
 
 export interface LabBoardProps {
@@ -145,6 +146,9 @@ function BeeBoard({ stage, state, onAction, hint, disabled }: LabBoardProps) {
     if (cell !== null) onAction(cell);
   };
   return <div className="lb-bee">
+    {stage.number >= 31 && <p className="lb-bee-discovery">{stage.arrows
+      ? '➜ 화살표 꽃에서는 화살표 쪽으로 나가요. 들어오는 쪽은 자유! 되짚기도 돼요.'
+      : '두 꽃밭 사이 작은 길! 건너기 전에 이쪽 꽃을 모두 만나 볼까요?'}</p>}
     <div className="lb-board-note">인사한 꽃길 <b>{state.length} / {flowers}</b><span>{remaining > 0 ? `벌집 🔒 남은 꽃을 먼저 (${remaining}송이)` : '벌집으로 돌아가요'}</span></div>
     <div className="lb-bee-frame">
       <svg className="lb-flower-path" viewBox={`0 0 ${stage.cols * 64} ${stage.rows * 64}`} aria-hidden="true"><polyline points={points} /></svg>
@@ -168,12 +172,14 @@ function BeeBoard({ stage, state, onAction, hint, disabled }: LabBoardProps) {
         {stage.terrain!.map((open, cell) => {
           const visited = state.includes(cell), goal = stage.goal[0] === cell, legal = !!act(stage, state, cell);
           const retrace = state.length > 1 && state[state.length - 2] === cell;
+          const arrow = stage.arrows?.[cell];
           return <button type="button" key={cell} data-bee-cell={cell}
-            aria-label={`${location(stage, cell)}, ${!open ? '풀밭, 길 없음' : cell === last ? '꿀벌 보리' : goal ? remaining > 0 ? '벌집 잠김, 남은 꽃을 먼저' : '벌집, 마지막에 도착해요' : retrace ? '직전 꽃, 누르면 끝 한 칸 지우기' : visited ? '인사한 꽃길' : '아직 방문하지 않은 꽃'}${legal ? ', 여기로 날아가기' : ''}`}
+            aria-label={`${location(stage, cell)}, ${!open ? '풀밭, 길 없음' : cell === last ? '꿀벌 보리' : goal ? remaining > 0 ? '벌집 잠김, 남은 꽃을 먼저' : '벌집, 마지막에 도착해요' : retrace ? '직전 꽃, 누르면 끝 한 칸 지우기' : visited ? '인사한 꽃길' : '아직 방문하지 않은 꽃'}${arrow !== undefined ? `, 화살표 꽃 ${ARROWS[arrow]} ${withTo(DIRECTIONS[arrow])}만 나가기` : ''}${legal ? ', 여기로 날아가기' : ''}`}
             onClick={e => { if (e.detail === 0 || !suppressClick.current) onAction(cell); suppressClick.current = false; }}
             disabled={disabled || !open} aria-disabled={!legal}
             className={`lb-tile lb-bee-cell${!open ? ' lb-bee-grass' : ''}${visited ? ' lb-bee-visited' : ''}${legal ? ' lb-bee-next' : ''}${retrace ? ' lb-bee-retrace' : ''}${hint === cell ? ' lb-hint' : ''}`}>
-            {cell === last ? <Toy kind="bee" /> : goal ? <Toy kind="hive" /> : open && !visited ? <Toy kind="flower" /> : open ? <span className="lb-flower-visited" aria-hidden="true">{retrace ? '↶' : '✓'}</span> : <span className="lb-grass" aria-hidden="true">⌁</span>}
+            {cell === last ? <Toy kind="bee" /> : goal ? <Toy kind="hive" /> : open && !visited ? arrow !== undefined ? <ArrowFlower direction={arrow} /> : <Toy kind="flower" /> : open ? <span className="lb-flower-visited" aria-hidden="true">{retrace ? '↶' : '✓'}</span> : <span className="lb-grass" aria-hidden="true">⌁</span>}
+            {arrow !== undefined && visited && <ArrowFlower direction={arrow} badge />}
             {cell === stage.start[0] && <span className="lb-start-marker" aria-hidden="true">출발</span>}
             {goal && remaining > 0 && <span className="lb-hive-lock" aria-hidden="true">🔒 남은 꽃을 먼저</span>}
           </button>;

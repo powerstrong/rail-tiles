@@ -17,13 +17,14 @@ function replay(stage: Stage, state: State, path: number[]): State {
 }
 
 describe('audited laboratory catalog', () => {
-  it('offers exactly two different concepts with thirty directly selectable stages each', () => {
+  it('offers exactly two different concepts with ten stages per chapter', () => {
     expect(CONCEPTS.map(c => c.id)).toEqual([...KINDS]);
-    expect(LAB_STAGES).toHaveLength(60);
+    expect(LAB_STAGES).toHaveLength(CONCEPTS.reduce((n, c) => n + c.chapters.length * 10, 0));
     for (const kind of KINDS) {
       const stages = stagesFor(kind);
-      expect(stages).toHaveLength(30);
-      expect(stages.map(s => s.number)).toEqual(Array.from({ length: 30 }, (_, i) => i + 1));
+      const count = CONCEPTS.find(c => c.id === kind)!.chapters.length * 10;
+      expect(stages).toHaveLength(count);
+      expect(stages.map(s => s.number)).toEqual(Array.from({ length: count }, (_, i) => i + 1));
       expect(stages.map(s => s.id)).toEqual(stages.map(s => `lab-v1-${kind}-${s.number}`));
     }
   });
@@ -32,14 +33,14 @@ describe('audited laboratory catalog', () => {
     const shipped = new Set(WORLDS.flatMap(w => w.stages.map(s => s.id)));
     for (const kind of KINDS) expect(WORLDS.find(w => w.id === kind)?.unlockAfter).toBeUndefined();
     const ids = LAB_STAGES.map(s => s.id);
-    expect(new Set(ids).size).toBe(60);
+    expect(new Set(ids).size).toBe(LAB_STAGES.length);
     for (const s of LAB_STAGES) {
       expect(shipped.has(s.id), s.id).toBe(true);
       for (const w of WORLDS) if (w.daily) expect(s.id.startsWith(w.daily.prefix)).toBe(false);
     }
   });
 
-  it('starts unfinished and replays all 60 published answers without mutating stage data', () => {
+  it('starts unfinished and replays all published answers without mutating stage data', () => {
     for (const s of LAB_STAGES) {
       const before = JSON.stringify(s);
       expect(isWon(s, s.start), s.id).toBe(false);
@@ -76,7 +77,7 @@ describe('audited laboratory catalog', () => {
 describe('age-appropriate construction constraints', () => {
 
   it('uses full-size dense boards and a measured decision curve rather than corridor length', () => {
-    for (const s of stagesFor('bee')) {
+    for (const s of stagesFor('bee').slice(0, 30)) {
       expect(s.cols, s.id).toBe(5);
       expect(s.rows, s.id).toBe(s.number <= 20 ? 5 : 6);
       expect(s.par, s.id).toBeGreaterThanOrEqual(s.number > 20 ? 25 : 16);
@@ -113,9 +114,9 @@ describe('age-appropriate construction constraints', () => {
 });
 
 describe('retained puzzle curation', () => {
-  it('keeps all sixty boards distinct and increases the challenge across chapters', () => {
+  it('keeps all published boards distinct and increases the challenge across chapters', () => {
     const signatures = LAB_STAGES.map(s => JSON.stringify([s.kind, s.cols, s.rows, s.start, s.goal, s.terrain, s.terrain2]));
-    expect(new Set(signatures).size).toBe(60);
+    expect(new Set(signatures).size).toBe(LAB_STAGES.length);
     for (const kind of KINDS) {
       const stages = stagesFor(kind);
       const averages = [0, 1, 2].map(ch => stages.slice(ch * 10, ch * 10 + 10).reduce((sum, s) => sum + s.par, 0) / 10);

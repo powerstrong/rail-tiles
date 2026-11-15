@@ -19,10 +19,10 @@ const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia
 
 interface PlayState { history: State[]; note: string; fx: { kind: 'move' | 'deny' | 'undo' | 'reset'; seq: number; action?: number } | null }
 type PlayEvent = { type: 'move'; action: number } | { type: 'direction'; direction: number } | { type: 'undo' } | { type: 'reset' } | { type: 'clear-note' } | { type: 'recover'; index: number };
-function invalidNote(kind: Kind): string {
-  switch (kind) {
+function invalidNote(stage: Stage): string {
+  switch (stage.kind) {
     case 'twins': return '두 토끼 모두 막혀 있어요. 다른 방향을 찾아볼까요?';
-    case 'bee': return '아직 가지 않은 이웃 꽃을 골라요. 벌집은 맨 마지막이에요.';
+    case 'bee': return stage.arrows ? '화살표 꽃에서는 화살표 쪽으로 나가요. 직전 꽃으로 되짚어도 돼요. 벌집은 맨 마지막이에요.' : '아직 가지 않은 이웃 꽃을 골라요. 벌집은 맨 마지막이에요.';
     default: return '다른 칸을 골라 다시 해 봐요.';
   }
 }
@@ -44,7 +44,7 @@ export function PuzzleScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
     if (action < 0) return current;
     const next = act(stage, now, action);
     if (next && stage.kind === 'bee' && next.length < now.length) return { history: current.history.slice(0, -1), note: '꽃길 한 칸을 되짚었어요.', fx: fx('undo') };
-    return next ? { history: [...current.history, next], note: '', fx: { ...fx('move'), action } } : { ...current, note: invalidNote(stage.kind), fx: fx('deny') };
+    return next ? { history: [...current.history, next], note: '', fx: { ...fx('move'), action } } : { ...current, note: invalidNote(stage), fx: fx('deny') };
   }, { history: [[...stage.start]], note: '', fx: null });
   const state = game.history.at(-1)!, won = isWon(stage, state), moves = game.history.length - 1;
   const graph = useMemo(() => {

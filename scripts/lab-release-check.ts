@@ -21,7 +21,7 @@ const scope: { onmessage?: (event: unknown) => void; postMessage: (result: unkno
 runInNewContext(readFileSync(`dist/assets/${worker}`, 'utf8'), { self: scope }, { timeout: 2000 });
 assert(scope.onmessage, 'Built Worker did not register');
 let checks = 0;
-for (const kind of KINDS) for (const number of [1, 15, 30]) {
+for (const kind of KINDS) for (const number of kind === 'bee' ? [1, 15, 30, 31, 40, 41, 50] : [1, 15, 30]) {
   const stage = stagesFor(kind)[number - 1];
   let response: { ok: boolean; result?: SearchResult } | undefined;
   scope.postMessage = raw => { response = raw as typeof response; };
@@ -40,4 +40,4 @@ scope.postMessage = raw => { invalid = raw; };
 scope.onmessage({ data: { stage: null, state: null } });
 assert.equal((invalid as { ok: boolean }).ok, false);
 assert.equal(Object.keys(invalid as object).length, 1);
-console.log(`Production lab assets and offline precache verified. Bundled hint Worker: ${checks}/6 stage checks passed; malformed requests handled.`);
+console.log(`Production lab assets and offline precache verified. Bundled hint Worker: ${checks}/10 stage checks passed; malformed requests handled.`);

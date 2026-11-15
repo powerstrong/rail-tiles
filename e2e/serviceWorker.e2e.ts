@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { renderServiceWorker } from '../scripts/serviceWorker';
+import { CONCEPTS } from '../src/lab/catalog';
 
 test('deployment waits for old tabs, preserves their lazy assets, then upgrades offline at a Pages subpath', async ({ browser }) => {
   // A previously deployed page that has not requested its lazy game module yet.
@@ -62,7 +63,7 @@ test('deployment waits for old tabs, preserves their lazy assets, then upgrades 
     await expect(next.locator('.lab-entry')).toHaveCount(0);
     await next.getByRole('button', { name: '시작하기', exact: true }).click();
     for (const title of ['거울 토끼의 숲', '꿀벌의 한붓 꽃길']) {
-      await expect(next.getByRole('button', { name: new RegExp(`^${title}, 별 1/90`) })).toBeVisible();
+      await expect(next.getByRole('button', { name: new RegExp(`^${title}, 별 1/${CONCEPTS.find(c => c.title === title)!.chapters.length * 30}`) })).toBeVisible();
     }
     for (const title of ['기차 차고지', '우주 정거장']) {
       await expect(next.getByRole('button', { name: new RegExp(`^${title}, 별`) })).toBeVisible();

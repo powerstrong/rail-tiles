@@ -21,7 +21,7 @@ export function beeQuality(stage: Stage, trials = 20_000) {
     let at = stage.start[0], mask = 2 ** at, count = 1;
     const total = stage.par + 1;
     while (count < total) {
-      const options = search.neighbors[at].filter(n => Math.floor(mask / search.bits[n]) % 2 === 0 && (n !== search.goal || count + 1 === total));
+      const options = search.exits[at].filter(n => Math.floor(mask / search.bits[n]) % 2 === 0 && (n !== search.goal || count + 1 === total));
       if (!options.length) break;
       at = options[Math.floor(random() * options.length)]; mask += 2 ** at; count++;
     }

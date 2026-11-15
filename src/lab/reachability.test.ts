@@ -34,8 +34,10 @@ describe('flower-path proof and recovery', () => {
     const graph = explore(stage);
     let state = stage.start;
     for (const action of stage.solution) {
-      expect(reachability(graph, state)).toBe('possible');
-      const answer = graph.bee!.query(state);
+      // Proof correctness keeps the UI work limit but is independent of CI load.
+      // Wall-clock exhaustion is tested separately below and in browser benchmarks.
+      const answer = graph.bee!.query(state, graph.beeBudget, Infinity);
+      expect(answer.answer).toBe('possible');
       expect(isWon(stage, answer.path!.reduce((v, a) => forward(stage, v, a)!, state))).toBe(true);
       for (const alternative of actions(stage, state)) {
         const next = forward(stage, state, alternative);

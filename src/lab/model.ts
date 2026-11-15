@@ -13,6 +13,9 @@ export interface Stage {
   goal: State;
   terrain?: number[];
   terrain2?: number[];
+  /** Bee arrow flowers: cell -> compulsory EXIT direction (0 up, 1 right, 2 down, 3 left).
+   * Enter from any side; retracing always erases the last step, ignoring arrows. */
+  arrows?: Record<number, number>;
   /** A checked solution, used for the stage audit, never for pretending arbitrary states are solved. */
   solution: number[];
   par: number;
@@ -49,6 +52,8 @@ export function act(s: Stage, v: State, action: number): State | null {
       if (v.length > 1 && action === v[v.length - 2]) return v.slice(0, -1);
       if (action >= s.cols * s.rows || !s.terrain![action] || v.includes(action)) return null;
       if (!DIRS.some((_, d) => neighbor(s, v.at(-1)!, d) === action)) return null;
+      const exit = s.arrows?.[v.at(-1)!];
+      if (exit !== undefined && neighbor(s, v.at(-1)!, exit) !== action) return null;
       if (action === s.goal[0] && v.length + 1 !== s.terrain!.filter(Boolean).length) return null;
       return [...v, action];
     }

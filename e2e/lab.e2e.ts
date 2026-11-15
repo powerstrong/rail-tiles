@@ -1,7 +1,7 @@
 import { test as base, expect, type Locator, type Page } from '@playwright/test';
 import { act, KINDS, type Stage, type State } from '../src/lab/model';
 import { readFileSync } from 'node:fs';
-const stages: Stage[] = JSON.parse(readFileSync(new URL('../src/lab/stages.generated.json', import.meta.url), 'utf8'));
+const stages: Stage[] = ['../src/lab/stages.generated.json', '../src/lab/bee50/stages.generated.json'].flatMap(path => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8')));
 const stagesFor = (kind: Stage['kind']) => stages.filter(s => s.kind === kind);
 import { explore, forward, reachability } from '../src/lab/reachability';
 import { PROGRESS_KEY } from '../src/storage';
@@ -43,7 +43,7 @@ async function hint(page: Page) {
   await expect(page.locator('.lab-tools button').last()).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('.lb-hint').first()).toBeVisible();
 }
-for (const kind of KINDS) test(`${kind}: all 30 official stages finish through controls and save stars`, async ({ page }) => {
+for (const kind of KINDS) test(`${kind}: all official stages finish through controls and save stars`, async ({ page }) => {
   await open(page, kind);
   for (const stage of stagesFor(kind)) {
     await expect(page.locator('.lab-play h1')).toHaveText(stage.title);
@@ -57,12 +57,12 @@ for (const kind of KINDS) test(`${kind}: all 30 official stages finish through c
     await expect(page.getByRole('region', { name: '스테이지 완료', exact: true })).toBeVisible();
     await expect(page.locator('.lab-clear h2')).toBeFocused();
     await expect.poll(() => page.evaluate(([key, id]) => JSON.parse(localStorage.getItem(key) ?? '{}').stars?.[id], [PROGRESS_KEY, stage.id])).toBe(3);
-    if (stage.number < 30) await page.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
+    if (stage.number < stagesFor(kind).length) await page.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
   }
   await expect(page.getByRole('button', { name: '다음 스테이지 →', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '스테이지 고르기', exact: true }).last().click();
   await page.getByRole('button', { name: '건너뛰기', exact: true }).click();
-  await expect(page.locator('.stage-card')).toHaveCount(30);
+  await expect(page.locator('.stage-card')).toHaveCount(stagesFor(kind).length);
 });
 
 test('new games are available from the initial route map and lab entrances are gone', async ({ page }) => {
@@ -71,7 +71,7 @@ test('new games are available from the initial route map and lab entrances are g
   await page.getByRole('button', { name: '시작하기', exact: true }).click();
   await expect(page.locator('.route-map')).toBeVisible();
   await expect(page.locator('.lab-entry')).toHaveCount(0);
-  for (const title of ['거울 토끼의 숲', '꿀벌의 한붓 꽃길']) await expect(page.getByRole('button', { name: new RegExp(`^${title}, 별 0/90`) })).toBeVisible();
+  for (const title of ['거울 토끼의 숲', '꿀벌의 한붓 꽃길']) await expect(page.getByRole('button', { name: new RegExp(`^${title}, 별 0/${stagesFor(title.startsWith('꿀벌') ? 'bee' : 'twins').length * 3}`) })).toBeVisible();
 });
 
 test('rabbits show both directions, waiting, and homes remain movable', async ({ page }) => {

@@ -7,8 +7,10 @@ const has = (mask: number, bit: number) => bit <= 0x40000000 ? (mask & bit) !== 
 export class BeeSearch {
   readonly bits: number[];
   readonly neighbors: number[][];
+  readonly exits: number[][];
+  readonly rulesKey: string;
   readonly full: number;
-  readonly memo = new Map<number, number>(); // next cell, -1 = impossible, -2 = won
+  readonly memo = new Map<number | string, number>(); // next cell, -1 = impossible, -2 = won
   readonly size: number;
   readonly goal: number;
   visited = 0;
@@ -18,18 +20,27 @@ export class BeeSearch {
     if (this.size > 36) throw new Error('Bee search supports boards up to 6×6');
     this.bits = Array.from({ length: this.size }, (_, i) => 2 ** i);
     this.neighbors = this.bits.map((_, at) => DIRS.map((_, d) => neighbor(stage, at, d)).filter(n => n >= 0 && stage.terrain![n]));
+    this.exits = this.neighbors.map((ns, at) => stage.arrows?.[at] === undefined
+      ? ns : ns.filter(n => n === neighbor(stage, at, stage.arrows![at])));
+    // The tile layout is immutable during a play. Namespace its state keys so proofs
+    // for equal heads/visited sets with different arrow rules cannot be confused.
+    this.rulesKey = stage.arrows ? Object.entries(stage.arrows).sort(([a], [b]) => +a - +b).map(([at, d]) => `${at}:${d}`).join(';') : '';
     this.full = this.bits.reduce((mask, bit, i) => mask + (stage.terrain![i] ? bit : 0), 0);
     this.goal = stage.goal[0];
   }
   mask(state: State) { return state.reduce((mask, at) => mask + this.bits[at], 0); }
-  key(state: State) { return this.mask(state) * this.size + state.at(-1)!; }
+  private stateKey(mask: number, at: number): number | string {
+    const position = mask * this.size + at;
+    return this.rulesKey ? `${this.rulesKey}|${position}` : position;
+  }
+  key(state: State) { return this.stateKey(this.mask(state), state.at(-1)!); }
   /** A query has both a work and a wall-clock limit. Limits never establish impossibility.
    * Proven subproblems survive between moves, including retracing and recovery. */
   query(state: State, budget = 6_000, milliseconds = 8): { answer: BeeAnswer; path: number[] | null } {
     this.visited = 0; this.exhausted = false;
     const deadline = milliseconds === Infinity ? Infinity : performance.now() + milliseconds;
     const walk = (at: number, mask: number): BeeAnswer => {
-      const key = mask * this.size + at, cached = this.memo.get(key);
+      const key = this.stateKey(mask, at), cached = this.memo.get(key);
       if (cached !== undefined) return cached === -1 ? 'impossible' : 'possible';
       if (this.visited >= budget || this.memo.size >= 50_000 || (deadline !== Infinity && this.visited % 32 === 0 && performance.now() >= deadline)) {
         this.exhausted = true; return 'unknown';
@@ -56,7 +67,7 @@ export class BeeSearch {
       }
       if (connected !== remaining) return remember(-1);
       let unknown = false;
-      for (const n of this.neighbors[at]) {
+      for (const n of this.exits[at]) {
         if (has(mask, this.bits[n]) || (n === this.goal && mask + this.bits[n] !== this.full)) continue;
         const answer = walk(n, mask + this.bits[n]);
         if (answer === 'possible') return remember(n);
@@ -70,7 +81,7 @@ export class BeeSearch {
     const path: number[] = [];
     let mask = this.mask(state), at = state.at(-1)!;
     for (;;) {
-      const next = this.memo.get(mask * this.size + at)!;
+      const next = this.memo.get(this.stateKey(mask, at))!;
       if (next < 0) break;
       path.push(next); mask += this.bits[next]; at = next;
     }

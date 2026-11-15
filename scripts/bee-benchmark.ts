@@ -20,7 +20,7 @@ export function benchmark(stages: Stage[], rounds = 20) {
       if (result.answer === 'unknown') entryUnknown++;
       let state = stage.start;
       for (const action of stage.solution) {
-        for (const n of search.neighbors[state.at(-1)!]) {
+        for (const n of search.exits[state.at(-1)!]) {
           if (state.includes(n) || (n === search.goal && state.length !== stage.par)) continue;
           if (query(search, [...state, n], move) === 'unknown') moveUnknown++;
         }
