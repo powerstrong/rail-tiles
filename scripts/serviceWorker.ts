@@ -8,10 +8,9 @@ import type { Plugin, ResolvedConfig } from 'vite';
  * produced. Each deploy is one version with its own cache: the page and the files it loads
  * always come from the same version, so it can never ask for a script the cache lacks.
  *
- * Updates arrive on the next launch: the browser notices the new sw.js, the new version
- * downloads every file fresh, takes over, and deletes the old cache. A page that is already
- * open keeps running the code it loaded (its daily puzzle worker falls back to the main thread
- * if that old file is gone).
+ * Updates download in the background and activate once all tabs using the old worker close.
+ * Until then the old worker and its cache must stay together: an open page may still request
+ * a lazy module or a hint worker that no longer exists on the deployment server.
  */
 export function renderServiceWorker(files: string[], version: string): string {
   const list = ['./', ...files.map((f) => `./${f}`)];
@@ -25,8 +24,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(FILES.map((url) => new Request(url, { cache: 'reload' }))))
-      .then(() => self.skipWaiting()),
+      .then((cache) => cache.addAll(FILES.map((url) => new Request(url, { cache: 'reload' })))),
   );
 });
 
