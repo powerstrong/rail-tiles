@@ -97,6 +97,12 @@ test('flow: mobile touch, first and last layouts, pointer cancellation and scree
   for(const c of first.solution[0].slice(1))await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[await center(page,c)]});
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   await expect(page.getByRole('region',{name:'스테이지 완료',exact:true})).toBeVisible();
+  // Chromium can omit the next synthesized click after a raw CDP captured drag.
+  // Verify drag rollback with a click, then independently exercise all-touch undo.
+  await page.getByRole('button',{name:'↶ 되돌리기',exact:true}).click();
+  await expect(page.getByRole('region',{name:'스테이지 완료',exact:true})).toHaveCount(0);
+  for(const cell of first.solution[0]) await page.locator(`[data-cell="${cell}"]`).tap();
+  await expect(page.getByRole('region',{name:'스테이지 완료',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'↶ 되돌리기',exact:true}).tap();
   await expect(page.getByRole('region',{name:'스테이지 완료',exact:true})).toHaveCount(0);
   await open(page,30,{'last-run':3});

@@ -5,7 +5,38 @@ import { WORLDS, type World, openedNote, stageCards, worldById } from './worlds'
 
 const ownerOf = (stageId: string | undefined) => WORLDS.find((w) => w.stages.some((s) => s.id === stageId));
 
+// [stage count, world gate, daily gate, daily prefix, bonus count]. Include every
+// course as well as the 15 map stations, so an accidentally dropped entry fails.
+const EXPECTED: Record<string, readonly [number, string | null, string | null, string | null, number]> = {
+  train: [40, null, 'first-passenger', 'daily-', 0],
+  twins: [30, null, null, null, 0],
+  bee: [50, null, null, null, 0],
+  flow: [30, null, null, null, 0],
+  pieces: [30, null, null, null, 0],
+  coral: [30, null, null, null, 0],
+  balance: [30, null, null, null, 0],
+  cloud: [30, null, null, null, 0],
+  memory: [30, null, null, null, 0],
+  ice: [30, 'last-run', 'ice-snow-pile', 'ice-daily-', 0],
+  machine: [30, 'ice-big-adventure', null, null, 3],
+  volcano: [30, 'mc-boss-1', null, null, 3],
+  train2: [20, 'last-run', null, null, 0],
+  depot: [30, 't2-boss-1', 'dp-water-tower', 'depot-daily-', 3],
+  space: [30, 't2-boss-1', 'sp-wormhole', 'space-daily-', 3],
+  clock: [30, 'sp-boss-1', 'ck-lever', 'clock-daily-', 3],
+};
+
 describe('world registry', () => {
+  it('registers all 500 stages and 15 stations, keeping the device course inside train', () => {
+    expect(Object.fromEntries(WORLDS.map(w => [w.id, w.stages.length])))
+      .toEqual(Object.fromEntries(Object.entries(EXPECTED).map(([id, spec]) => [id, spec[0]])));
+    expect(WORLDS.reduce((n, w) => n + w.stages.length, 0)).toBe(500);
+    expect(WORLDS.filter(w => !w.routeOf)).toHaveLength(15);
+    expect(WORLDS.filter(w => w.routeOf).map(w => [w.id, w.routeOf])).toEqual([['train2', 'train']]);
+    expect(WORLDS.filter(w => !w.unlockAfter).map(w => w.id).sort())
+      .toEqual(['train', 'twins', 'bee', 'flow', 'pieces', 'coral', 'balance', 'cloud', 'memory'].sort());
+  });
+
   it('has unique world ids', () => {
     expect(new Set(WORLDS.map((w) => w.id)).size).toBe(WORLDS.length);
   });
@@ -105,24 +136,7 @@ describe('world registry', () => {
 
   it('keeps the shipped unlock rules (players already opened worlds by them)', () => {
     const rules = Object.fromEntries(WORLDS.map((w) => [w.id, [w.unlockAfter ?? null, w.daily?.unlockAfter ?? null, w.daily?.prefix ?? null]]));
-    expect(rules).toEqual({
-      flow: [null, null, null],
-      pieces: [null, null, null],
-      coral: [null, null, null],
-      balance: [null, null, null],
-      cloud: [null, null, null],
-      twins: [null, null, null],
-      bee: [null, null, null],
-      memory: [null, null, null],
-      train: [null, 'first-passenger', 'daily-'],
-      train2: ['last-run', null, null],
-      ice: ['last-run', 'ice-snow-pile', 'ice-daily-'],
-      machine: ['ice-big-adventure', null, null],
-      volcano: ['mc-boss-1', null, null],
-      depot: ['t2-boss-1', 'dp-water-tower', 'depot-daily-'],
-      space: ['t2-boss-1', 'sp-wormhole', 'space-daily-'],
-      clock: ['sp-boss-1', 'ck-lever', 'clock-daily-'],
-    });
+    expect(rules).toEqual(Object.fromEntries(Object.entries(EXPECTED).map(([id, spec]) => [id, spec.slice(1, 4)])));
   });
 
   it('lets every garage item be unlocked with the stars of the regular stages', () => {
@@ -137,7 +151,7 @@ describe('world registry', () => {
 
   it('marks the bonus stages each world has', () => {
     const bonuses = Object.fromEntries(WORLDS.map((w) => [w.id, stageCards(w).filter((c) => c.bonus).length]));
-    expect(bonuses).toEqual({ flow: 0, twins: 0, bee: 0, train: 0, train2: 0, ice: 0, machine: 3, volcano: 3, depot: 3, space: 3, clock: 3, pieces: 0, coral: 0, balance: 0, cloud: 0, memory: 0 });
+    expect(bonuses).toEqual(Object.fromEntries(Object.entries(EXPECTED).map(([id, spec]) => [id, spec[4]])));
   });
 
   for (const w of WORLDS) {

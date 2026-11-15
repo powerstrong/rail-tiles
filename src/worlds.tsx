@@ -125,14 +125,6 @@ const world = <S extends WorldStage>(w: World<S>) => w as unknown as World;
 
 export const WORLDS: World[] = [
   world({
-    id: 'pieces', title: '조각 맞추기', blurb: '돌리고 맞추면, 숨어 있던 그림이 짠!',
-    color: '#25857d', emblem: 'pieces',
-    stages: PIECES_STAGES, chapters: PIECES_CHAPTERS, Game: PiecesScreen,
-    id: 'cloud', title: '구름 자수 공방', blurb: '숫자 묶음을 풀어 색실 작품을 수놓아요',
-    color: '#4775a1', emblem: 'cloud', theme: 'world-cloud',
-    stages: CLOUD_STAGES, chapters: CLOUD_CHAPTERS, Game: CloudScreen,
-  }),
-  world({
     id: 'train',
     title: '들꽃 기차 마을',
     blurb: '기본 노선 · 선택형 장치 노선',
@@ -160,6 +152,27 @@ export const WORLDS: World[] = [
     id: 'memory', title: '미지의 세계', blurb: '짝을 찾으며 새로운 풍경을 만나요',
     color: '#397d79', emblem: 'memory', theme: 'world-memory',
     stages: MEMORY_STAGES, chapters: MEMORY_CHAPTERS, Game: MemoryScreen,
+  }),
+  world({
+    id: 'flow', title: '색깔 길 잇기', blurb: '색실로 단추를 이어 마을의 조각보를 꿰매요',
+    color: '#347d75', emblem: 'flow', theme: 'world-flow',
+    stages: FLOW_STAGES, chapters: FLOW_CHAPTERS, Game: FlowScreen,
+  }),
+  world(CORAL_WORLD),
+  world({
+    id: 'balance', title: '별사탕 저울', blurb: '톡! 사탕을 옮겨 두 접시를 반듯하게',
+    color: '#9560ae', emblem: 'balance', theme: 'world-balance',
+    stages: BALANCE_STAGES, chapters: BALANCE_CHAPTERS, Game: BalanceScreen,
+  }),
+  world({
+    id: 'pieces', title: '조각 맞추기', blurb: '돌리고 맞추면, 숨어 있던 그림이 짠!',
+    color: '#25857d', emblem: 'pieces',
+    stages: PIECES_STAGES, chapters: PIECES_CHAPTERS, Game: PiecesScreen,
+  }),
+  world({
+    id: 'cloud', title: '구름 자수 공방', blurb: '숫자 묶음을 풀어 색실 작품을 수놓아요',
+    color: '#4775a1', emblem: 'cloud', theme: 'world-cloud',
+    stages: CLOUD_STAGES, chapters: CLOUD_CHAPTERS, Game: CloudScreen,
   }),
   world({
     id: 'ice',
@@ -300,16 +313,6 @@ export const WORLDS: World[] = [
       loadingText: '오늘의 시계탑 태엽을 감는 중…',
       clearNote: (n) => `🔥 ${n}일 연속 클리어 · 내일 새 시계탑이 열려요`,
     },
-  }),
-  world({
-    id: 'flow', title: '색깔 길 잇기', blurb: '색실로 단추를 이어 마을의 조각보를 꿰매요',
-    color: '#347d75', emblem: 'flow', theme: 'world-flow',
-    stages: FLOW_STAGES, chapters: FLOW_CHAPTERS, Game: FlowScreen,
-  }),
-  world(CORAL_WORLD),
-    id: 'balance', title: '별사탕 저울', blurb: '톡! 사탕을 옮겨 두 접시를 반듯하게',
-    color: '#9560ae', emblem: 'balance', theme: 'world-balance',
-    stages: BALANCE_STAGES, chapters: BALANCE_CHAPTERS, Game: BalanceScreen,
   }),
 ];
 

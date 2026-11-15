@@ -3,8 +3,8 @@
  * them, and the way the player's train runs from one place to another. Pure data, no React.
  *
  * The track is a tree. At the top is the plaza (garage, notice board, mailbox on one siding);
- * a line runs down from the board to the first world, and every other world hangs off the world
- * whose first boss opens it (its `unlockAfter`), so the drawing always matches the unlock rules.
+ * lines run from the board to worlds open from the start. Gated worlds hang off the world
+ * whose first boss opens them (its `unlockAfter`), so the drawing matches the unlock rules.
  * The train never stops on a station's disc (it would hide the emblem): each station has a stop
  * just above it on the incoming track.
  */
@@ -25,38 +25,23 @@ export const PLAZA = {
 export type PlazaId = keyof typeof PLAZA;
 export const isPlaza = (id: string): id is PlazaId => id in PLAZA;
 
-/** Station discs, hand-placed for the shipped worlds (a phone is 360 wide). */
+/** Three phone-sized columns: nine open destinations, then the original unlock branches.
+ * Rows leave room for the train stop, full Korean title, star count and touch target.
+ * Long connections use the gutters rather than cutting through another station.
+ */
 const PLACED: Record<string, Pt> = {
-  flow: [298, 596],
-  pieces: [298, 596],
-  coral: [298, 596],
-  balance: [298, 596],
-  cloud: [298, 596],
-  train: [180, 222],
-  twins: [62, 222],
-  bee: [298, 222],
-  ice: [62, 344],
-  machine: [62, 470],
-  volcano: [62, 596],
-  space: [180, 344],
-  clock: [180, 470],
-  depot: [298, 400],
-  twins: [62, 236],
-  bee: [298, 236],
-  train: [120, 358],
-  memory: [240, 358],
-  ice: [62, 484],
-  machine: [62, 610],
-  volcano: [62, 736],
-  space: [180, 484],
-  clock: [180, 610],
-  depot: [298, 540],
+  twins: [62, 238], train: [180, 238], bee: [298, 238],
+  flow: [62, 390], pieces: [180, 390], coral: [298, 390],
+  balance: [62, 542], cloud: [180, 542], memory: [298, 542],
+  ice: [62, 738], depot: [180, 738], space: [298, 738],
+  machine: [62, 890], clock: [298, 890],
+  volcano: [62, 1042],
 };
-const ROW = 126;
+const ROW = 152;
 
 export interface WorldLink {
   id: string;
-  /** The world whose stage opens this one; none for the first world. */
+  /** The world whose stage opens this one; none for a destination open from the start. */
   parent?: string;
 }
 
@@ -84,6 +69,8 @@ export interface Layout {
 
 const dist = (p: Pt, q: Pt) => Math.hypot(q[0] - p[0], q[1] - p[1]);
 const lengthOf = (pts: Pt[]) => pts.slice(1).reduce((s, p, i) => s + dist(pts[i], p), 0);
+
+const polyline = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x} ${y}`).join(' ');
 
 function bezier(p0: Pt, p1: Pt, p2: Pt, p3: Pt, n = 18): Pt[] {
   const out: Pt[] = [];
@@ -114,19 +101,31 @@ export function layoutRoutes(worlds: WorldLink[]): Layout {
   }
   for (const id of Object.keys(PLAZA) as PlazaId[]) stops[id] = [PLAZA[id].x, SIDING_Y];
 
-  // Plaza siding, and the line down from the board to the first world.
+  // Plaza siding, and the lines from the board to destinations open from the start.
   const add = (a: string, b: string, pts: Pt[], track: string) => edges.push({ a, b, pts, len: lengthOf(pts), track });
   add('board', 'garage', [stops.board, stops.garage], `M${stops.board[0]} ${SIDING_Y} H${stops.garage[0] - 22}`);
   add('board', 'mail', [stops.board, stops.mail], `M${stops.board[0]} ${SIDING_Y} H${stops.mail[0] + 22}`);
   for (const root of worlds.filter(w => !w.parent)) {
     const [x, y] = discs[root.id];
-    add('board', root.id, [stops.board, stops[root.id]], `M${stops.board[0]} ${SIDING_Y} L${x} ${y - STOP_GAP} V${y}`);
+    // The shared stems run between columns; their branches arrive above each disc.
+    const lane = x < MAP_W / 2 ? 121 : 239;
+    const pts: Pt[] = y === 238 && x === MAP_W / 2
+      ? [stops.board, stops[root.id]]
+      : [stops.board, [180, 168], [lane, 168], [lane, y - STOP_GAP], stops[root.id]];
+    add('board', root.id, pts, polyline([...pts, [x, y]]));
   }
 
   for (const w of worlds) {
     if (!w.parent || !discs[w.parent]) continue;
     const [px, py] = discs[w.parent];
     const [cx, cy] = discs[w.id];
+    if (cy - py > ROW * 2) {
+      // Bypass the open destination rows on the outside of the map.
+      const lane = cx < MAP_W / 2 ? 8 : MAP_W - 8;
+      const pts: Pt[] = [stops[w.parent], [px, py], [px, py + 86], [lane, py + 86], [lane, cy - STOP_GAP], stops[w.id]];
+      add(w.parent, w.id, pts, polyline([...pts.slice(1), [cx, cy]]));
+      continue;
+    }
     const bend = cy - 66;
     const k = (bend - py) * 0.55;
     const curve = px === cx ? [[px, py] as Pt, [cx, bend] as Pt] : bezier([px, py], [px, py + k], [cx, bend - k], [cx, bend]);

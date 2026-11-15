@@ -3011,6 +3011,15 @@ body:has(.world-clock) {
   box-shadow: 0 3px 0 var(--line);
 }
 
+.route-guide {
+  flex: none;
+  margin: 0 16px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
 .route-scroll {
   flex: 1;
   min-height: 0;

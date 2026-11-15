@@ -88,7 +88,7 @@ test('cloud last board keeps phone cells at least 44px and supports zoom, line e
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: '+ 칸 크게 보기', exact: true }).tap();
-  expect((await page.locator('[data-cell="0"]').boundingBox())!.width).toBe(56);
+  await expect.poll(async () => (await page.locator('[data-cell="0"]').boundingBox())!.width).toBe(56);
   expect(await page.locator('.cloud-scroll').evaluate(e => e.scrollWidth > e.clientWidth)).toBe(true);
   await page.getByRole('button', { name: '1행 단서 2·2', exact: true }).tap();
   await expect(page.locator('.cloud-board-row').first().locator('.line-active')).toHaveCount(6);

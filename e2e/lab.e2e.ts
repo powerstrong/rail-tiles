@@ -253,11 +253,7 @@ test('device routes live inside Wildflower and preserved boss records still unlo
   await expect(page.locator('.select h1')).toHaveText('들꽃 장치 노선');
   await expect(page.locator('.stage-card').nth(3).getByLabel('별 2개')).toBeVisible();
   await page.getByRole('button', { name: '여행지 목록으로', exact: true }).click();
-  await expect(page.getByRole('button', { name: /^들꽃 장치 노선, 별/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^들꽃 장치 노선,/ })).toHaveCount(0);
-  await expect(page.locator('.route-station')).toHaveCount(10);
-  await expect(page.getByRole('button', { name: /^들꽃 장치 노선,/ })).toHaveCount(0);
-  await expect(page.locator('.route-station')).toHaveCount(10);
   for (const title of ['기차 차고지', '우주 정거장']) await expect(page.getByRole('button', { name: new RegExp(`^${title}, 별`) })).toBeVisible();
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).stars['t2-busy-crossing'], PROGRESS_KEY)).toBe(3);
 });

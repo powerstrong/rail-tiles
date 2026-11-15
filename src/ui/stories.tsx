@@ -45,6 +45,7 @@ export const STORIES: Record<string, Story> = {
     friend: '실타래 솔솔', tail: 52, Scene: FlowScene,
     lines: ['실바람 마을 잔치에 걸 조각보를 만들자!', '색과 무늬가 같은 단추끼리 실로 이어 줘.', '겹치면 실이 끊겨. 언제든 다시 이을 수 있어!'],
     farewell: { tail: 52, Scene: FlowScene, lines: ['모든 조각보가 포근하게 이어졌어!', '우리가 함께 만든 잔치 깃발을 선물할게.', '다음 잔치에도 놀러 와. 안녕!'] },
+  },
   pieces: {
     friend: '그림 조각 모모', tail: 50, Scene: PiecesScene,
     lines: ['그림 공방에 온 걸 환영해!', '조각을 돌려서 빈 틀을 채워 줄래?', '틀을 다 채우면 숨어 있던 그림이 나타나!'],
@@ -55,10 +56,12 @@ export const STORIES: Record<string, Story> = {
     friend: '별지기 소미', tail: 54, Scene: BalanceScene,
     lines: ['어서 와! 별사탕 축제를 준비하고 있어.', '사탕을 누르면 반대 접시로 폴짝 옮겨져.', '양쪽 무게를 맞추면 별빛이 반짝일 거야!'],
     farewell: { tail: 54, Scene: BalanceScene, lines: ['모든 저울이 반듯해졌어!', '반짝이는 별사탕을 기차에 실어 줄게.', '우리 또 별빛을 나누자. 안녕!'] },
+  },
   cloud: {
     friend: '구름 공방지기', tail: 50, Scene: CloudScene,
     lines: ['구름 위 자수 공방에 온 걸 환영해!', '숫자만큼 붙여 수놓고, 묶음 사이는 비워 줘.', '한 땀부터 시작해서 우리 전시회를 열자!'],
     farewell: { tail: 50, Scene: CloudScene, lines: ['서른 작품에 모두 색실이 피었어!', '네가 수놓은 마음을 기차에 걸어 줄게.', '작품을 보러 언제든 다시 와. 안녕!'] },
+  },
   memory: {
     friend: '탐험 역장님', tail: 50, Scene: MemoryScene,
     lines: ['미지의 세계에 온 걸 환영해요!', '같은 그림 두 장을 찾아 주세요.', '짝을 찾으며 새로운 풍경을 만나요.'],

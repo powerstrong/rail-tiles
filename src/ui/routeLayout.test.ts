@@ -10,6 +10,9 @@ const layout = layoutRoutes(links);
 
 describe('route map layout', () => {
   it('places every world inside a phone-wide map, apart from each other', () => {
+    expect(Object.keys(layout.discs).sort()).toEqual(links.map(w => w.id).sort());
+    expect(Object.keys(layout.discs)).toHaveLength(15);
+    expect(layout.discs.train2).toBeUndefined();
     for (const w of WORLDS.filter(w => !w.routeOf)) {
       const [x, y] = layout.discs[w.id];
       expect(x, w.id).toBeGreaterThanOrEqual(40);
@@ -17,7 +20,32 @@ describe('route map layout', () => {
       expect(y, w.id).toBeLessThan(layout.height);
     }
     const ps = Object.values(layout.discs);
-    for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) expect(Math.hypot(ps[i][0] - ps[j][0], ps[i][1] - ps[j][1])).toBeGreaterThan(100);
+    for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) {
+      // Include labels and the entire 100 × 142 tap area, not only circle centres.
+      expect(Math.abs(ps[i][0] - ps[j][0]) >= 100 || Math.abs(ps[i][1] - ps[j][1]) >= 142).toBe(true);
+    }
+  });
+
+  it('routes long tracks around unrelated station discs', () => {
+    for (const edge of layout.edges) {
+      const pts = [...edge.pts, ...(layout.discs[edge.b] ? [layout.discs[edge.b]] : [])];
+      for (const [id, p] of Object.entries(layout.discs)) {
+        if (id === edge.a || id === edge.b) continue;
+        for (let i = 1; i < pts.length; i++) {
+          const a = pts[i - 1], b = pts[i];
+          const dx = b[0] - a[0], dy = b[1] - a[1];
+          const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+          expect(Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy), `${edge.a} → ${edge.b} crosses ${id}`).toBeGreaterThan(36);
+        }
+      }
+    }
+  });
+
+  it('gives future stations new rows instead of reusing a temporary coordinate', () => {
+    const extended = layoutRoutes([...links, { id: 'future' }, { id: 'future-child', parent: 'future' }]);
+    expect(extended.discs.future[1]).toBeGreaterThan(layout.discs.volcano[1] + 142);
+    expect(extended.discs['future-child'][1]).toBeGreaterThan(extended.discs.future[1] + 142);
+    expect(pathBetween(extended, 'board', 'future-child')).toEqual(['board', 'future', 'future-child']);
   });
 
   it('draws the track the unlock rules describe: every world hangs off the world that opens it', () => {

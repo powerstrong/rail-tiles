@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { WORLDS } from './worlds';
 import { starsFor } from './engine/stars';
 import { absorbSaved, emptyProgress, exportCode, loadProgress, mergeProgress, needsNewerBrowser, readCode, recordClear, saveProgress } from './storage';
 
@@ -187,5 +188,38 @@ describe('memory progress alongside shipped worlds', () => {
     expect(restored.last).toEqual(old.last);
     const code = await exportCode(restored);
     expect((await readCode(code))?.stars).toEqual(restored.stars);
+  });
+});
+
+describe('all-world integration save compatibility', () => {
+  it('unions every promoted legacy concept without modifying old storage or losing official data', async () => {
+    const kinds = ['twins', 'bee', 'coral', 'balance', 'cloud'];
+    const completed = Object.fromEntries(kinds.flatMap(kind => Array.from({ length: 30 }, (_, i) => [`lab-v1-${kind}-${i + 1}`, true])));
+    const old = { ...emptyProgress(), stars: { 'last-run': 3 as const, 't2-boss-1': 2 as const, 'lab-v1-bee-30': 3 as const },
+      look: { body: 'body-red' }, lookSeen: 8, stories: ['train', 'train2', 'memory:bye'], last: { world: 'bee', stage: 'lab-v1-bee-30' } };
+    const store = memory(JSON.stringify(old));
+    const legacy = JSON.stringify({ completed: { ...completed, 'lab-v1-bee-31': true, 'lab-v1-cloud-01': true, 'lab-v1-removed-1': true } });
+    store.setItem('rail-tiles-lab-v1', legacy);
+    const loaded = loadProgress(store);
+    expect(Object.keys(loaded.stars)).toHaveLength(152);
+    expect(loaded).toMatchObject(old);
+    for (const id of Object.keys(completed)) expect(loaded.stars[id]).toBe(id === 'lab-v1-bee-30' ? 3 : 1);
+    expect(store.getItem('rail-tiles:progress')).toBe(JSON.stringify(old));
+    expect(store.getItem('rail-tiles-lab-v1')).toBe(legacy);
+
+    // A stale tab must not drop stars from any of the sixteen registered courses.
+    let updated = loaded;
+    for (const w of WORLDS) updated = recordClear(updated, w.stages.at(-1)!.id, 3);
+    saveProgress(updated, store);
+    saveProgress(old, store);
+    const restored = loadProgress(store);
+    expect(restored.stars).toEqual(updated.stars);
+    expect(restored).toMatchObject(old);
+    expect(restored.stars['lab-v1-bee-50']).toBe(3);
+    expect(store.getItem('rail-tiles-lab-v1')).toBe(legacy);
+    const imported = await readCode(await exportCode(restored));
+    expect(imported?.stars).toEqual(restored.stars);
+    expect(imported?.look).toEqual(old.look);
+    expect(absorbSaved(old, restored).stars).toEqual(restored.stars);
   });
 });

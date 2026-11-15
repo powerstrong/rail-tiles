@@ -193,6 +193,7 @@ export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, co
       </header>
 
 
+      <p className="route-guide">{stations.length}개 여행지 · 아래로 내려 더 둘러보세요</p>
       <div className="route-scroll" ref={scrollRef}>
         <svg className="route-map" viewBox={`0 0 ${MAP_W} ${layout.height}`} role="group" aria-label="노선도">
           <rect width={MAP_W} height={layout.height} fill="#F3E8D2" />

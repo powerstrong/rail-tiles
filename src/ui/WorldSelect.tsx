@@ -1,7 +1,7 @@
 import { FlowEmblem } from '../flow/FlowArt';
 import { BalanceEmblem } from '../balance/art';
-
 import { CoralEmblem } from '../coral/art';
+
 export interface WorldCard {
   id: string;
   title: string;
