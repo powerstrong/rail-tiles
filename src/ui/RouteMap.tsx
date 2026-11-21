@@ -4,6 +4,8 @@ import { makePuff, useLook } from './look';
 import { PLAZA, type PlazaId, type Layout, type Run, MAP_W, isPlaza, poseOn, rerouteTo, runLength, standAt } from './routeLayout';
 import { play } from './sound';
 import { Emblem, type WorldCard } from './WorldSelect';
+import { ThemeToggle } from './ThemeToggle';
+import { VersionLabel } from './VersionLabel';
 
 export interface StationInfo extends WorldCard {
   /** Today's puzzle of this world: none, waiting to be played, or cleared. */
@@ -180,6 +182,7 @@ export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, co
 
   return (
     <main className="route">
+      <VersionLabel />
       <header className="select-head route-head">
         <button className="icon-btn" onClick={onBack} aria-label="타이틀로">
           <svg viewBox="0 0 24 24" aria-hidden>
@@ -190,15 +193,16 @@ export function RouteMap({ layout, stations, focus, onFocus, onEnter, onBack, co
         <span className="route-stars" aria-label={`모은 별 ${totalStars}개`}>
           ★ {totalStars}
         </span>
+        <ThemeToggle />
       </header>
 
 
       <p className="route-guide">{stations.length}개 여행지 · 아래로 내려 더 둘러보세요</p>
       <div className="route-scroll" ref={scrollRef}>
         <svg className="route-map" viewBox={`0 0 ${MAP_W} ${layout.height}`} role="group" aria-label="노선도">
-          <rect width={MAP_W} height={layout.height} fill="#F3E8D2" />
+          <rect width={MAP_W} height={layout.height} fill="var(--map-bg, #F3E8D2)" />
           {/* The plaza, paved. */}
-          <rect x={14} y={14} width={MAP_W - 28} height={140} rx={22} fill="#E9DCC2" />
+          <rect x={14} y={14} width={MAP_W - 28} height={140} rx={22} fill="var(--map-plaza, #E9DCC2)" />
           <text x={MAP_W - 30} y={146} textAnchor="end" className="route-plaza-name">
             중앙역 광장
           </text>

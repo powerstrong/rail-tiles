@@ -1,0 +1,186 @@
+/* Theme chrome is deliberately independent of puzzle pigments and SVG tile art.
+   Rules in this file only affect dark mode, preserving the existing light palette. */
+:root { color-scheme: light; }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #252733;
+  --bg-deep: #20222d;
+  --card: #343744;
+  --ink: #fff2df;
+  --ink-soft: #d1c6b9;
+  --line: #555565;
+  --teal: #99d8cb;
+  --teal-hi: #b4e4d8;
+  --amber: #ffc078;
+  --amber-deep: #f2b26b;
+  --red: #ffaaa0;
+  --wood: #a98362;
+  --wood-dark: #755943;
+  --shadow: 0 3px 0 #1c1f29, 0 10px 24px #11131b33;
+  --panel: #3d404d;
+  --selected: #36554f;
+  --warning: #584632;
+  --map-bg: #2b303b;
+  --map-plaza: #3a3e49;
+  --board-ink: #344d49;
+}
+
+/* Kept out of the play headers and their short-window controls. */
+.title { position: relative; }
+.title-settings { position: absolute; top: var(--cover-top, max(12px, env(safe-area-inset-top))); right: var(--cover-right, max(12px, env(safe-area-inset-right))); }
+.theme-toggle { min-width: 44px; min-height: 44px; }
+.version-label {
+  position: fixed;
+  right: max(8px, env(safe-area-inset-right));
+  bottom: var(--version-bottom, max(3px, env(safe-area-inset-bottom)));
+  z-index: 2;
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-soft);
+  pointer-events: none;
+  user-select: none;
+}
+/* A reserved footer prevents the route card's buttons from touching the label. */
+.route { padding-bottom: max(var(--version-footer, 18px), env(safe-area-inset-bottom)); }
+
+/* World containers used to replace the root palette with a light one. */
+html[data-theme='dark'] :is(.world-ice, .world-machine, .world-volcano, .world-depot, .world-space, .world-clock, .world-memory) {
+  --bg: #252733;
+  --card: #343744;
+  --line: #555565;
+  --ink-soft: #d1c6b9;
+  --teal: #99d8cb;
+}
+html[data-theme='dark'] body {
+  background: radial-gradient(circle at 20% 0%, #383342 0, transparent 55%), var(--bg);
+}
+html[data-theme='dark'] :is(.lab, .flow-play, .memory-screen, .pieces, .coral-play, .balance-play, .cloud-screen) {
+  --lab-theme-accent: #99d8cb;
+  --lab-theme-wash: #36554f;
+  --lab-accent: #99d8cb;
+  --lab-wash: #36554f;
+  --flow-ink: var(--ink);
+  --coral-ink: var(--ink);
+  --balance-ink: var(--ink);
+  color: var(--ink);
+}
+html[data-theme='dark'] :is(.coral-play, .balance-play, .cloud-screen) { background: var(--bg); }
+
+/* Shared controls, stage lists, overlays and story cards. */
+html[data-theme='dark'] :is(.primary, .go-btn, .board-go) { color: #36291f; }
+html[data-theme='dark'] .go-btn svg { fill: #36291f; }
+html[data-theme='dark'] :is(.all-clear, .route-continue) { color: #243c38; box-shadow: 0 3px 0 #49665d; }
+html[data-theme='dark'] .all-clear-bye { color: #243c38; }
+html[data-theme='dark'] :is(.daily-card, .robot-bar, .lava-bar, .depot-bar, .space-bar, .clock-bar, .unlock-banner) {
+  background: var(--panel); box-shadow: 0 3px 0 var(--line);
+}
+html[data-theme='dark'] :is(.daily-card.waiting, .stage-card.locked, .stage-card.soon, .world-card.locked, .world-card.soon) {
+  background: #30323e; color: var(--ink-soft);
+}
+html[data-theme='dark'] :is(.stage-card.locked .stage-num, .stage-card.soon .stage-num) { background: var(--panel); color: var(--ink-soft); }
+html[data-theme='dark'] .stage-card.boss:not(.locked) { background: #453b59; box-shadow: var(--shadow); }
+html[data-theme='dark'] .stage-card.bonus:not(.locked) { background: #504436; box-shadow: var(--shadow); }
+html[data-theme='dark'] :is(.chapter-num, .world-kicker, .story-place) { color: color-mix(in srgb, var(--world, var(--chapter, var(--teal))) 35%, #fff2df); }
+html[data-theme='dark'] :is(.chapter.locked .chapter-num, .world-lock) { color: var(--ink-soft); }
+html[data-theme='dark'] :is(.tool.selected, .garage-item.on, .board-row.done, .course-picker button[aria-pressed='true']) { background: var(--selected); }
+html[data-theme='dark'] .count { background: #dacbb6; color: #282a35; }
+html[data-theme='dark'] :is(.status .par, .one-shot-tip strong, .route-stars) { color: var(--amber); }
+html[data-theme='dark'] :is(.status.is-fail, .space-stuck, .clock-stuck, .status .water.low) { color: #ffb9b0; }
+html[data-theme='dark'] .status.is-fail { background: #593b40; }
+html[data-theme='dark'] :is(.run-tools button, .ice-stuck button, .course-picker button, .save-code) { color: var(--ink); background: var(--card); border-color: var(--line); }
+html[data-theme='dark'] .save-note { color: var(--teal) !important; }
+html[data-theme='dark'] .save-note.bad { color: var(--red) !important; }
+html[data-theme='dark'] .course-picker { background: var(--bg); }
+html[data-theme='dark'] :is(.clock-rest, .is-boss .stage-no) { color: var(--amber); }
+html[data-theme='dark'] :is(.dpad-btn svg, .space-dpad .dpad-btn svg, .clock-dpad .dpad-btn svg) { fill: var(--teal); }
+html[data-theme='dark'] .clock-rest svg { stroke: var(--amber); }
+html[data-theme='dark'] :is(.space-dpad .dpad-btn.hinted, .clock-rest.hinted) { background: var(--warning); }
+html[data-theme='dark'] .story-name { background: var(--panel); color: var(--ink); }
+html[data-theme='dark'] .overlay { background: #141721b8; }
+
+/* The map is a night landscape; station emblems keep their original pigments. */
+html[data-theme='dark'] :is(.route-place-name, .route-name) { fill: var(--ink); stroke: var(--map-bg); }
+html[data-theme='dark'] .route-sub { fill: var(--ink-soft); stroke: var(--map-bg); }
+html[data-theme='dark'] .route-station.locked .route-name { fill: var(--ink-soft); }
+html[data-theme='dark'] .route-plaza-name { fill: var(--ink-soft); }
+html[data-theme='dark'] .route-rails { stroke: #b5a693; }
+html[data-theme='dark'] .route-rails-gap { stroke: var(--map-bg); }
+html[data-theme='dark'] .route-sleepers { stroke: #8b7561; }
+html[data-theme='dark'] .route-track-locked { stroke: #77717c; }
+html[data-theme='dark'] .route-panel { background: linear-gradient(to bottom, transparent, var(--bg) 18%); }
+
+/* Button-grid worlds: chrome follows the theme, game surfaces keep their art.
+   More specific card/cell rules below restore the original puzzle semantics. */
+html[data-theme='dark'] :is(.lab-tools button, .lab-mute, .lab-outline-button, .lb-direction, .lb-view-toggle,
+  .flow-play button, .memory-screen button, .memory-collection button, .pieces button, .coral-play button,
+  .balance-header button, .balance-tools button, .cloud-screen button) {
+  background: var(--card); color: var(--ink); border-color: var(--line);
+}
+html[data-theme='dark'] :is(.lab-play-rules, .lab-feedback-line.has-message, .lab-clear, .lab-stuck, .lab-stuck button, .lab-done-tag,
+  .lb-example, .lb-bee-discovery, .flow-help, .flow-first, .flow-clear, .memory-rules, .memory-result, #memory-album,
+  .pieces-rules, .pieces-clear, .coral-rules, .coral-clear, .balance-rules, .balance-clear,
+  .cloud-lesson, .cloud-feedback, .cloud-proof, .cloud-clear, .cloud-gallery) {
+  background: var(--panel); color: var(--ink); border-color: var(--line);
+}
+html[data-theme='dark'] :is(.lab-back, .lab-play-rules ol, .lab-play-rules > p, .lab-play-status, .lab-feedback-line,
+  .lab-clear h2, .lab-clear p:not(.lab-eyebrow), .lb-board-note, .lb-board-note b, .lb-caption, .lb-forest-name,
+  .lb-example summary, .lb-scroll-note, .lb-rabbit-preview, .lb-home-rule, .lb-rabbit-reaction,
+  .flow-kicker, .flow-status b, .flow-rating, .memory-top > span, .memory-heading > p:first-child, .memory-limits,
+  .memory-collected, .memory-note, .memory-screen .memory-rules-toggle, .memory-collection, .memory-collection button:disabled,
+  .pieces-heading p, .pieces-count, .coral-heading p, .coral-score strong, .coral-score > div:last-child,
+  .coral-score > div:last-child span, .coral-feedback small, .balance-eyebrow, .balance-star-guide,
+  .cloud-heading p, .cloud-caption, .cloud-score) { color: var(--ink-soft); }
+html[data-theme='dark'] :is(.lab-solid-button, .memory-screen .memory-primary, .coral-play .coral-primary,
+  .flow-clear .flow-next, .cloud-screen .cloud-primary) { background: var(--teal); color: #243c38; border-color: var(--teal); }
+html[data-theme='dark'] .lab-play-goal > button { color: var(--ink); background: var(--card); border-color: var(--line); }
+html[data-theme='dark'] :is(.lb-view-toggle[aria-pressed='true'], .pieces-piece[aria-pressed='true'], .pieces-piece.is-placed) { background: var(--selected); }
+html[data-theme='dark'] :is(.flow-tools button:last-child, .pieces .pieces-hint-apply, .coral-play .coral-color.is-hint) { background: var(--warning); }
+html[data-theme='dark'] .flow-grid button { background: transparent; border: 0; }
+html[data-theme='dark'] .flow-grid button:focus-visible { background: #fff4c629; }
+
+/* These light islands preserve paired faces, coloured threads, coral pigments,
+   left/right scale pans and the light SVG tile illustrations in all 15 worlds. */
+html[data-theme='dark'] :is(.board, .title-loop, .story-scene, .lb-forest-grid, .lb-bee-frame, .flow-board,
+  .pieces-board, .balance-scale, .memory-postcard, .memory-empty-postcard, .memory-map-missing) { color: var(--board-ink); color-scheme: light; }
+html[data-theme='dark'] .memory-board { background: #3b4e4a; border-color: #657b6b; }
+html[data-theme='dark'] .memory-screen .memory-card { background: #397d79; color: #e2e7bd; border-color: #70aaa0; }
+html[data-theme='dark'] .memory-screen .memory-card.is-up { background: #fff9ec; border-color: #decda9; }
+html[data-theme='dark'] .memory-screen .memory-card.is-matched { background: #f3f6df; border-color: #7c9f62; }
+html[data-theme='dark'] .memory-place > small { color: var(--board-ink); }
+html[data-theme='dark'] .balance-candy { color: #51405e; }
+html[data-theme='dark'] .balance-empty { color: #756080; }
+html[data-theme='dark'] .lb-hive-lock { color: #514628; }
+html[data-theme='dark'] .coral-ocean { color: #254b52; }
+html[data-theme='dark'] .coral-play .coral-color:disabled { background: #3d514b; color: var(--ink-soft); }
+html[data-theme='dark'] .coral-tools button:disabled { background: var(--panel); color: var(--ink-soft); }
+html[data-theme='dark'] .pieces-board-caption { color: #456153; }
+/* Nonogram numbers, crosses and filled stitches remain distinct in night mode. */
+html[data-theme='dark'] .cloud-screen { --thread: #a9cdea; }
+html[data-theme='dark'] .cloud-board { background: var(--card); border-color: var(--line); }
+html[data-theme='dark'] .cloud-screen .cloud-clue, html[data-theme='dark'] .cloud-corner { background: var(--panel); color: var(--ink); }
+html[data-theme='dark'] .cloud-screen .cloud-clue.selected { background: #425d74; box-shadow: inset 0 -3px #a9cdea; }
+html[data-theme='dark'] .cloud-screen .cloud-cell { background: var(--card); color: var(--thread); border-color: #788494; }
+html[data-theme='dark'] .cloud-screen .cloud-cell.line-active { background: #384959; border-color: #a9cdea; }
+html[data-theme='dark'] .cloud-screen .mark-2 { color: #d2c9bc; background: #41424c; }
+html[data-theme='dark'] .cloud-screen .cloud-hint-cell { background: var(--warning); outline-color: var(--amber); }
+html[data-theme='dark'] .cloud-screen .cloud-toolbar button[aria-pressed=true] { background: #425d74; color: var(--ink); border-color: #a9cdea; }
+html[data-theme='dark'] .cloud-candidates .target { background: var(--warning); }
+html[data-theme='dark'] .cloud-stars { color: var(--amber); }
+html[data-theme='dark'] .cloud-screen .cloud-board.is-finished .cloud-cell { background: var(--card); border-color: var(--line); }
+html[data-theme='dark'] .cloud-screen .cloud-board.is-finished .cloud-clue,
+html[data-theme='dark'] .cloud-board.is-finished .cloud-corner { background: var(--panel); }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle { transition: none; }
+}
+
+html[data-theme='dark'] .flow-legend > span { color: color-mix(in srgb, var(--thread-color) 55%, #fff2df); }
+html[data-theme='dark'] :is(.stage-card.done .stage-num, .chapter .stage-card.done .stage-num) { background: #36554f; color: var(--ink); }
+html[data-theme='dark'] .world-badge { background: var(--panel); }
+html[data-theme='dark'] .tag-bonus { color: #36291f; }
+html[data-theme='dark'] .daily-icon svg { stroke: #36291f; }
+html[data-theme='dark'] .daily-card.done .daily-icon svg { stroke: #243c38; }
+html[data-theme='dark'] .balance-scale-caption { color: #705276; }
+html[data-theme='dark'] .balance-total { color: #51405e; }
+html[data-theme='dark'] .coral-origin { color: #161b25; }
+html[data-theme='dark'] .lab-cheer { background: var(--card); color: var(--ink); }

@@ -9,6 +9,8 @@ import { CHIMNEY, TrainArt } from './art/TrainArt';
 import { makePuff, useLook } from './look';
 import { InstallButton } from './InstallButton';
 import { poseTransform } from './trainRunner';
+import { ThemeToggle } from './ThemeToggle';
+import { VersionLabel } from './VersionLabel';
 
 /** A closed 4×2 loop (columns 1–4, rows 0–1) the title train circles forever. */
 const LOOP = buildPath([
@@ -116,6 +118,8 @@ interface TitleProps {
 export function TitleScreen({ continueText, continueResume, onContinue, onPlay, onGarage, onSave, newLooks }: TitleProps) {
   return (
     <main className="title">
+      <div className="title-settings"><ThemeToggle /></div>
+      <VersionLabel />
       <div className="title-inner">
         <p className="title-kicker">내 기차로 떠나는 퍼즐 여행</p>
         <h1 className="logo">

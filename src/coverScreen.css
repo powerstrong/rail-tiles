@@ -4,6 +4,8 @@
 @media (max-height: 480px) {
   :root {
     --cover-top: max(4px, env(safe-area-inset-top));
+    --version-bottom: max(1px, env(safe-area-inset-bottom));
+    --version-footer: 16px;
     --cover-bottom: max(6px, env(safe-area-inset-bottom));
     --cover-left: max(8px, env(safe-area-inset-left));
     --cover-right: max(8px, env(safe-area-inset-right));

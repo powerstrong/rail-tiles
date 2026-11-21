@@ -3,8 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import './styles.css';
 import './coverScreen.css';
+import './theme.css';
+import { initializeTheme } from './theme';
 import { listenForInstall } from './ui/InstallButton';
 
+initializeTheme();
 listenForInstall();
 // Offline play once installed: cache what the game loads (production builds only).
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
