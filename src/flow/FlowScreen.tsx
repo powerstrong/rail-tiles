@@ -1,5 +1,5 @@
 import { StageCompletion } from '../ui/StageCompletion';
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
 import { starsFor } from '../engine/stars';
 import { isMuted, play, setMuted } from '../ui/sound';
@@ -37,7 +37,7 @@ export function FlowScreen({ stage, bestStars, hasNext, onBack, onNext, onCleare
   }, []);
   const chapter = FLOW_CHAPTERS[Math.floor((stage.number-1)/10)];
   const rule = stage.fill ? '같은 무늬를 잇고, 모든 칸을 채워요.' : '같은 무늬 단추끼리 이어요. 빈칸은 남아도 좋아요.';
-  return <main className="flow-play">
+  return <main className="flow-play" style={{ '--cover-cols': stage.cols, '--cover-ratio': stage.cols / stage.rows } as CSSProperties}>
     <header className="flow-top"><button onClick={onBack}>← 스테이지 고르기</button><span>색깔 길 잇기</span><button className="flow-mute" aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted} onClick={() => { setMuted(!muted); setMutedState(!muted); }}>{muted ? '♪ 꺼짐' : '♪ 켜짐'}</button></header>
     <div className="flow-heading"><div><p className="flow-kicker">실바람 마을 · {chapter.number}장 · {(stage.number-1)%10+1}/10</p><h1 ref={heading} tabIndex={-1}>{stage.title}</h1></div><div className="flow-spool"><Spool happy={won} /></div></div>
     <div className="flow-rule"><p>{rule}{stage.number >= 21 && <strong> 같은 무늬 고리도 지나가요.</strong>}</p><button onClick={() => setHelp(v => !v)} aria-expanded={help} aria-controls="flow-rules">{help ? '접기' : '도움말'}</button></div>

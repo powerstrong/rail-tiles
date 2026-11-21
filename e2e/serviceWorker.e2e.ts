@@ -7,9 +7,10 @@ import { CONCEPTS } from '../src/lab/catalog';
 test('deployment waits for old tabs, preserves their lazy assets, then upgrades offline at a Pages subpath', async ({ browser }) => {
   // A previously deployed page that has not requested its lazy game module yet.
   const legacy = new Map([
-    ['index.html', '<!doctype html><button onclick="import(\'./old-game.js\').then(m => m.open())">Old game</button>'],
+    ['index.html', '<!doctype html><link rel="manifest" href="./manifest.webmanifest"><button onclick="import(\'./old-game.js\').then(m => m.open())">Old game</button>'],
+    ['manifest.webmanifest', JSON.stringify({ start_url: './', scope: './', display: 'standalone', orientation: 'portrait' })],
     ['old-game.js', 'export function open() { document.body.textContent = "Old game ready"; }'],
-    ['sw.js', renderServiceWorker(['index.html', 'old-game.js'], 'legacy-upgrade-test') + '\nself.addEventListener("install", () => self.skipWaiting());'],
+    ['sw.js', renderServiceWorker(['index.html', 'old-game.js', 'manifest.webmanifest'], 'legacy-upgrade-test') + '\nself.addEventListener("install", () => self.skipWaiting());'],
   ]);
   const mime: Record<string, string> = { html: 'text/html', js: 'text/javascript', css: 'text/css', svg: 'image/svg+xml', png: 'image/png', webmanifest: 'application/manifest+json' };
   let deployed = false;
@@ -52,6 +53,7 @@ test('deployment waits for old tabs, preserves their lazy assets, then upgrades 
     await oldPage.close();
     await context.setOffline(true);
     await otherTab.reload();
+    expect(await otherTab.evaluate(async () => (await (await fetch('./manifest.webmanifest')).json()).orientation)).toBe('portrait');
     await otherTab.getByRole('button', { name: 'Old game' }).click();
     await expect(otherTab.locator('body')).toHaveText('Old game ready');
     await otherTab.close();
@@ -60,6 +62,10 @@ test('deployment waits for old tabs, preserves their lazy assets, then upgrades 
     // The new version was fully cached before activation, so even its first launch works offline.
     const next = await context.newPage();
     await next.goto(url);
+    // SW activation exposes the new manifest even offline. Android's separate
+    // WebAPK update scheduling still requires a real-device verification.
+    expect(await next.locator('link[rel="manifest"]').evaluate(el => (el as HTMLLinkElement).href)).toBe(`${url}manifest.webmanifest`);
+    expect(await next.evaluate(async () => (await (await fetch('./manifest.webmanifest')).json()).orientation)).toBe('any');
     await expect(next.locator('.lab-entry')).toHaveCount(0);
     await next.getByRole('button', { name: '시작하기', exact: true }).click();
     for (const title of ['거울 토끼의 숲', '꿀벌의 한붓 꽃길']) {

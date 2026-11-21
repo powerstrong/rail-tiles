@@ -16,6 +16,9 @@ export function useFitBoard<T extends HTMLElement>() {
     const fit = () => {
       const board = game.querySelector<SVGSVGElement>('.board-wrap .board');
       if (!board) return;
+      // Shared SVG boards use 100-unit cells. Short viewports scroll the interactive
+      // boards at 45px per cell instead of squeezing their hit areas below 44px.
+      game.style.setProperty('--cover-board-width', `${board.viewBox.baseVal.width * .45}px`);
       const cs = getComputedStyle(game);
       let used = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
       let shown = 0;

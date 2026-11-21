@@ -1,5 +1,5 @@
 import { StageCompletion } from '../ui/StageCompletion';
-import { useEffect, useLayoutEffect, useReducer, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useReducer, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import type { GameProps } from '../worlds';
 import { starsFor } from '../engine/stars';
 import { isMuted, play, setMuted } from '../ui/sound';
@@ -108,7 +108,7 @@ export function PiecesScreen({ stage, bestStars, hasNext, clearNote, onBack, onN
   const ghost = hover && selected !== null ? { index: selected, pose: hover } : hint && !hint.remove ? hint : guided >= 0 ? { index: guided, pose: stage.solution[guided] } : null;
   const validGhost = ghost && canPlace(stage, layout, ghost.index, ghost.pose);
   const chapter = PIECES_CHAPTERS[Math.floor((stage.number - 1) / 10)];
-  return <main className="pieces" onPointerMove={move} onPointerUp={end} onPointerCancel={() => { drag.current = null; setFloating(null); setHover(null); setNote('원래 자리에 두었어요. 다시 집어도 돼요.'); }}>
+  return <main className="pieces" style={{ '--cover-cols': stage.cols } as CSSProperties} onPointerMove={move} onPointerUp={end} onPointerCancel={() => { drag.current = null; setFloating(null); setHover(null); setNote('원래 자리에 두었어요. 다시 집어도 돼요.'); }}>
     <header className="pieces-top"><button onClick={onBack} aria-label="스테이지 고르기">← 목록</button><span>조각 맞추기</span><button aria-label={muted ? '소리 켜기' : '소리 끄기'} onClick={() => { setMuted(!muted); setMutedState(!muted); }}>{muted ? '소리 ×' : '소리 ♪'}</button></header>
     <div className="pieces-heading"><p>{chapter.title} · {stage.label.replace('STAGE ', '')}</p><h1 ref={title} tabIndex={-1}>{stage.title}</h1>{bestStars > 0 && <span className="pieces-best">최고 ★{bestStars}</span>}</div>
     <div className="pieces-goal"><span>{stage.number === 1 ? '● 조각을 점선에 쏙! 두 조각을 모아 봐요.' : stage.number === 11 ? '창문은 비워 둬요. 오목한 자리에 쏙!' : stage.number === 21 ? '돌려도 안 맞나요? 뒤집기를 눌러 봐요!' : '조각을 돌려서 틀을 빈틈없이 채워요.'}</span><button onClick={() => setHelp(!help)} aria-expanded={help}>규칙 {help ? '−' : '+'}</button></div>

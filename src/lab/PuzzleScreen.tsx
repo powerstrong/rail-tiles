@@ -109,7 +109,7 @@ export function PuzzleScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
   }, [stage.kind, won]);
   const total = stagesFor(stage.kind).length;
   const progressText = stage.kind === 'bee' ? `방문한 꽃길 ${state.length} / ${stage.terrain!.filter(Boolean).length}` : `${moves}번 움직였어요`;
-  return <main className={`lab lab-play lab-${concept.id}`} style={{ '--lab-accent': concept.color, '--lab-wash': concept.wash, '--lab-board-ratio': stage.cols / stage.rows } as CSSProperties}>
+  return <main className={`lab lab-play lab-${concept.id}`} style={{ '--lab-accent': concept.color, '--lab-wash': concept.wash, '--lab-board-ratio': stage.cols / stage.rows, '--lab-board-cols': stage.cols } as CSSProperties}>
     <header className="lab-top"><button className="lab-back" onClick={onBack}>← 스테이지 고르기</button><span className="lab-play-world"><span aria-hidden="true">{concept.icon}</span>{concept.title}</span>
       <button className="lab-mute" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 H7.5 L12 5.5 V18.5 L7.5 14.5 H4 Z" />{muted ? <path d="M16 9.5 L21 14.5 M21 9.5 L16 14.5" /> : <path d="M15.5 9 Q17.5 12 15.5 15 M18 6.5 Q22 12 18 17.5" />}</svg></button></header>
     <div className="lab-play-heading"><div><p className="lab-eyebrow">{concept.chapters[Math.floor((stage.number - 1) / 10)]} · {stage.number} / {total}</p><h1 tabIndex={-1} ref={heading}>{stage.title}</h1></div>{bestStars > 0 && <span className="lab-done-tag">✓ 최고 별 {bestStars}개</span>}</div>
