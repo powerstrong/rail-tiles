@@ -1,3 +1,6 @@
+.board-first, .board-first-map, .board-first-fit, .cloud-screen .board-first-secondary { display: contents; }
+.board-first-handle, .board-first-status { display: none; }
+
 /* Flex Window can be landscape even while the folded phone is held upright.
    Keep these overrides last. Landscape phones and short desktop windows benefit
    from the same layout; viewports taller than 480px keep their existing layout. */
@@ -43,43 +46,43 @@
   .route-card-text span { font-size: 11px; }
   .route-card .primary, .route-continue { min-height: 44px; padding: 6px 10px; font-size: 13px; }
 
-  /* The shared SVG games already measure their surrounding UI with useFitBoard.
-     Remove the 200px floor after tightening that UI. Direction pads use one row. */
-  .game {
-    height: 100dvh;
-    padding: var(--cover-top) var(--cover-right) var(--cover-bottom) var(--cover-left);
-    gap: 3px;
+  /* One scroll destination per puzzle. Menus precede it, secondary tools follow.
+     The bottom reserve also keeps the fixed version label away from controls. */
+  .game, .lab.lab-play, .flow-play, .memory-screen, .pieces, .coral-play, .balance-play, .cloud-screen {
+    height: auto; min-height: 100dvh;
+    padding: var(--cover-top) var(--cover-right) calc(var(--cover-bottom) + 20px) var(--cover-left);
+    gap: 8px;
   }
-  .game-head { gap: 6px; }
-  .game-title h1 { font-size: 15px; }
-  .stage-no { font-size: 10px; letter-spacing: 0; }
-  .head-actions { gap: 4px; }
-  .game .tip { min-height: 0; font-size: 11px; line-height: 1.3; }
-  .game .board { max-height: max(44px, calc(100dvh - var(--reserve, 190px))); }
   .game > * { flex-shrink: 0; }
-  /* Direction-pad games keep the whole map visible. Boards that require direct
-     manipulation retain 45px cells and a native scrolling gutter on each side. */
-  .game .board-wrap:has(> .board:not(.ice-board, .space-board, .clock-board)) {
-    flex: 1; min-height: 64px; overflow: auto; padding-inline: 16px;
+  .board-first {
+    position: relative; display: flex; flex-direction: column; gap: 4px;
+    height: 100dvh; min-height: 0; flex: none; width: 100%;
+    padding: var(--cover-top) 0 var(--cover-bottom);
   }
-  /* Keep a native pan strip visible even after scrolling both axes. The SVG
-     drawing surface itself consumes touch gestures, including its frame. */
-  .game .board-wrap:has(> .board:not(.ice-board, .space-board, .clock-board))::after {
-    content: ''; display: block; position: sticky; left: 0; bottom: 0;
-    height: 16px; background: var(--bg); border-top: 2px solid var(--line);
+  .board-first-handle {
+    display: block; flex: none; text-align: center; font-size: 10px; line-height: 12px;
+    color: var(--ink-soft); user-select: none; order: 0;
   }
-  .game .board:not(.ice-board, .space-board, .clock-board) {
-    width: var(--cover-board-width); max-width: none; max-height: none; margin-inline: auto;
-  }
-  .game .status { min-height: 44px; padding: 2px 4px; font-size: 11px; }
-  .game .hint-btn { height: 44px; padding-inline: 8px; font-size: 12px; }
-  .game .dock { margin-top: auto; gap: 6px; }
+  .board-first-more { order: 4; }
+  .board-first-status { display: block; order: 2; flex: none; font-size: 11px; line-height: 16px; text-align: center; color: var(--ink); }
+  .board-first-map { display: block; order: 1; position: relative; flex: 1; min-width: 0; min-height: 0; width: 100%; }
+  .board-first-fit { display: block; position: absolute; width: 100%; transform-origin: top left; }
+  .board-first > :is(.dock, .erupt-row, .pieces-tray, .pieces-transform, .cloud-toolbar, .coral-palette) { order: 3; flex: none; }
+  /* Keep the original, full status/star/hint row immediately below the viewport. */
+  .board-first:has(> .board-first-secondary) { margin-bottom: calc(var(--board-first-after, 56px) + 8px); }
+  .board-first > .board-first-secondary { position: absolute; top: 100%; width: 100%; }
+  .board-first > .status-row { min-height: 48px; }
+  .game .status { min-height: 44px; padding: 4px; font-size: 12px; }
+  .game .hint-btn { min-width: 44px; height: 44px; padding-inline: 8px; font-size: 12px; }
+  .game .board-wrap { width: 100%; overflow: visible; padding: 0; }
+  .game .board { width: 100%; max-width: 100%; max-height: none; height: auto; }
+  .game .dock { margin: 0; gap: 6px; justify-content: center; }
   .game .tools { gap: 5px; }
-  .game .tool { min-height: 44px; padding: 2px; gap: 0; }
+  .game .tool { min-width: 44px; min-height: 44px; padding: 2px; gap: 0; }
   .game .tool-icon { width: 22px; height: 22px; }
   .game .tool-label { font-size: 10px; }
   .game .count { min-width: 20px; height: 20px; top: -5px; right: -3px; padding: 0 3px; border-width: 2px; font-size: 10px; }
-  .game .go-btn { width: 68px; min-height: 44px; font-size: 14px; }
+  .game .go-btn { width: 68px; min-width: 44px; min-height: 44px; font-size: 14px; }
   .game .go-btn svg { width: 18px; height: 18px; }
   .game .dpad { grid-template-columns: repeat(4, 44px); grid-template-rows: 44px; gap: 4px; }
   .game .dpad-btn { grid-area: auto; min-width: 44px; min-height: 44px; }
@@ -88,168 +91,138 @@
   .game .penguin-chip { width: 44px; height: 44px; }
   .game .clock-rest { width: 60px; height: 44px; min-height: 44px; flex-direction: row; display: flex; justify-content: center; gap: 2px; font-size: 11px; }
   .clock-rest svg { width: 20px; height: 20px; }
-  .run-tools { padding: 0; gap: 4px; }
+  .game-head { flex-wrap: wrap; }
+  .game-title { min-width: 140px; }
+  .game-title h1 { font-size: 18px; }
+  .game .tip { font-size: 13px; min-height: 0; }
+  .run-tools button, .ice-stuck button { min-height: 44px; }
   .run-tools:empty { display: none; }
-  .run-tools button, .ice-stuck button { min-height: 44px; padding: 4px 8px; font-size: 11px; }
 
-  /* Button-grid games retain 44px cells. Dense boards scroll inside their own
-     panel instead of shrinking the cells or pushing the tools off the screen. */
-  .lab.lab-play, .flow-play, .memory-screen, .pieces, .coral-play, .balance-play, .cloud-screen {
-    position: relative;
-    padding: var(--cover-top) var(--cover-right) var(--cover-bottom) var(--cover-left);
+  .board-first.board-first-side {
+    display: grid; grid-template-columns: minmax(0, 1fr) 96px;
+    grid-template-rows: 12px minmax(0, 1fr) auto 12px;
   }
-  .lab.lab-play { height: 100dvh; display: flex; flex-direction: column; gap: 2px; }
-  .lab-play .lab-top { min-height: 44px; margin: 0; gap: 4px; }
-  .lab-play .lab-back { min-width: 44px; min-height: 44px; font-size: 11px; }
-  .lab-play .lab-mute { width: 44px; height: 44px; flex: none; }
-  .lab-play .lab-play-world { font-size: 10px; }
-  .lab-play .lab-play-heading { margin: 0 76px 0 0; min-height: 44px; }
-  .lab-play .lab-play-heading h1 { font-size: 15px; line-height: 1.2; }
-  .lab-play .lab-eyebrow { font-size: 9px; line-height: 1.2; }
-  .lab-play .lab-done-tag { display: none; }
-  .lab-play .lab-play-goal { position: absolute; top: calc(var(--cover-top) + 44px); right: var(--cover-right); padding: 0; border: 0; background: none; }
-  .lab-play-goal > span, .lab-play-goal > p { display: none; }
-  .lab-play-goal > button { min-height: 44px; }
-  .lab-play .lab-play-rules { position: absolute; z-index: 8; top: calc(var(--cover-top) + 90px); left: var(--cover-left); right: var(--cover-right); max-height: calc(100dvh - var(--cover-top) - 96px - env(safe-area-inset-bottom)); overflow: auto; margin: 0; }
-  .lab-play .lab-play-canvas { flex: 1; min-height: 44px; overflow: auto; margin: 2px 0 4px; width: 100%; }
-  .lab-bee .lb-bee { width: min(100%, max(calc(var(--lab-board-cols) * 44px + 10px), calc((100dvh - 185px) * var(--lab-board-ratio) + 10px))); max-width: 100%; }
-  .lab-bee .lb-bee-frame { padding: 3px; }
-  .lab-bee .lb-bee-grid { gap: 0; grid-template-columns: repeat(var(--lb-cols), minmax(44px, 1fr)); }
-  .lab-bee .lb-bee-cell { min-width: 44px; min-height: 44px; }
-  .lab-bee .lb-hive-lock { font-size: 8px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lab-bee .lb-flower-path { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); }
-  .lab-play .lb-board-note { min-height: 0; margin: 0 0 2px; font-size: 10px; line-height: 1.2; }
-  .lab-play .lb-board-note b, .lab-play .lb-board-note > span { font-size: 10px; }
-  .lab-play .lb-caption, .lab-bee .lb-bee-count, .lab-bee .lb-bee-discovery { display: none; }
-  .lab-play .lab-play-status { min-height: 14px; font-size: 10px; line-height: 1.2; }
-  .lab-play .lab-message-slot { flex: none; height: 18px; min-height: 18px; margin: 0; }
-  .lab-play .lab-feedback-line { margin: 0; padding: 0 3px; min-height: 0; max-height: 18px; overflow: auto; font-size: 10px; line-height: 1.3; }
-  .lab-play .lab-message-slot:has(.lab-stuck) { height: 64px; }
-  .lab-play .lab-stuck { margin: 0; padding: 0; font-size: 10px; line-height: 1.2; }
-  .lab-play .lab-tools { flex: none; padding: 0; gap: 4px; }
-  .lab-play .lab-tools button { min-height: 44px; height: 44px; padding: 2px; font-size: 11px; flex-direction: row; }
-  .lab-twins .lb-view-options { margin: 0; }
-  .lab-twins .lb-forest-pair { gap: 6px; overflow: auto; justify-content: start; }
-  .lab-twins .lb-forest-side { min-width: calc(var(--lab-board-cols) * 46px + 16px); }
-  .lab-twins .lb-grid { grid-template-columns: repeat(var(--lb-cols), minmax(44px, 1fr)); width: max-content; min-width: 100%; }
-  .lab-twins .lb-tile { min-width: 44px; min-height: 44px; }
-  .lab-twins .lb-dpad { position: sticky; bottom: 0; z-index: 2; background: var(--bg); grid-template-columns: repeat(4, 44px); grid-template-rows: 44px; gap: 4px; margin-top: 4px; }
-  .lab-twins .lb-direction { grid-area: auto; min-height: 44px; }
+  .board-first-side > .board-first-handle { grid-column: 1 / -1; grid-row: 1; }
+  .board-first-side > .board-first-map { grid-column: 1; grid-row: 2; height: 100%; }
+  .board-first-side > .board-first-status { grid-column: 1 / -1; grid-row: 3; }
+  .board-first-side > .board-first-more { grid-row: 4; }
+  .game .board-first-side > :is(.dock, .erupt-row) { grid-column: 2; grid-row: 2; align-self: center; flex-direction: column; align-items: center; }
+  .game .board-first-side .tools { flex: none; display: grid; grid-template-columns: repeat(2, 44px); gap: 4px; }
+  .game .board-first-side .go-btn { width: 92px; }
+  .game .board-first-side .erupt-btn { width: 92px; min-width: 44px; min-height: 44px; padding: 6px; gap: 2px; font-size: 14px; flex-direction: column; word-break: normal; }
+  .board-first-side > .board-first-secondary { grid-column: 1 / -1; }
+
+  /* Twins' direction pad belongs outside the fitted forests. Both forests stay
+     side by side, even if the expanded view was selected before folding. */
+  .lab-play-canvas, .lab-twins .lb-movement { display: contents; }
+  .lab-twins :is(.lb-board-note, .lb-view-options, .lb-home-rule, .lb-rabbit-reaction, .lb-caption) { display: none; }
+  .lab-twins .lb-forest-pair { flex-direction: row; gap: 8px; align-items: start; }
+  .lab-twins .lb-forest-side { min-width: 0; width: auto; max-width: none; }
+  .lab-twins .lb-forest-name { font-size: 12px; margin: 0 0 4px; }
+  .lab-twins .lb-rabbit-preview { min-height: 0; margin: 0 0 4px; font-size: 10px; }
+  .lab-twins .lb-grid { grid-template-columns: repeat(var(--lb-cols), minmax(0, 1fr)); gap: 2px; padding: 4px; width: 100%; }
+  .lab-twins .lb-dpad { order: 3; flex: none; grid-template-columns: repeat(4, 44px); grid-template-rows: 44px; gap: 4px; margin: 0; }
+  .lab-twins .lb-direction { grid-area: auto; min-width: 44px; min-height: 44px; }
   .lab-twins .lb-dpad-heart { display: none; }
+  .lab-bee .lb-bee { width: 100%; max-width: none; }
+  .lab-bee .lb-bee-frame { padding: 3px; }
+  .lab-bee .lb-bee-grid { gap: 0; grid-template-columns: repeat(var(--lb-cols), minmax(0, 1fr)); }
+  .lab-bee .lb-bee-cell { min-width: 0; min-height: 0; }
+  .lab-bee :is(.lb-board-note, .lb-caption, .lb-bee-discovery) { display: none; }
+  .lab-bee .lb-flower-path { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); }
+  .lab-play :is(.lab-top, .lab-play-heading, .lab-play-goal) { margin-bottom: 8px; }
+  .lab-play .lab-play-rules { position: static; max-height: none; overflow: visible; margin-bottom: 10px; }
+  .lab-play .lab-play-status { font-size: 12px; }
+  .lab-play .lab-message-slot { height: auto; min-height: 0; margin: 8px 0; }
+  .lab-play .lab-stuck, .game :is(.ice-stuck, .space-stuck, .clock-stuck) {
+    position: fixed; z-index: 8; left: var(--cover-left); right: var(--cover-right);
+    bottom: calc(var(--cover-bottom) + 16px); margin: 0 auto; max-width: 440px;
+    max-height: calc(100dvh - 40px); overflow: auto; padding: 8px;
+    background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+  }
+  .lab-stuck button { min-width: 44px; min-height: 44px; }
+  .lab-play .lab-tools button { min-width: 44px; min-height: 44px; }
+  .lab-play .lab-celebrate { position: absolute; inset: 20px 0 60px; pointer-events: none; }
 
-  .flow-heading { min-height: 44px; margin: 0; padding-right: 70px; }
-  .flow-heading h1 { font-size: 18px; }
-  .flow-kicker { margin: 0; font-size: 10px; }
-  .flow-spool, .flow-first, .flow-rule p { display: none; }
-  .flow-rule { position: absolute; right: var(--cover-right); top: calc(var(--cover-top) + 44px); margin: 0; }
-  .flow-rule button { min-width: 44px; }
-  /* The margins around the drawing surface also allow native touch scrolling. */
-  .flow-cloth { flex: 1; min-height: 44px; width: 100%; overflow: auto; margin: 4px auto; padding: 4px; border-radius: 12px; }
-  .flow-board { width: min(100%, max(calc(var(--cover-cols) * 44px), calc((100dvh - 185px) * var(--cover-ratio)))); min-width: calc(var(--flow-cols) * 44px); margin-inline: auto; }
-  .flow-status { margin: 2px 0; font-size: 10px; gap: 3px; }
-  .flow-status b { font-size: 12px; }
-  .flow-legend { font-size: 10px; gap: 6px; flex-wrap: wrap; }
-  .flow-note { min-height: 0; max-height: 16px; overflow: auto; font-size: 10px; line-height: 1.4; margin: 2px 0; }
-  .flow-tools button { min-width: 44px; min-height: 44px; font-size: 11px; padding: 2px; }
-  .flow-rating { margin: 2px 0; font-size: 10px; }
-  .flow-play { height: 100dvh; display: flex; flex-direction: column; }
-  .flow-play > * { flex-shrink: 0; }
-  .flow-status, .flow-legend { line-height: 1.2; }
+  .flow-cloth { width: 100%; max-width: none; overflow: visible; padding: 4px; margin: 0; border-radius: 12px; }
+  .flow-board { width: 100%; min-width: 0; }
+  .flow-play .flow-tools button { min-width: 44px; min-height: 44px; }
+  .flow-help { position: static; }
+  .memory-board, .memory-board-dense { width: 100%; max-width: none; overflow: visible; padding: 4px; gap: 4px; }
+  .memory-screen .memory-card { min-height: 0; min-width: 0; padding: 3px; aspect-ratio: 1; }
+  .memory-screen .memory-card > svg, .memory-face { min-height: 0; }
 
-  .memory-top { flex-wrap: nowrap; gap: 4px; }
-  .memory-top > span { display: none; }
-  .memory-top button { font-size: 11px; padding: 4px 8px; }
-  .memory-heading { margin: 2px 0; padding-right: 64px; }
-  .memory-heading > p:first-child { font-size: 9px; line-height: 12px; }
-  .memory-heading h1 { font-size: 17px; line-height: 20px; margin: 0; }
-  .memory-score { font-size: 10px; line-height: 16px; }
-  .memory-score strong { font-size: 13px; }
-  .memory-limits { margin: 0; font-size: 9px; line-height: 12px; }
-  .memory-shelf { min-height: 18px; margin: 0 0 2px; font-size: 11px; }
-  .memory-postcard { width: 32px; height: 20px; }
-  .memory-board { flex: 1; min-height: 44px; align-content: start; overflow: auto; padding: 4px; gap: 4px; }
-  .memory-screen .memory-card { min-width: 44px; min-height: 44px; height: 44px; aspect-ratio: auto; padding: 2px; }
-  .memory-note { min-height: 0; max-height: 16px; overflow: auto; margin: 2px 0; line-height: 16px; font-size: 10px; }
-  .memory-tools { grid-template-columns: 1fr 1fr; gap: 4px; }
-  .memory-tools button { font-size: 10px; padding: 2px 4px; }
-  .memory-observe { margin: 0; min-height: 44px; font-size: 11px; }
-  .memory-screen .memory-rules-toggle { position: absolute; top: calc(var(--cover-top) + 44px); right: var(--cover-right); min-width: 44px; font-size: 10px; padding: 2px; }
-  .memory-screen { height: 100dvh; display: flex; flex-direction: column; }
-  .memory-screen > * { flex-shrink: 0; }
-
-  .pieces-heading, .cloud-heading { margin: 2px 70px 2px 0; }
-  .pieces { height: 100dvh; display: flex; flex-direction: column; }
-  .pieces > * { flex-shrink: 0; }
-  .pieces-heading { min-height: 44px; margin-block: 0; }
-  .pieces-heading h1, .cloud-heading h1, .balance-heading h1, .coral-heading h1 { font-size: 17px; line-height: 1.2; }
-  .pieces-heading p, .cloud-heading p { font-size: 9px; margin: 0; }
-  .pieces-goal { margin: 0; position: absolute; top: calc(var(--cover-top) + 44px); right: var(--cover-right); }
-  .pieces-goal > span { display: none; }
-  .pieces-canvas { flex: 1; min-height: 52px; padding: 3px 16px; overflow: auto; border-radius: 8px; }
-  .pieces-board { width: calc(var(--cover-cols) * 44px); min-width: calc(var(--cover-cols) * 44px); }
-  .pieces-board-caption, .pieces-count { display: none; }
-  .pieces-tray { flex-wrap: nowrap; overflow: auto; justify-content: start; padding: 2px 0; }
-  .pieces .pieces-piece { flex: 0 0 62px; min-height: 44px; height: 44px; padding: 1px; touch-action: pan-x; }
-  .pieces .pieces-hint-apply { position: absolute; z-index: 3; bottom: calc(var(--cover-bottom) + 44px); left: var(--cover-left); right: var(--cover-right); }
+  /* Dense tap boards gain a full-height map by putting transform/mark tools
+     beside it. The seven-piece tray still fits in a single 44px row below. */
+  .pieces .board-first, .cloud-screen .board-first {
+    display: grid; grid-template-columns: minmax(0, 1fr) 44px;
+    grid-template-rows: 12px minmax(0, 1fr) 16px 12px;
+  }
+  .pieces .board-first { grid-template-rows: 10px minmax(0, 1fr) 14px 44px 10px; gap: 2px; }
+  .pieces .board-first-handle { font-size: 9px; line-height: 10px; }
+  .pieces .board-first-status { line-height: 14px; }
+  :is(.pieces, .cloud-screen) .board-first-handle { grid-column: 1 / -1; grid-row: 1; }
+  :is(.pieces, .cloud-screen) .board-first-map { grid-column: 1; grid-row: 2; height: 100%; }
+  :is(.pieces, .cloud-screen) .board-first-status { grid-column: 1 / -1; grid-row: 3; }
+  :is(.pieces, .cloud-screen) .board-first-more { grid-column: 1 / -1; grid-row: -2; }
+  .pieces .board-first-more { grid-row: 5; }
+  .cloud-screen .board-first-more { grid-row: 4; }
+  .pieces .pieces-tray { grid-column: 1 / -1; grid-row: 4; }
+  .pieces .pieces-transform, .cloud-screen .cloud-toolbar {
+    grid-column: 2; grid-row: 2; display: flex; flex-direction: column; align-self: center;
+  }
+  .pieces .pieces-transform button, .cloud-toolbar button { width: 44px; flex: none; }
+  .pieces-canvas { padding: 2px; overflow: visible; border-radius: 12px; }
+  .pieces-board { width: 100%; min-width: 0; max-width: none !important; }
+  .pieces-board-caption { display: none; }
+  .pieces-tray { flex-wrap: nowrap; overflow-x: auto; justify-content: start; padding: 0; gap: 4px; }
+  .pieces .pieces-piece { flex: 0 0 44px; min-width: 44px; min-height: 44px; width: 44px; height: 44px; padding: 1px; touch-action: pan-x; }
   .pieces-piece svg { height: 26px; }
   .pieces-piece span { font-size: 9px; line-height: 12px; }
-  .pieces-transform button, .pieces-tools button { padding: 2px; font-size: 10px; }
-  .pieces-status { min-height: 14px; max-height: 14px; overflow: auto; padding: 0; font-size: 10px; line-height: 14px; }
+  .pieces-transform { gap: 4px; }
+  .pieces-transform button { min-width: 44px; min-height: 44px; padding: 2px; font-size: 10px; }
+  .pieces .pieces-hint-apply { min-height: 44px; }
 
-  .coral-heading { padding: 2px 68px 2px 0; }
-  .coral-heading p { font-size: 9px; margin: 0; }
-  .coral-best { display: none; }
-  .coral-goal { position: absolute; top: calc(var(--cover-top) + 44px); right: var(--cover-right); border: 0; }
-  .coral-goal p { display: none; }
-  .coral-score { margin: 0 0 2px; font-size: 10px; }
-  .coral-score strong { font-size: 14px; }
-  .coral-ocean { flex: 1; min-height: 44px; overflow: auto; padding: 3px; width: 130px; margin: auto; }
-  .coral-board-label { font-size: 8px; margin: 0; }
-  .coral-grid { gap: 1px; }
-  .coral-seafloor, .coral-palette-label { display: none; }
-  .coral-palette { margin-top: 4px; gap: 4px; }
-  .coral-play .coral-color { padding: 2px; min-height: 44px; gap: 0; font-size: 9px; }
-  .coral-swatch { width: 22px; height: 18px; }
-  .coral-swatch svg { width: 18px; height: 18px; }
+  .coral-ocean { padding: 4px; overflow: visible; }
+  .coral-board-label, .coral-seafloor, .coral-palette-label { display: none; }
+  .coral-grid { gap: 2px; }
+  .coral-palette { gap: 4px; }
+  .coral-play .coral-color { min-width: 44px; min-height: 44px; height: 44px; padding: 1px; gap: 0; font-size: 9px; }
+  .coral-swatch { width: 22px; height: 16px; }
+  .coral-swatch svg { width: 16px; height: 16px; }
   .coral-color strong { font-size: 10px; }
-  .coral-feedback { min-height: 0; max-height: 16px; overflow: auto; padding: 0; font-size: 10px; }
-  .coral-tools button { font-size: 10px; padding: 2px; }
-  .coral-play { height: 100dvh; display: flex; flex-direction: column; }
-  .coral-play > * { flex-shrink: 0; }
 
-  .balance-eyebrow { margin: 0; font-size: 9px; }
-  .balance-discovery { font-size: 10px; margin: 0 0 2px; line-height: 1.2; }
-  .balance-scales { max-height: max(88px, calc(100dvh - 190px)); overflow: auto; gap: 8px; margin-bottom: 2px; padding: 10px 0; }
-  .balance-scale, .balance-double .balance-scale { padding: 2px 5px 12px; }
-  .balance-scale-art, .balance-double .balance-scale-art { height: 18px; margin: 0; }
-  .balance-pan, .balance-double .balance-pan { min-height: 62px; padding: 2px; }
-  .balance-total { margin: 0; font-size: 9px; }
-  .balance-total strong { font-size: 15px; }
-  .balance-candies { grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 2px; }
-  .balance-pan { overflow: auto; }
-  .balance-candy, .balance-fixed, .balance-double .balance-candy, .balance-double .balance-fixed { height: 44px; min-width: 44px; }
-  .balance-candy svg, .balance-double .balance-candy svg { height: 36px; }
-  .balance-status { min-height: 14px; padding: 0; font-size: 10px; }
-  .balance-tools button { min-height: 44px; padding: 2px; font-size: 11px; }
-  .balance-star-guide { margin: 2px 0; font-size: 9px; }
-  .balance-rule-toggle { position: absolute; top: calc(var(--cover-top) + 44px); right: var(--cover-right); min-width: 44px; }
-  .balance-heading { padding-right: 70px; }
+  .balance-scales { gap: 12px; margin: 0; padding: 12px 0; overflow: visible; }
+  .balance-scale, .balance-double .balance-scale { padding: 4px 5px 16px; }
+  .balance-scale-art { height: 60px; margin: 0; }
+  .balance-double .balance-scale-art { height: 32px; margin: 0; }
+  .balance-pan, .balance-double .balance-pan { min-height: 96px; padding: 4px 4px 12px; }
+  .balance-total { margin: 0; font-size: 10px; }
+  .balance-total strong { font-size: 17px; }
+  .balance-candies { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
+  .balance-candy, .balance-fixed { height: 44px; min-width: 0; }
+  .balance-double .balance-candy, .balance-double .balance-fixed { height: 38px; min-width: 0; }
+  .balance-candy svg, .balance-double .balance-candy svg { height: 32px; }
+  .balance-empty { margin-top: 12px; }
+  .balance-double { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .balance-double .balance-scale { min-width: 0; padding-inline: 2px; }
+  .balance-double .balance-scale-caption { display: block; text-align: center; font-size: 10px; }
+  .balance-double .balance-scale-caption span { display: block; font-size: 9px; }
+  .balance-double .balance-plates { gap: 4px; }
+  .balance-double .balance-pan { padding: 2px 2px 10px; }
+  .balance-double .balance-candies { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .balance-fixed svg { height: 26px; }
+  .balance-fixed small { font-size: 8px; line-height: 8px; }
 
-  .cloud-lesson, .cloud-caption { display: none; }
-  .cloud-toolbar button, .cloud-tools button { font-size: 11px; padding: 2px; }
-  .cloud-board-options { margin: 2px 0; font-size: 10px; }
-  .cloud-board-options button { font-size: 10px; padding: 2px 6px; }
-  .cloud-scroll { max-height: max(44px, calc(100dvh - 250px)); padding: 0 0 4px; }
+  .cloud-screen .board-first-secondary { display: block; }
+  .cloud-toolbar { margin: 0; gap: 4px; }
+  .cloud-toolbar button { min-width: 44px; min-height: 44px; font-size: 11px; padding: 2px; }
+  .cloud-scroll { overflow: visible; max-height: none; padding: 0; }
+  .cloud-board { width: 100%; grid-template-columns: 44px repeat(var(--cloud-cols), minmax(0, 1fr)); }
+  .cloud-screen .cloud-cell { width: 100%; height: auto; min-height: 0; aspect-ratio: 1; }
   .cloud-col { min-height: 44px; }
-  .cloud-screen .cloud-clue { font-size: 11px; }
-  .cloud-feedback { min-height: 0; max-height: 16px; overflow: auto; margin: 2px 0; padding: 0 4px; font-size: 10px; line-height: 1.4; }
-  /* The same undo action is always available in the 44px tools row. */
-  .cloud-feedback button { display: none; }
-  .cloud-tools { margin-top: 2px; }
-  .cloud-score { font-size: 10px; }
-  .cloud-gallery-button { margin: 2px 0; }
-  .cloud-rules { margin-top: 2px; }
-  .cloud-rules summary { min-height: 44px; }
+  .cloud-screen .cloud-clue { font-size: 12px; }
+  .cloud-board-options { margin: 8px 0; }
 
   /* Result cards and stories have their own scroll surface, with safe-area room
      on every edge. Even a long explanation must leave its actions reachable. */
@@ -272,7 +245,7 @@
     width: auto; max-width: 440px; max-height: calc(100dvh - var(--cover-top) - var(--cover-bottom));
     overflow: auto; margin: 0 auto; padding: 8px; box-shadow: 0 4px 20px #393d3c44;
   }
-  .story { padding: max(48px, calc(env(safe-area-inset-top) + 44px)) var(--cover-right) var(--cover-bottom) var(--cover-left); gap: 2px; justify-content: start; }
+  .story { position: fixed; inset: 0; max-height: 100dvh; overflow: auto; padding: max(48px, calc(env(safe-area-inset-top) + 44px)) var(--cover-right) var(--cover-bottom) var(--cover-left); gap: 2px; justify-content: start; }
   .story-skip { top: var(--cover-top); min-height: 44px; padding: 4px 12px; }
   .story-caption { font-size: 10px; }
   .story-place { font-size: 18px; }
@@ -282,9 +255,5 @@
   .story-line { font-size: 13px; line-height: 1.3; }
   .story-actions { margin-top: 4px; }
   .story-actions button { min-height: 44px; padding: 4px 16px; font-size: 13px; }
-  .flow-help, .memory-rules, .pieces-rules, .coral-rules, .balance-rules, .cloud-proof, .cloud-gallery {
-    position: fixed; z-index: 8; top: max(96px, calc(env(safe-area-inset-top) + 92px));
-    left: var(--cover-left); right: var(--cover-right); bottom: max(56px, calc(env(safe-area-inset-bottom) + 50px));
-    overflow: auto; margin: 0; background: var(--card); box-shadow: var(--shadow);
-  }
+
 }

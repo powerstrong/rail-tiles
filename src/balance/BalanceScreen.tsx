@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
@@ -44,7 +45,7 @@ export function BalanceScreen({ stage, bestStars, hasNext, onBack, onNext, onCle
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   }, []);
-  const tool = (event: Event) => { activeCandy.current = null; dispatch(event); play(event.type === 'hint' ? 'pop' : 'erase'); };
+  const tool = (event: Event) => { activeCandy.current = null; dispatch(event); if (event.type === 'reset') showBoard(); play(event.type === 'hint' ? 'pop' : 'erase'); };
   const linked = (group: number) => stage.candies.filter(c => c.group === group).length > 1;
   const pairName = (group: number) => group === 0 ? '○' : '◇';
   return <main className="balance-play">
@@ -52,6 +53,8 @@ export function BalanceScreen({ stage, bestStars, hasNext, onBack, onNext, onCle
     <p className="balance-eyebrow">{CHAPTER_TITLES[chapter]} · {stage.number}/30</p>
     <div className="balance-heading"><h1 tabIndex={-1} ref={heading}>{stage.label.replace('STAGE ', '')} {stage.title}</h1>{bestStars > 0 && <span>최고 ★{bestStars}</span>}</div>
     <p className="balance-discovery">{stage.discovery}</p>
+    <BoardFirst status={<>{moves}번 눌렀어요</>}>
+    <BoardMap>
     <div className={`balance-scales${sums.length > 1 ? ' balance-double' : ''}`}>
       {sums.map(([left, right], scale) => {
         const delta = Math.sign(right - left) * Math.min(12, 5 + Math.abs(right - left));
@@ -78,6 +81,8 @@ export function BalanceScreen({ stage, bestStars, hasNext, onBack, onNext, onCle
         </section>;
       })}
     </div>
+    </BoardMap>
+    </BoardFirst>
     <div className="balance-status" role="status" aria-live="polite">{won ? '✦ 반듯반듯! 별빛이 모였어요.' : game.hint !== null ? `${linked(game.hint) ? pairName(game.hint) + ' 짝꿍 중 ' : ''}빛나는 테두리의 사탕을 하나 눌러 보세요.` : stage.number === 1 && moves === 0 ? '무게 2 사탕을 톡! 눌러 볼까요?' : `${moves}번 눌렀어요 · 언제든 되돌릴 수 있어요.`}</div>
     <div className="balance-tools" aria-label="퍼즐 도움 도구"><button disabled={moves === 0} onClick={() => tool({ type: 'undo' })}>↶ 되돌리기</button><button onClick={() => tool({ type: 'reset' })}>↻ 처음부터</button><button disabled={won} onClick={() => tool({ type: 'hint' })}>✧ 힌트</button></div>
     <p className="balance-star-guide">★★★ {stage.par}번 · ★★ {stage.par + TWO_STAR_SLACK}번 이하{game.hinted ? ' · 힌트 사용: 최대 ★★' : ''}</p>

@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { type Intro, IntroCard } from '../ui/IntroCard';
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dir } from '../engine/dir';
@@ -173,6 +174,7 @@ export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext
     play('rotate');
   };
   const restart = (keepHint = false) => {
+    showBoard();
     if (busy) return;
     setState(initialState(stage));
     setHistory([]);
@@ -277,6 +279,8 @@ export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext
         {recoveryIndex >= 0 && <button onClick={recover} disabled={busy}>마지막으로 풀 수 있던 지점으로 되돌리기</button>}
       </div>}
 
+      <BoardFirst status={<>밀기 {moves}번</>}>
+      <BoardMap>
       <div className="board-wrap">
         <IceBoard
           stage={stage}
@@ -299,7 +303,8 @@ export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext
         )}
       </div>
 
-      <div className="status-row">
+      </BoardMap>
+      <div className="status-row board-first-secondary">
         <button className="hint-btn" onClick={showHint} disabled={busy || won} aria-label="힌트 보기">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
@@ -349,6 +354,8 @@ export function PenguinScreen({ stage, hasNext, bestStars, intro, onBack, onNext
           ))}
         </div>
       </div>
+
+      </BoardFirst>
 
       {won && (
         <ResultOverlay label="스테이지 클리어">

@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { type Intro, IntroCard } from '../ui/IntroCard';
@@ -125,6 +126,7 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
     play('rotate');
   };
   const restart = (keepHint = false) => {
+    showBoard();
     if (busy) return;
     setHistory([{ s: initialState(stage), spin: 0, facing: 0 }]);
     setWon(false);
@@ -242,6 +244,8 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
         <p className="tip">{stage.tip}</p>
       )}
 
+      <BoardFirst status={<>똑딱 {ticks}번{bonus && ` · 남은 ${Math.max(0, left)}번`}{colors.length > 0 && ` · 다음: ${colors.map(c => `${c === 0 ? '빨강' : '파랑'}${blockUp(c, nextTurn) ? '↑' : '↓'}`).join(' ')}`}</>}>
+      <BoardMap>
       <div className="board-wrap">
         <ClockBoard
           stage={stage}
@@ -263,7 +267,8 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
         )}
       </div>
 
-      <div className="status-row">
+      </BoardMap>
+      <div className="status-row board-first-secondary">
         <button className="hint-btn" onClick={showHint} disabled={locked || stuck} aria-label="힌트 보기">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
@@ -310,6 +315,8 @@ export function ClockScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
           쉬기
         </button>
       </div>
+
+      </BoardFirst>
 
       {late && (
         <ResultOverlay label="자정의 종이 울렸어요">

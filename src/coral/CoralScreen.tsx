@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { StarRow } from '../ui/StageSelect';
 import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
@@ -73,6 +74,8 @@ export function CoralScreen({ stage, hasNext, bestStars, onBack, onNext, onClear
     <div className="coral-goal"><p>{chapter.number === 1 ? '깃발에서 같은 색 이웃을 쭉 이어요.' : chapter.number === 2 ? '가운데 깃발에서 사방으로 이어요.' : '바위는 두고, 산호를 모두 이어요.'}</p><button onClick={() => setHelp(!help)} aria-expanded={help}>규칙 {help ? '−' : '+'}</button></div>
     {help && <div className="coral-rules"><p>색 버튼을 누르면 깃발과 연결된 산호가 모두 그 색으로 바뀌고, 상하좌우의 같은 색을 끝까지 흡수해요. 대각선과 바위는 건너지 않아요.</p><p>+숫자는 이번에 늘어날 칸 수예요. 색을 가리키거나 키보드로 고르면 그 칸이 반짝여요. 큰 무리 뒤에 만날 이웃도 살펴봐요.</p><p>몇 번이 걸려도 완성! ★★★는 {stage.par}번 이하, ★★는 {stage.par + TWO_STAR_SLACK}번 이하예요. 힌트를 쓰면 최대 ★★. 되돌리기는 자유예요.</p></div>}
     <div className="coral-score"><div><strong data-testid="coral-moves">{moves}번</strong> 물들였어요</div><div>★★★ {stage.par}번 이하<br /><span>★★ {stage.par + TWO_STAR_SLACK}번 이하</span></div></div>
+    <BoardFirst status={<>{moves}번 물들였어요</>}>
+    <BoardMap>
     <section className="coral-ocean" aria-label="산호 정원">
       <div className="coral-board-label"><span>깃발과 연결된 산호</span><strong>{count(state.mask)} / {count(reef.all)}칸</strong></div>
       <div className="coral-grid" role="group" aria-label={`산호초, ${count(state.mask)}칸 연결`} style={{ '--coral-cols': stage.cols } as CSSProperties}>
@@ -87,6 +90,7 @@ export function CoralScreen({ stage, hasNext, bestStars, onBack, onNext, onClear
       </div>
       <div className="coral-seafloor" aria-hidden="true"><svg viewBox="0 0 320 23"><path d="M0 20Q70 4 145 19T320 16V23H0Z" fill="#ddcaa0" /><path d="M23 21V7m0 8-7-5m7 1 7-8M286 21V5m0 10 8-7" stroke="#69a594" strokeWidth="3" fill="none" strokeLinecap="round" /><circle cx="250" cy="8" r="3" fill="none" stroke="#7ebebd" /></svg></div>
     </section>
+    </BoardMap>
     <p className="coral-palette-label">다음 색 고르기 <span>+숫자만큼 커져요</span></p>
     <div className="coral-palette" role="group" aria-label="퍼뜨릴 색 고르기" style={{ gridTemplateColumns: `repeat(${reef.palette.length}, minmax(0, 1fr))` }}>
       {reef.palette.map(color => {
@@ -96,8 +100,9 @@ export function CoralScreen({ stage, hasNext, bestStars, onBack, onNext, onClear
         </button>;
       })}
     </div>
+    </BoardFirst>
     <div className="coral-feedback" role="status" aria-live="polite">{won ? '모든 산호가 한 색! 무지개 정원이 반짝여요.' : game.note || '어떤 색이 더 멀리 이어질까요? +숫자를 살펴봐요.'}{game.hinted && <small>힌트 사용 · 이번 완성은 최대 ★★</small>}</div>
-    <div className="coral-tools" aria-label="퍼즐 도움 도구"><button disabled={!moves} onClick={() => { play('erase'); dispatch({ type: 'undo' }); }}>↶ 되돌리기</button><button onClick={() => dispatch({ type: 'reset' })}>↻ 처음부터</button><button disabled={won || busy} aria-busy={busy} onClick={requestHint}>{busy ? '찾는 중…' : '한 걸음 힌트'}</button></div>
+    <div className="coral-tools" aria-label="퍼즐 도움 도구"><button disabled={!moves} onClick={() => { play('erase'); dispatch({ type: 'undo' }); }}>↶ 되돌리기</button><button onClick={() => { dispatch({ type: 'reset' }); showBoard(); }}>↻ 처음부터</button><button disabled={won || busy} aria-busy={busy} onClick={requestHint}>{busy ? '찾는 중…' : '한 걸음 힌트'}</button></div>
     {won && <StageCompletion className="coral-clear" stars={starsFor(moves, stage.par, game.hinted)} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="coral-primary" note={clearNote} />}
   </main>;
 }

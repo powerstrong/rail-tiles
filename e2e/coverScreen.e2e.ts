@@ -1,5 +1,8 @@
+import { createEditor, placeRail, rotateRail } from '../src/engine/editor';
+import { GONE } from '../src/depot/model';
+import { shape, type PiecesStage } from '../src/pieces/model';
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdirSync } from 'node:fs';
 import { STAGES } from '../src/stages/stages';
 import { S2_STAGES } from '../src/stages/season2';
 import { ICE_STAGES } from '../src/penguin/stages';
@@ -21,24 +24,26 @@ const FLOW_STAGES: FlowStage[] = data('../src/flow/stages.generated.json');
 
 type Course = { world: string; stages: { id: string }[]; board: string; tools: string };
 const courses: Course[] = [
-  { world: 'train', stages: STAGES, board: '.board-wrap', tools: '.dock' },
-  { world: 'ice', stages: ICE_STAGES, board: '.board-wrap', tools: '.dock' },
-  { world: 'bee', stages: labStages.filter(s => s.kind === 'bee'), board: '.lab-play-canvas', tools: '.lab-tools' },
-  { world: 'flow', stages: FLOW_STAGES, board: '.flow-cloth', tools: '.flow-tools' },
-  { world: 'memory', stages: MEMORY_STAGES, board: '.memory-board', tools: '.memory-tools' },
-  { world: 'twins', stages: labStages.filter(s => s.kind === 'twins'), board: '.lab-play-canvas', tools: '.lab-tools' },
-  { world: 'train2', stages: S2_STAGES, board: '.board-wrap', tools: '.dock' },
-  { world: 'depot', stages: DEPOT_STAGES, board: '.board-wrap', tools: '.status-row' },
-  { world: 'space', stages: SPACE_STAGES, board: '.board-wrap', tools: '.dock' },
-  { world: 'machine', stages: MACHINE_STAGES, board: '.board-wrap', tools: '.status-row' },
-  { world: 'clock', stages: CLOCK_STAGES, board: '.board-wrap', tools: '.dock' },
-  { world: 'volcano', stages: VOLCANO_STAGES, board: '.board-wrap', tools: '.erupt-row' },
-  { world: 'pieces', stages: data('../src/pieces/stages.generated.json'), board: '.pieces-canvas', tools: '.pieces-tools' },
-  { world: 'coral', stages: data('../src/coral/stages.generated.json'), board: '.coral-ocean', tools: '.coral-tools' },
-  { world: 'balance', stages: data('../src/balance/stages.generated.json'), board: '.balance-scales', tools: '.balance-tools' },
-  { world: 'cloud', stages: data('../src/cloud/patterns.json'), board: '.cloud-scroll', tools: '.cloud-tools' },
+  { world: 'train', stages: STAGES, board: 'svg.board', tools: '.dock' },
+  { world: 'ice', stages: ICE_STAGES, board: 'svg.board', tools: '.dock' },
+  { world: 'bee', stages: labStages.filter(s => s.kind === 'bee'), board: '.lb-bee-frame', tools: '' },
+  { world: 'flow', stages: FLOW_STAGES, board: '.flow-cloth', tools: '' },
+  { world: 'memory', stages: MEMORY_STAGES, board: '.memory-board', tools: '' },
+  { world: 'twins', stages: labStages.filter(s => s.kind === 'twins'), board: '.lb-forest-pair', tools: '.lb-dpad' },
+  { world: 'train2', stages: S2_STAGES, board: 'svg.board', tools: '.dock' },
+  { world: 'depot', stages: DEPOT_STAGES, board: 'svg.board', tools: '' },
+  { world: 'space', stages: SPACE_STAGES, board: 'svg.board', tools: '.dock' },
+  { world: 'machine', stages: MACHINE_STAGES, board: 'svg.board', tools: '' },
+  { world: 'clock', stages: CLOCK_STAGES, board: 'svg.board', tools: '.dock' },
+  { world: 'volcano', stages: VOLCANO_STAGES, board: 'svg.board', tools: '.erupt-row' },
+  { world: 'pieces', stages: data('../src/pieces/stages.generated.json'), board: '.pieces-canvas', tools: '.pieces-tray, .pieces-transform' },
+  { world: 'coral', stages: data('../src/coral/stages.generated.json'), board: '.coral-ocean', tools: '.coral-palette' },
+  { world: 'balance', stages: data('../src/balance/stages.generated.json'), board: '.balance-scales', tools: '' },
+  { world: 'cloud', stages: data('../src/cloud/patterns.json'), board: '.cloud-board', tools: '.cloud-toolbar' },
 ];
-const photographed = new Set(['train', 'ice', 'bee', 'flow', 'memory']);
+const photographed = new Set(['train', 'ice', 'bee', 'flow', 'memory', 'twins', 'pieces', 'cloud', 'coral', 'balance']);
+const shots = '/tmp/boardfirst-shots';
+mkdirSync(shots, { recursive: true });
 
 async function inViewport(locator: Locator, page: Page) {
   await expect(locator).toBeVisible();
@@ -53,7 +58,7 @@ async function inViewport(locator: Locator, page: Page) {
 }
 async function noHorizontalScroll(page: Page) {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
-  await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+
 }
 async function open(page: Page, course: Course, index = 0) {
   await page.goto('/');
@@ -71,53 +76,158 @@ async function open(page: Page, course: Course, index = 0) {
   }
   await expect(page.locator(course.board)).toBeVisible();
 }
+/** Replay the public controls at their fitted size, then exercise the real result. */
+async function finish(page: Page, course: Course, index: number) {
+  const point = async (x: number, y: number) => page.locator('svg.board').evaluate((svg, [x, y]) => {
+    const p = (svg as SVGSVGElement).createSVGPoint(); p.x = x * 100; p.y = y * 100;
+    const screen = p.matrixTransform((svg as SVGSVGElement).getScreenCTM()!);
+    return { x: screen.x, y: screen.y };
+  }, [x, y]);
+  const tapCell = async (x: number, y: number) => { const p = await point(x, y); await page.mouse.click(p.x, p.y); };
+  switch (course.world) {
+    case 'train': case 'train2': {
+      const stage = (course.world === 'train' ? STAGES : S2_STAGES)[index];
+      let editor = createEditor();
+      for (const p of stage.solution) {
+        await page.getByRole('radio', { name: new RegExp({ straight: '직선', curve: '곡선', cross: '교차' }[p.rail.kind]) }).click();
+        await tapCell(p.x + .5, p.y + .5);
+        editor = placeRail(stage, editor, p.x, p.y, p.rail.kind);
+        while (editor.placed[`${p.x},${p.y}`].rot !== p.rail.rot) {
+          await tapCell(p.x + .5, p.y + .5); editor = rotateRail(editor, p.x, p.y);
+        }
+      }
+      await page.getByRole('button', { name: '출발', exact: true }).click();
+      break;
+    }
+    case 'ice': {
+      const stage = ICE_STAGES[index];
+      for (const push of stage.solution) {
+        if (stage.penguins.length > 1) await page.getByRole('radio', { name: `펭귄 ${push.penguin + 1}`, exact: true }).click();
+        await page.locator(`.dpad-${push.dir}`).click();
+      }
+      break;
+    }
+    case 'space':
+      for (const [i, dir] of SPACE_STAGES[index].solution.entries()) {
+        await page.locator(`.dpad-${dir}`).click();
+        await expect(page.locator('.board-first-status')).toContainText(`중력 ${i + 1}번`);
+      }
+      break;
+    case 'clock': for (const action of CLOCK_STAGES[index].solution) await page.locator(action === 4 ? '.clock-rest' : `.dpad-${action}`).click(); break;
+    case 'machine': for (const device of MACHINE_STAGES[index].solution) await page.getByRole('button', { name: `거울 ${device + 1} 돌리기`, exact: true }).click(); break;
+    case 'volcano': {
+      const stage = VOLCANO_STAGES[index];
+      for (const cell of stage.solution) await tapCell(cell % stage.width + .5, Math.floor(cell / stage.width) + .5);
+      if (!stage.race) await page.locator('.erupt-btn').click();
+      break;
+    }
+    case 'depot': {
+      const stage = DEPOT_STAGES[index], state = [...stage.start];
+      for (const [i, move] of stage.solution.entries()) {
+        const v = stage.vehicles[move.vehicle], from = state[move.vehicle];
+        const to = move.to === GONE ? (v.exit === 1 || v.exit === 2 ? (v.horizontal ? stage.width : stage.height) - v.len + 1 : -1) : move.to;
+        const a = await point(v.horizontal ? from + v.len / 2 : v.line + .5, v.horizontal ? v.line + .5 : from + v.len / 2);
+        const b = await point(v.horizontal ? to + v.len / 2 : v.line + .5, v.horizontal ? v.line + .5 : to + v.len / 2);
+        await page.mouse.move(a.x, a.y); await page.mouse.down(); await page.mouse.move(b.x, b.y, { steps: 5 }); await page.mouse.up();
+        state[move.vehicle] = move.to;
+        if (i < stage.solution.length - 1) await expect(page.getByRole('button', { name: '힌트 보기', exact: true })).toBeEnabled();
+      }
+      break;
+    }
+    case 'bee': case 'twins': {
+      const stage = labStages.filter(s => s.kind === course.world)[index];
+      for (const action of stage.solution) await page.locator(stage.kind === 'bee' ? `[data-bee-cell="${action}"]` : `.lb-direction-${action}`).click();
+      break;
+    }
+    case 'flow': for (const path of FLOW_STAGES[index].solution) for (const cell of path) await page.locator(`.flow-grid [data-cell="${cell}"]`).click(); break;
+    case 'pieces': {
+      const stage: PiecesStage = data('../src/pieces/stages.generated.json')[index];
+      for (const [i, pose] of stage.solution.entries()) {
+        await page.locator('.pieces-piece').nth(i).click();
+        if (pose.flip) await page.getByRole('button', { name: '↔ 뒤집기', exact: true }).click();
+        for (let turn = 0; turn < pose.turn; turn++) await page.getByRole('button', { name: '↻ 돌리기', exact: true }).click();
+        const anchor = shape(stage.pieces[i], pose.turn, pose.flip)[0];
+        await page.locator(`.pieces-cell[data-cell="${pose.x + anchor[0]},${pose.y + anchor[1]}"]`).click();
+      }
+      break;
+    }
+    case 'balance': for (const group of data('../src/balance/stages.generated.json')[index].solution) await page.locator(`.balance-candy[data-group="${group}"]`).first().click(); break;
+    case 'coral': for (const color of data('../src/coral/stages.generated.json')[index].solution) await page.locator(`.coral-color[data-color="${color}"]`).click(); break;
+    case 'cloud': {
+      let tool = 1;
+      for (const step of data('../src/cloud/proofs.generated.json').stages[index].solution) {
+        if (step.value !== tool) { await page.getByRole('button', { name: step.value === 1 ? '✚ 수놓기' : '× 빈칸', exact: true }).click(); tool = step.value; }
+        await page.locator(`.cloud-cell[data-cell="${step.cell}"]`).click();
+      }
+      break;
+    }
+    case 'memory': {
+      await page.getByRole('checkbox', { name: '다음 카드를 누를 때 덮기', exact: true }).check();
+      await page.locator('.board-first').evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+      const cards = page.locator('.memory-card'), faces: string[] = [];
+      for (const card of await cards.all()) {
+        if ((await card.getAttribute('aria-label'))!.includes('뒷면')) await card.click();
+        faces.push((await card.getAttribute('aria-label'))!.split(', ')[1]);
+      }
+      while (await page.locator('.memory-card:not(.is-matched)').count()) {
+        const states = await cards.evaluateAll(nodes => nodes.map(el => ({ up: el.classList.contains('is-up'), matched: el.classList.contains('is-matched') })));
+        const up = states.findIndex(s => s.up && !s.matched);
+        const a = up < 0 ? states.findIndex(s => !s.matched) : up;
+        const b = faces.findIndex((face, i) => i !== a && face === faces[a]);
+        if (up < 0) await cards.nth(a).click();
+        await cards.nth(b).click();
+      }
+      break;
+    }
+  }
+  const result = page.getByRole('region', { name: '스테이지 완료', exact: true });
+  await expect(result).toBeVisible({ timeout: 60_000 });
+  for (const button of await result.getByRole('button').all()) {
+    await inViewport(button, page);
+    await button.click({ trial: true });
+  }
+  if (index === 0) {
+    await result.getByRole('button', { name: '다음 스테이지 →', exact: true }).click();
+    await inViewport(page.locator(course.board), page);
+    await inViewport(page.locator('.board-first-status'), page);
+  }
+}
+
 async function checkPlay(page: Page, course: Course) {
   await noHorizontalScroll(page);
-  await inViewport(page.locator('header').first(), page);
-  await inViewport(page.locator('h1'), page);
   await inViewport(page.locator(course.board), page);
-  await inViewport(page.locator(course.tools), page);
-  for (const button of await page.locator(`${course.tools} button`).all()) {
-    await inViewport(button, page);
-    const box = await button.boundingBox();
-    expect(box!.width).toBeGreaterThanOrEqual(44);
-    expect(box!.height).toBeGreaterThanOrEqual(44);
-    if (await button.isEnabled()) await button.click({ trial: true });
-  }
-  // Scrolling dense boards must not steal the header or bottom tools.
-  await page.locator(course.board).evaluate(el => { el.scrollTop = el.scrollHeight; });
-  await inViewport(page.locator(course.tools), page);
-  if (['bee', 'flow', 'memory'].includes(course.world)) {
-    const cells = page.locator(course.world === 'bee' ? '.lb-bee-cell' : course.world === 'flow' ? '.flow-grid button' : '.memory-card');
-    for (const cell of await cells.all()) {
-      const box = await cell.boundingBox();
-      expect(box!.width).toBeGreaterThanOrEqual(44);
-      expect(box!.height).toBeGreaterThanOrEqual(44);
+  await inViewport(page.locator('.board-first-status'), page);
+  // Inspect every scroll container between the real drawing surface and the play
+  // viewport. Checking only an outer wrapper missed the cropped grids previously.
+  expect(await page.locator(course.board).evaluate(el => {
+    const bad: string[] = [];
+    for (let node: Element | null = el; node && !node.classList.contains('board-first'); node = node.parentElement) {
+      if (node.clientHeight && (node.scrollHeight > node.clientHeight + 1 || node.scrollWidth > node.clientWidth + 1)) bad.push(node.getAttribute('class') ?? node.tagName);
+    }
+    return bad;
+  })).toEqual([]);
+  if (course.tools) {
+    for (const tools of await page.locator(course.tools).all()) {
+      await inViewport(tools, page);
+      for (const button of await tools.locator('button').all()) {
+        await inViewport(button, page);
+        const box = (await button.boundingBox())!;
+        expect(box.width).toBeGreaterThanOrEqual(44);
+        expect(box.height).toBeGreaterThanOrEqual(44);
+        if (await button.isEnabled()) await button.click({ trial: true });
+      }
     }
   }
-  // SVG hit areas can be tiny even when the surrounding board fits perfectly.
-  if (['train', 'train2', 'depot', 'machine', 'volcano'].includes(course.world)) {
-    const scale = await page.locator('svg.board').evaluate(el => (el as SVGSVGElement).getScreenCTM()!.a);
-    expect(scale * 100).toBeGreaterThanOrEqual(44);
-  }
-  if (course.world === 'pieces') {
-    const cell = page.locator('.pieces-cell').last();
-    await cell.scrollIntoViewIfNeeded();
-    const box = (await cell.boundingBox())!;
-    expect(box.width).toBeGreaterThanOrEqual(44);
-    expect(box.height).toBeGreaterThanOrEqual(44);
-    const region = (await page.locator(course.board).boundingBox())!;
-    expect(box.y).toBeGreaterThanOrEqual(region.y);
-    expect(box.y + box.height).toBeLessThanOrEqual(region.y + region.height);
-    await cell.click({ trial: true });
-  }
-  if (course.world === 'twins') {
-    for (const button of await page.locator('.lb-direction').all()) {
-      await inViewport(button, page);
-      if (await button.isEnabled()) await button.click({ trial: true });
-    }
-  }
-  await page.locator(course.board).evaluate(el => { el.scrollTop = 0; });
+  // Every cell, including the last row, must be visible without scrolling a board.
+  const cells = course.world === 'twins' ? '.lb-forest-cell' : course.world === 'bee' ? '.lb-bee-cell' : course.world === 'flow' ? '.flow-grid button' : course.world === 'memory' ? '.memory-card' : course.world === 'pieces' ? '.pieces-cell' : course.world === 'cloud' ? '.cloud-cell' : '';
+  if (cells) for (const cell of await page.locator(cells).all()) await inViewport(cell, page);
+  expect(await page.locator('header').first().evaluate(el => el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(0);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await inViewport(page.locator('header').first(), page);
+  const back = page.locator('header').first().getByRole('button').first();
+  await back.click({ trial: true });
+  await page.locator('.board-first').evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  await inViewport(page.locator(course.board), page);
 }
 
 for (const viewport of [{ width: 360, height: 330 }, { width: 374, height: 300 }, { width: 360, height: 300 }]) {
@@ -131,12 +241,12 @@ for (const viewport of [{ width: 360, height: 330 }, { width: 374, height: 300 }
       await inViewport(page.getByRole('button', { name: '시작하기', exact: true }), page);
       await noHorizontalScroll(page);
       expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(viewport.height);
-      if (viewport.width === 360) await page.screenshot({ path: test.info().outputPath('title.png') });
+      if (viewport.width === 360) await page.screenshot({ path: `${shots}/title-${viewport.height}.png` });
       await page.getByRole('button', { name: '시작하기', exact: true }).click();
       await inViewport(page.locator('.route-card'), page);
       await inViewport(page.getByRole('button', { name: '놀러 가기', exact: true }), page);
       await noHorizontalScroll(page);
-      if (viewport.width === 360) await page.screenshot({ path: test.info().outputPath('route-map.png') });
+      if (viewport.width === 360) await page.screenshot({ path: `${shots}/route-map-${viewport.height}.png` });
       await page.getByRole('button', { name: /^구름 자수 공방,/ }).click();
       await inViewport(page.getByRole('button', { name: '놀러 가기', exact: true }), page);
       await page.getByRole('button', { name: '놀러 가기', exact: true }).click();
@@ -149,54 +259,14 @@ for (const viewport of [{ width: 360, height: 330 }, { width: 374, height: 300 }
         await open(page, course);
         await checkPlay(page, course);
         if (viewport.width === 360 && photographed.has(course.world)) {
-          await page.screenshot({ path: test.info().outputPath(`${course.world}.png`) });
+          await page.screenshot({ path: `${shots}/${course.world}-${viewport.height}.png` });
         }
+        await finish(page, course, 0);
         await open(page, course, course.stages.length - 1);
         await checkPlay(page, course);
+        await finish(page, course, course.stages.length - 1);
       });
     }
-
-    test('dense drawing boards scroll by touch from their margins without moving the tools', async ({ page }) => {
-      const cdp = await page.context().newCDPSession(page);
-      for (const world of ['bee', 'flow', 'train', 'depot', 'machine', 'volcano', 'pieces']) {
-        const course = courses.find(c => c.world === world)!;
-        await open(page, course, course.stages.length - 1);
-        const region = page.locator(course.board);
-        const box = (await region.boundingBox())!;
-        const x = box.x + (world === 'bee' || world === 'flow' ? 12 : 6), start = box.y + box.height - 8;
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: start }] });
-        for (let step = 1; step <= 6; step++) {
-          await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: start - (box.height - 24) * step / 6 }] });
-        }
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-        await expect.poll(() => region.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
-        await inViewport(page.locator(course.tools), page);
-        await noHorizontalScroll(page);
-        if (['train', 'depot', 'machine', 'volcano'].includes(world)) {
-          const overflows = await region.evaluate(el => el.scrollWidth > el.clientWidth + 2);
-          if (overflows) {
-            await region.evaluate(el => { el.scrollLeft = 1; el.scrollTop = 20; });
-            // Once both offsets are nonzero the ordinary side margins can be
-            // offscreen; the sticky native pan strip must still accept gestures.
-            const x = box.x + box.width / 2, y = box.y + box.height - 8;
-            await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-            for (let step = 1; step <= 6; step++) {
-              await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - 80 * step / 6, y }] });
-            }
-            await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-            await expect.poll(() => region.evaluate(el => el.scrollLeft)).toBeGreaterThan(1);
-            // Chromium can lock a gesture to one axis, so use a second swipe.
-            await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-            for (let step = 1; step <= 6; step++) {
-              await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - 40 * step / 6 }] });
-            }
-            await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-            await expect.poll(() => region.evaluate(el => el.scrollTop)).toBeGreaterThan(20);
-            await inViewport(page.locator(course.tools), page);
-          }
-        }
-      }
-    });
 
     test('train cells can be tapped to complete a puzzle with result actions in reach', async ({ page }) => {
       await open(page, courses.find(c => c.world === 'train')!);
@@ -213,6 +283,8 @@ for (const viewport of [{ width: 360, height: 330 }, { width: 374, height: 300 }
         await button.click({ trial: true });
       }
       await noHorizontalScroll(page);
+      await result.getByRole('button', { name: '다음 스테이지 →', exact: true }).tap();
+      await inViewport(page.locator('svg.board'), page);
     });
 
     test('bee recovery and help stay reachable after a wrong turn on the dense board', async ({ page }) => {
@@ -230,7 +302,7 @@ for (const viewport of [{ width: 360, height: 330 }, { width: 374, height: 300 }
       for (const cell of dead!.slice(1)) await page.locator(`[data-bee-cell="${cell}"]`).tap();
       const recover = page.getByRole('button', { name: '마지막으로 풀 수 있던 지점으로 되돌리기', exact: true });
       await inViewport(recover, page);
-      await inViewport(page.locator('.lab-tools'), page);
+
       await recover.tap();
       await expect(page.locator('.lab-stuck')).toHaveCount(0);
       await page.getByRole('button', { name: '규칙 보기', exact: true }).tap();
@@ -242,23 +314,18 @@ for (const viewport of [{ width: 360, height: 330 }, { width: 374, height: 300 }
       await noHorizontalScroll(page);
     });
 
-    test('pieces tray scrolls by touch and hint actions leave the bottom tools reachable', async ({ page }) => {
+    test('every piece and transform fits, and secondary hint actions remain reachable', async ({ page }) => {
       const course = courses.find(c => c.world === 'pieces')!;
       await open(page, course, course.stages.length - 1);
-      const tray = page.locator('.pieces-tray');
-      const box = (await tray.boundingBox())!;
-      const cdp = await page.context().newCDPSession(page);
-      const x = box.x + box.width - 25, y = box.y + box.height / 2;
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-      for (let step = 1; step <= 6; step++) {
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - 180 * step / 6, y }] });
+      for (const button of await page.locator('.pieces-tray button, .pieces-transform button').all()) {
+        await inViewport(button, page);
+        if (await button.isEnabled()) await button.click({ trial: true });
       }
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-      await expect.poll(() => tray.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
       await page.getByRole('button', { name: '한 조각 힌트', exact: true }).tap();
       await inViewport(page.locator('.pieces-hint-apply'), page);
       await page.locator('.pieces-hint-apply').tap();
       await expect(page.locator('.pieces-hint-apply')).toHaveCount(0);
+      await page.locator('.pieces-tools').scrollIntoViewIfNeeded();
       await inViewport(page.locator('.pieces-tools'), page);
       await noHorizontalScroll(page);
     });
@@ -313,5 +380,126 @@ test('unfolding/resizing restores the existing phone, tablet and desktop layouts
       });
       expect(unchanged).toEqual({ same: true, count: 1 });
     }
+  }
+});
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`360×330 ${theme}: title, route, photographed twins and play screens`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 330 });
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto('/');
+    await page.screenshot({ path: `${shots}/title-${theme}.png` });
+    await page.getByRole('button', { name: '시작하기', exact: true }).click();
+    await page.screenshot({ path: `${shots}/route-map-${theme}.png` });
+    for (const course of courses.filter(c => photographed.has(c.world))) {
+      await open(page, course, course.world === 'twins' ? 3 : 0);
+      await checkPlay(page, course);
+      await page.screenshot({ path: `${shots}/${course.world}${course.world === 'twins' ? '-1-4' : '-1-1'}-${theme}.png` });
+    }
+  });
+}
+
+test('restarting from secondary tools returns to the board; reduced motion never animates entry', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 300 });
+  for (const world of ['bee', 'twins', 'flow', 'memory', 'pieces', 'cloud', 'balance', 'coral']) {
+    const course = courses.find(c => c.world === world)!;
+    await open(page, course);
+    const reset = page.getByRole('button', { name: /처음부터|새로 섞어 시작/ }).last();
+    await reset.click();
+    await inViewport(page.locator(course.board), page);
+    await inViewport(page.locator('.board-first-status'), page);
+  }
+});
+
+test('reading menus survives state changes, resize and fold/unfold without scroll jumps', async ({ page }) => {
+  const settle = () => page.evaluate(() => new Promise<void>(resolve => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
+  for (const world of ['train', 'cloud', 'balance', 'twins']) {
+    await page.setViewportSize({ width: 360, height: 330 });
+    await open(page, courses.find(c => c.world === world)!);
+    await inViewport(page.locator('.board-first-status'), page);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.getByRole('button', { name: /소리 켜기|소리 끄기/ }).click();
+    await settle();
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+    for (const viewport of [{ width: 360, height: 300 }, { width: 390, height: 844 }, { width: 360, height: 330 }]) {
+      await page.setViewportSize(viewport);
+      await settle();
+      expect(await page.evaluate(() => scrollY)).toBe(0);
+      await inViewport(page.locator('header').first(), page);
+    }
+  }
+});
+
+test('cloud clues and balance pans remain legible at 360×330', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 330 });
+  const cloud = courses.find(c => c.world === 'cloud')!;
+  // The first pattern really is a single stitch, not a missing grid.
+  await open(page, cloud);
+  await checkPlay(page, cloud);
+  await expect(page.locator('.cloud-cell')).toHaveCount(1);
+  await expect(page.locator('.cloud-clue')).toHaveText(['1', '1']);
+  await page.screenshot({ path: `${shots}/fixed-cloud-330.png` });
+  await open(page, cloud, cloud.stages.length - 1);
+  const pattern = data('../src/cloud/patterns.json').at(-1);
+  await expect(page.locator('.cloud-cell')).toHaveCount(pattern.rows * pattern.cols);
+  await expect(page.locator('.cloud-clue')).toHaveCount(pattern.rows + pattern.cols);
+  await checkPlay(page, cloud);
+  await page.screenshot({ path: `${shots}/fixed-cloud-dense-330.png` });
+
+  const balance = courses.find(c => c.world === 'balance')!;
+  for (const index of [0, balance.stages.length - 1]) {
+    await open(page, balance, index);
+    await checkPlay(page, balance);
+    for (const pan of await page.locator('.balance-pan').all()) {
+      const panBox = (await pan.boundingBox())!;
+      for (const candy of await pan.locator('.balance-candy, .balance-fixed').all()) {
+        const box = (await candy.boundingBox())!;
+        expect(box.y + box.height).toBeLessThan(panBox.y + panBox.height - 5);
+        expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(31);
+      }
+    }
+    await page.screenshot({ path: `${shots}/fixed-balance${index ? '-dense' : ''}-330.png` });
+  }
+});
+
+test('cover handles allow native touch scrolling to menus and secondary tools', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 330 });
+  const cdp = await page.context().newCDPSession(page);
+  const swipe = async (y: number, distance: number) => {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 180, y }] });
+    for (let step = 1; step <= 8; step++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 180, y: y + distance * step / 8 }] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  };
+  for (const world of ['train', 'twins', 'pieces', 'cloud']) {
+    const course = courses.find(c => c.world === world)!;
+    await open(page, course);
+    const menu = (await page.locator('.board-first-handle').first().boundingBox())!;
+    await swipe(menu.y + menu.height / 2, 240);
+    await inViewport(page.locator('header').first(), page);
+    await page.locator('.board-first').evaluate(el => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    const more = (await page.locator('.board-first-more').boundingBox())!;
+    const before = await page.evaluate(() => scrollY);
+    await swipe(more.y + more.height / 2, -230);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(before + 40);
+  }
+});
+
+test('bonus resources remain visible beside the move count', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 300 });
+  const bonuses = [
+    { world: 'machine', index: MACHINE_STAGES.findIndex(s => s.battery !== undefined), label: '배터리' },
+    { world: 'depot', index: DEPOT_STAGES.findIndex(s => s.limit !== undefined), label: '남은 이동' },
+    { world: 'space', index: SPACE_STAGES.findIndex(s => s.limit !== undefined), label: '산소' },
+    { world: 'clock', index: CLOCK_STAGES.findIndex(s => s.limit !== undefined), label: '남은' },
+  ];
+  for (const bonus of bonuses) {
+    expect(bonus.index).toBeGreaterThanOrEqual(0);
+    const course = courses.find(c => c.world === bonus.world)!;
+    await open(page, course, bonus.index);
+    await inViewport(page.locator(course.board), page);
+    await inViewport(page.locator('.board-first-status'), page);
+    await expect(page.locator('.board-first-status')).toContainText(bonus.label);
   }
 });

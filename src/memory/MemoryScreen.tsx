@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
@@ -56,10 +57,14 @@ export function MemoryScreen({ stage, bestStars, hasNext, onCleared, onBack, onN
     <div className="memory-score"><span>안 맞은 횟수 <strong>{state.misses}</strong></span><span>최고 별 {bestStars ? '★'.repeat(bestStars) : '아직 없어요'}</span></div>
     <p className="memory-limits">★★★ {limits.three}번 이하 · ★★ {limits.two}번 이하{state.hinted ? ' · 힌트 사용: 최대 ★★' : ''}</p>
     <div className="memory-shelf" role="status"><span>찾은 짝 <strong>{state.matched.length / 2} / {pairs}</strong></span>{stage.postcard ? <div className="memory-place"><MemoryPostcard id={stage.id} pairs={pairs} matched={state.matched.length / 2}/>{bestStars > 0 && <small>이미 모은 엽서</small>}</div> : lastFace && <span className="memory-collected"><MemoryArt face={lastFace}/>{FACE_NAMES[lastFace]} 짝꿍!</span>}</div>
+    <BoardFirst status={<>찾은 짝 {state.matched.length / 2} / {pairs} · 안 맞음 {state.misses}</>}>
+    <BoardMap>
     <MemoryBoard stage={stage} state={state} onFlip={index => dispatch({ type: 'flip', index })}/>
+    </BoardMap>
+    </BoardFirst>
     <p className="memory-note" role="status">{state.note || (completed ? '모든 짝이 제자리를 찾았어요!' : state.pendingMismatch ? '다음 카드를 누르면 바로 이어져요.' : '천천히 기억해요. 몇 번이든 괜찮아요.')}</p>
     {completed && <StageCompletion className="memory-result" stars={rating} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="memory-primary">{stage.postcard && <figure className="memory-result-postcard"><PostcardArt id={stage.id}/></figure>}</StageCompletion>}
-    <div className="memory-tools"><button onClick={() => dispatch({ type: 'restart', stage, seed: newSeed() })}>↻ 새로 섞어 시작</button><button disabled={completed} onClick={() => dispatch({ type: 'hint' })}>본 짝 알려주기 · 사용하면 최대 ★★</button></div>
+    <div className="memory-tools"><button onClick={() => { dispatch({ type: 'restart', stage, seed: newSeed() }); showBoard(); }}>↻ 새로 섞어 시작</button><button disabled={completed} onClick={() => dispatch({ type: 'hint' })}>본 짝 알려주기 · 사용하면 최대 ★★</button></div>
     <label className="memory-observe"><input type="checkbox" checked={manualCover} onChange={e => setManualCover(e.target.checked)}/>다음 카드를 누를 때 덮기</label>
     <button className="memory-rules-toggle" aria-expanded={rulesOpen} aria-controls="memory-rules" onClick={() => setRulesOpen(!rulesOpen)}>{rulesOpen ? '규칙 접기 −' : '규칙 보기 +'}</button>
     {rulesOpen && <section id="memory-rules" className="memory-rules" aria-label="게임 규칙"><p>같은 그림 두 장을 찾아 주세요. 짝을 찾으며 새로운 풍경을 만나요.</p><ul><li>두 장씩 열어요. 같으면 그림이 그대로 남아요.</li><li>다르면 잠깐 보여 준 뒤 덮어요. 기다리지 않고 다음 카드를 눌러도 돼요.</li><li>본 짝 알려주기는 이미 본 카드만 알려 줘요. 도움을 받으면 최대 별 두 개예요.</li><li>시간과 실수 제한은 없어요. 완료하면 별 하나 이상을 받아요.</li><li>나갔다 돌아오면 새 카드로 시작해요.</li></ul></section>}

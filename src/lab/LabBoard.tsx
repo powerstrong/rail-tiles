@@ -1,3 +1,4 @@
+import { BoardMap } from '../ui/BoardFirst';
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from 'react';
 import { act, location, type Stage, type State } from './model';
 import { withTo } from '../ui/korean';
@@ -99,7 +100,7 @@ function MovementBoard(props: LabBoardProps) {
     <div className="lb-board-note"><span>↕ 함께</span><span>↔ 서로 반대로</span></div>
     <div className="lb-view-options"><button type="button" className="lb-view-toggle" aria-label={large ? '두 숲 나란히 보기' : '숲 크게 보기'} aria-pressed={large} onClick={() => setLarge(value => !value)}>{large ? '↔ 두 숲 나란히 보기' : '⊕ 숲 크게 보기'}</button></div>
     <p className="lb-home-rule">집에 있어도 다음 버튼에 다시 움직여요. 두 집에 함께 도착하면 완성이에요.</p>
-    <div className="lb-forest-pair">
+    <BoardMap><div className="lb-forest-pair">
       {floors.map((floor, board) => <div className={`lb-forest-side lb-forest-side-${board}`} key={board}>
         <p className="lb-forest-name">{board === 0 ? '루루의 숲' : '라라의 거울 숲'}</p>
         <p className="lb-rabbit-preview">다음 {ARROWS[board === 1 && previewDir % 2 ? (previewDir + 2) % 4 : previewDir]} {preview[board] === state[board] ? '벽 앞에서 쉬어요' : '한 칸 움직여요'}</p>
@@ -121,6 +122,7 @@ function MovementBoard(props: LabBoardProps) {
         </div>
       </div>)}
     </div>
+    </BoardMap>
     {previousState && lastAction != null && <p className="lb-rabbit-reaction" role="status">{[0, 1].map(i => `${i === 0 ? '루루' : '라라'}: ${previousState[i] === state[i] ? '벽에 막혀 쉬었어요' : '한 칸 움직였어요'}`).join(' · ')}</p>}
     <Dpad {...props} onPreview={setPreviewDir} />
     <p className="lb-caption">한 버튼으로 두 친구가 함께 움직여요.</p>
@@ -145,7 +147,7 @@ function BeeBoard({ stage, state, onAction, hint, disabled }: LabBoardProps) {
     // No interpolation: a skipped cell is rejected by the same adjacency rule as a tap.
     if (cell !== null) onAction(cell);
   };
-  return <div className="lb-bee">
+  return <BoardMap><div className="lb-bee">
     {stage.number >= 31 && <p className="lb-bee-discovery">{stage.arrows
       ? '➜ 화살표 꽃에서는 화살표 쪽으로 나가요. 들어오는 쪽은 자유! 되짚기도 돼요.'
       : '두 꽃밭 사이 작은 길! 건너기 전에 이쪽 꽃을 모두 만나 볼까요?'}</p>}
@@ -187,7 +189,7 @@ function BeeBoard({ stage, state, onAction, hint, disabled }: LabBoardProps) {
       </div>
     </div>
     <p className="lb-caption">이웃 꽃을 누르거나 한 칸씩 이어요. 직전 꽃으로 되짚으면 끝 한 칸이 지워져요.</p>
-  </div>;
+  </div></BoardMap>;
 }
 
 export function LabBoard(props: LabBoardProps) {

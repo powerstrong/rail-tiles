@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { StageCompletion } from '../ui/StageCompletion';
 import { type CSSProperties, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import type { GameProps } from '../worlds';
@@ -45,11 +46,15 @@ export function FlowScreen({ stage, bestStars, hasNext, onBack, onNext, onCleare
     {stage.number === 1 && <p className="flow-first">● 단추에서 같은 ● 단추까지 쭉 그어 보세요.</p>}
     {stage.number === 11 && <p className="flow-first">새 발견! 두 단추가 이어져도 빈칸이 남으면 길을 바꿔 봐요.</p>}
     {stage.number === 21 && <p className="flow-first">새 발견! 점선 고리는 같은 무늬 실이 꼭 지나갈 자리예요.</p>}
+    <BoardFirst status={<>{f.joined} / {stage.pairs.length}짝 연결</>}>
+    <BoardMap>
     <div className={`flow-cloth${won ? ' is-complete' : ''}`}><FlowBoard stage={stage} game={game} dispatch={dispatch} /></div>
+    </BoardMap>
+    </BoardFirst>
     <div className="flow-status" aria-label="길 잇기 진행"><span><b>{f.joined}</b> / {stage.pairs.length}짝 연결</span><span>끊긴 짝 <b>{f.loose}</b></span><span>남은 칸 <b>{f.remaining}</b>{!stage.fill && ' · 남아도 돼요'}</span></div>
     <div className="flow-legend" aria-label="실의 색과 무늬">{stage.pairs.map((_,i) => <span key={i} style={{ '--thread-color': THREADS[i].color } as CSSProperties}>{THREADS[i].mark} {THREADS[i].name.split(' ')[0]}</span>)}</div>
     <p className="flow-note" role="status" aria-live="polite">{game.note || (won ? '한 땀 한 땀, 마을의 천이 완성됐어요!' : game.active !== null ? `${THREADS[game.active].name} 실을 잇는 중 · 다른 실 위에 그리면 그 실이 끊겨요.` : '단추나 그려 둔 실에서 시작해요. 언제든 고칠 수 있어요.')}</p>
-    <div className="flow-tools" aria-label="퍼즐 도움 도구"><button onClick={() => dispatch({ type:'undo' })} disabled={!game.history.length && !game.before}>↶ 되돌리기</button><button onClick={() => dispatch({ type:'reset' })}>↻ 처음부터</button><button onClick={() => dispatch({ type:'hint' })} disabled={won}>✦ 한 줄 힌트</button></div>
+    <div className="flow-tools" aria-label="퍼즐 도움 도구"><button onClick={() => dispatch({ type:'undo' })} disabled={!game.history.length && !game.before}>↶ 되돌리기</button><button onClick={() => { dispatch({ type:'reset' }); showBoard(); }}>↻ 처음부터</button><button onClick={() => dispatch({ type:'hint' })} disabled={won}>✦ 한 줄 힌트</button></div>
     <p className="flow-rating">{game.hinted ? '힌트 사용 · 이번 완성은 최대 ★★' : '몇 번 고쳐도 괜찮아요 · 힌트 없이 완성하면 ★★★'}{bestStars > 0 && ` · 최고 ★${bestStars}`}</p>
     {won && <StageCompletion className="flow-clear" stars={stars} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="flow-next" />}
   </main>;

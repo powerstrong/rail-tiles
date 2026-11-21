@@ -161,7 +161,11 @@ for (const width of [320, 390, 844]) test(`${width}px: boards fit without page o
       expect(cell!.height).toBeGreaterThanOrEqual(44);
     }
     if (kind === 'twins') {
-      await page.getByRole('button', { name: '숲 크게 보기', exact: true }).click();
+      if (page.viewportSize()!.height > 480) await page.getByRole('button', { name: '숲 크게 보기', exact: true }).click();
+      else {
+        await expect(page.locator('.lb-forest-pair')).toBeInViewport({ ratio: 1 });
+        await expect(page.locator('.lb-dpad')).toBeInViewport({ ratio: 1 });
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
     }
   }

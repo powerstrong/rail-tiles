@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { ALL_DIRS, type Dir } from '../engine/dir';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
@@ -180,6 +181,7 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
     play('rotate');
   };
   const restart = (keepHint = false) => {
+    showBoard();
     if (busy && !outOfAir) return;
     stopAll();
     setHistory([initialState(stage)]);
@@ -300,6 +302,8 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
         <p className="tip">{stage.tip}</p>
       )}
 
+      <BoardFirst status={<>중력 {presses}번{bonus && ` · 산소 ${Math.max(0, left)}번`}</>}>
+      <BoardMap>
       <div className="board-wrap">
         <SpaceBoard
           stage={stage}
@@ -314,7 +318,8 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
         />
       </div>
 
-      <div className="status-row">
+      </BoardMap>
+      <div className="status-row board-first-secondary">
         <button className="hint-btn" onClick={showHint} disabled={locked || stuck} aria-label="힌트 보기">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
@@ -348,6 +353,8 @@ export function SpaceScreen({ stage, hasNext, bestStars, intro, onBack, onNext, 
           ))}
         </div>
       </div>
+
+      </BoardFirst>
 
       {outOfAir && (
         <ResultOverlay label="산소가 다 떨어졌어요">

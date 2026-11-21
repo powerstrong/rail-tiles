@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { type Intro, IntroCard } from '../ui/IntroCard';
 import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
@@ -126,6 +127,7 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
     play('rotate');
   };
   const restart = (keepHint: boolean) => {
+    showBoard();
     // The last tap is still turning into a result: let the card come first.
     if (finishing.current && !won && !drained) return;
     timers.current.forEach(clearTimeout);
@@ -217,6 +219,8 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
         <p className="tip">{stage.tip}</p>
       )}
 
+      <BoardFirst status={<>누르기 {taps}번 · 전구 {lighting.litBulbs.size}/{stage.bulbs.length}{bonus && ` · 배터리 ${Math.max(0, left)}칸`}</>}>
+      <BoardMap>
       <div className="board-wrap">
         <svg className="board machine-board" viewBox={`${-PAD} ${-PAD} ${w + PAD * 2} ${h + PAD * 2 + 8}`} role="grid" aria-label={`${stage.width}×${stage.height} 레이저 공장`}>
           <Floor stage={stage} />
@@ -259,7 +263,8 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
         </svg>
       </div>
 
-      <div className="status-row">
+      </BoardMap>
+      <div className="status-row board-first-secondary">
         <button className="hint-btn" onClick={showHint} disabled={won || drained} aria-label="힌트 보기">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
@@ -279,6 +284,8 @@ export function MachineScreen({ stage, hasNext, bestStars, intro, onBack, onNext
           </span>
         </div>
       </div>
+
+      </BoardFirst>
 
       {drained && (
         <ResultOverlay label="배터리 방전">

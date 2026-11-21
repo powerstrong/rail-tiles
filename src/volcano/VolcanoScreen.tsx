@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { type Stars, TWO_STAR_SLACK, starsFor } from '../engine/stars';
 import { type Intro, IntroCard } from '../ui/IntroCard';
@@ -186,6 +187,7 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
   };
 
   const restart = (keepHint: boolean) => {
+    showBoard();
     timers.current.forEach(clearTimeout);
     setStones(new Set());
     setRaceState(raceStart(stage));
@@ -279,6 +281,8 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
         <p className="tip">{stage.tip}</p>
       )}
 
+      <BoardFirst sideControls={!race && stage.height >= 6} status={phase === 'fail' ? failNote : <>돌 {used}개</>}>
+      <BoardMap>
       <div className="board-wrap">
         <svg className="board volcano-board" viewBox={`${-PAD} ${-PAD} ${w + PAD * 2} ${h + PAD * 2 + 8}`} role="grid" aria-label={`${stage.width}×${stage.height} 화산 섬`}>
           <Ground stage={stage} />
@@ -312,7 +316,8 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
         </svg>
       </div>
 
-      <div className="status-row">
+      </BoardMap>
+      <div className="status-row board-first-secondary">
         <button className="hint-btn" onClick={showHint} disabled={phase !== 'build'} aria-label="힌트 보기">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
@@ -351,6 +356,8 @@ export function VolcanoScreen({ stage, hasNext, bestStars, intro, onBack, onNext
           )}
         </div>
       )}
+
+      </BoardFirst>
 
       {race && phase === 'fail' && (
         <ResultOverlay label="대피 실패">

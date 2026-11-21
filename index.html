@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f4e9d6" />
+    <style>
+      /* Paint the chosen canvas while the external stylesheet is loading. */
+      html { background: #f4e9d6; }
+      html[data-theme='dark'] { background: #252733; }
+    </style>
     <script>
       // Run before styles or React: a saved choice wins, otherwise follow the OS.
       (() => {

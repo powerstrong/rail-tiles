@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from './BoardFirst';
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type CellPos, type EditorState, createEditor, eraseRail, paintStroke, placeBlock, placeRail, remaining, replaceRail, resetBoard, rotateRail, undo, usedCount } from '../engine/editor';
 import { type Pose, poseAt, traceToPath } from '../engine/geometry';
@@ -185,6 +186,7 @@ export function GameScreen({ stage, hasNext, bestStars, onBack, onNext, onCleare
 
   /** Fresh attempt: empty board and the hint penalty lifted, as if the stage was just opened. */
   const restartStage = () => {
+    showBoard();
     setEditor(createEditor());
     setHinted(false);
     setHintKey(null);
@@ -396,7 +398,7 @@ export function GameScreen({ stage, hasNext, bestStars, onBack, onNext, onCleare
     say(stage.oneShot ? '새 도전이에요. 출발 전에 길을 다시 놓아 봐요.' : '기차를 세웠어요. 레일을 바로 고쳐 보세요.');
   };
   const doUndo = () => !running && applyEdit(undo(editor)) && play('rotate');
-  const doReset = () => !running && applyEdit(resetBoard(editor)) && play('erase');
+  const doReset = () => { if (!running) { applyEdit(resetBoard(editor)); play('erase'); showBoard(); } };
   const showHint = () => {
     if (running) return;
     const next = solutionOrder.find((p) => !matches(p));
@@ -485,6 +487,8 @@ export function GameScreen({ stage, hasNext, bestStars, onBack, onNext, onCleare
         <p className="tip">{stage.tip}</p>
       )}
 
+      <BoardFirst sideControls={stage.height >= 6} status={failure ? <>앗! {FAIL_TEXT[failure.reason]}</> : running ? '칙칙폭폭…' : <>레일 {usedCount(editor.placed)}개</>}>
+      <BoardMap>
       <div className="board-wrap">
         <Board
           stage={stage}
@@ -515,7 +519,8 @@ export function GameScreen({ stage, hasNext, bestStars, onBack, onNext, onCleare
         )}
       </div>
 
-      <div className="status-row">
+      </BoardMap>
+      <div className="status-row board-first-secondary">
         <button className="hint-btn" onClick={showHint} disabled={running} aria-label="힌트 보기">
           <svg viewBox="0 0 24 24" aria-hidden>
             <path d="M9 18 H15 M10 21 H14 M12 3 A6 6 0 0 0 8 13.5 C8.8 14.3 9 15 9 16 H15 C15 15 15.2 14.3 16 13.5 A6 6 0 0 0 12 3 Z" />
@@ -599,6 +604,8 @@ export function GameScreen({ stage, hasNext, bestStars, onBack, onNext, onCleare
           출발
         </button>
       </div>
+
+      </BoardFirst>
 
       <div className="run-tools" aria-label="운행 확인 도구">
         {running ? <>

@@ -23,8 +23,8 @@ const courses = [
   { world: 'clock', stages: CLOCK_STAGES, board: '.board-wrap' },
   { world: 'volcano', stages: VOLCANO_STAGES, board: '.board-wrap' },
   { world: 'memory', stages: MEMORY_STAGES, board: '.memory-board' },
-  { world: 'bee', stages: lab.filter(s => s.kind === 'bee'), board: '.lab-play-canvas' },
-  { world: 'twins', stages: lab.filter(s => s.kind === 'twins'), board: '.lab-play-canvas' },
+  { world: 'bee', stages: lab.filter(s => s.kind === 'bee'), board: '.lb-bee-frame' },
+  { world: 'twins', stages: lab.filter(s => s.kind === 'twins'), board: '.lb-forest-pair' },
   ...['flow', 'pieces', 'coral', 'balance', 'cloud'].map(world => ({ world,
     stages: data(`../src/${world}/${world === 'cloud' ? 'patterns.json' : 'stages.generated.json'}`),
     board: ({ flow: '.flow-cloth', pieces: '.pieces-canvas', coral: '.coral-ocean', balance: '.balance-scales', cloud: '.cloud-scroll' } as Record<string, string>)[world],
@@ -101,8 +101,10 @@ for (const scheme of ['light', 'dark'] as const) {
   test(`system ${scheme} is applied before React loads`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: scheme });
     await page.route('**/assets/*.js', route => route.abort());
+    await page.route('**/assets/*.css', route => route.abort());
     await page.goto('/');
     await theme(page, scheme);
+    await expect(page.locator('html')).toHaveCSS('background-color', scheme === 'dark' ? 'rgb(37, 39, 51)' : 'rgb(244, 233, 214)');
     await expect(page.locator('#root')).toBeEmpty();
     expect(await page.evaluate(() => localStorage.getItem('rail-tiles:theme'))).toBeNull();
   });
@@ -208,13 +210,15 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 360, height: 330 }
         await theme(page, 'dark');
         await noOverflow(page);
         await readableText(page);
-        await expect(page.locator('h1')).toBeInViewport();
+        if (viewport.height > 480) await expect(page.locator('h1')).toBeInViewport();
+        else await expect(page.locator('.board-first-status')).toBeInViewport();
         await expect(page.locator('.version-label, .theme-toggle')).toHaveCount(0);
         await photograph(page, `${course.world}${viewport.height === 330 ? '-cover' : ''}`);
         await open(page, course, course.stages.length - 1);
         await noOverflow(page);
         await readableText(page);
-        await expect(page.locator('h1')).toBeInViewport();
+        if (viewport.height > 480) await expect(page.locator('h1')).toBeInViewport();
+        else await expect(page.locator('.board-first-status')).toBeInViewport();
       });
     }
     test('story, intro and result cards keep readable night surfaces', async ({ page }) => {

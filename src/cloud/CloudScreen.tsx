@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type { GameProps } from '../worlds';
@@ -69,12 +70,16 @@ export function CloudScreen({ stage, onBack, onNext, onCleared, hasNext, bestSta
     <header className="cloud-header"><button onClick={onBack}>← 스테이지 고르기</button><span>구름 자수 공방</span><button aria-label={muted ? '소리 켜기' : '소리 끄기'} aria-pressed={muted} onClick={() => { setMuted(!muted); updateMuted(!muted); }}>{muted ? '♪ 켜기' : '♪ 끄기'}</button></header>
     <div className="cloud-heading"><p>{CLOUD_CHAPTERS[Math.floor((stage.number - 1) / 10)].title} · {stage.label.replace('STAGE ', '')} / 30</p><h1 ref={heading} tabIndex={-1}>{stage.title}</h1></div>
     <p className="cloud-lesson">{stage.lesson}</p>
+    <BoardFirst status={conflict ? `${lineName(conflict)}의 표시를 고쳐 봐요` : <>{moves}번 표시</>}>
     <div className="cloud-toolbar" role="group" aria-label="바느질 도구">
       {([1, 2, 0] as const).map(v => <button key={v} aria-pressed={tool === v} onClick={() => setTool(v)}>{['· 지우개', '✚ 수놓기', '× 빈칸'][v]}</button>)}
     </div>
+    <div className="board-first-secondary">
     <p className="cloud-caption">· 아직 모름　✚ 수놓음　× 비움{stage.rows > 1 ? ' · 숫자를 누르면 줄 강조' : ''}</p>
     <div className="cloud-board-options"><button aria-pressed={large} onClick={() => setLarge(v => !v)}>{large ? '− 한눈에 보기' : '+ 칸 크게 보기'}</button><span>{focus ? `${lineName(focus)} 강조 중` : '가로 ↔ · 세로 ↕'}</span></div>
     {large && <p className="cloud-caption">확대한 판은 옆으로 밀어 보세요. 줄의 숫자는 따라와요.</p>}
+    </div>
+    <BoardMap>
     <div className="cloud-scroll" role="region" aria-label="자수판" tabIndex={0}>
       <div className={`cloud-board${won ? ' is-finished' : ''}`} role="group" aria-label="숫자 단서와 자수 칸" style={{ '--cloud-cols': stage.cols, '--cloud-cell': large || stage.cols <= 4 ? '56px' : '44px' } as CSSProperties}>
         <span className="cloud-corner" aria-hidden="true">↕<br />↔</span>
@@ -90,9 +95,11 @@ export function CloudScreen({ stage, onBack, onNext, onCleared, hasNext, bestSta
         </div>)}
       </div>
     </div>
+    </BoardMap>
+    </BoardFirst>
     <div className="cloud-feedback" role="status" aria-live="polite">{conflict ? <><strong>{lineName(conflict)}의 숫자와 표시가 맞지 않아요.</strong> 이 줄을 고치거나 되돌려 보세요. <button onClick={undo}>직전 표시 되돌리기</button></> : note || (hint ? hint.reason : won ? '숨은 무늬가 작품이 되었어요!' : '숫자 묶음 사이에는 한 칸 이상 ×. 모든 칸을 ✚ 또는 ×로 정하면 완성이에요.')}</div>
     {hint && <section className="cloud-proof" aria-label="한 줄 힌트의 근거"><p>{lineName(hint.line)}에 놓을 수 있는 모양 {hint.line.candidates.length}가지 <span>(✚ 수놓기 · × 비움)</span></p><div className="cloud-candidates">{hint.line.candidates.map((p, i) => <div key={i} aria-label={p.map(v => v ? '수' : '빈').join(' ')}>{p.map((v, k) => <span key={k} className={hint.line.cells[k] === hint.cell ? 'target' : ''}>{v ? '✚' : '×'}</span>)}</div>)}</div><button onClick={() => mark(hint.cell, hint.value)}>이 칸을 {hint.value === 1 ? '수놓기' : '×로 표시'}</button></section>}
-    <div className="cloud-tools"><button onClick={undo} disabled={!moves}>↶ 되돌리기</button><button onClick={() => { setHistory([blank()]); setHinted(false); clearHint(); }}>↻ 처음부터</button><button onClick={askHint} disabled={won}>한 줄 힌트</button></div>
+    <div className="cloud-tools"><button onClick={undo} disabled={!moves}>↶ 되돌리기</button><button onClick={() => { setHistory([blank()]); showBoard(); setHinted(false); clearHint(); }}>↻ 처음부터</button><button onClick={askHint} disabled={won}>한 줄 힌트</button></div>
     <p className="cloud-score">{moves}번 표시 · ★★★ {stage.par}번 · ★★ {stage.par + 2}번 이하{hinted ? ' · 힌트 사용: 최대 ★★' : ''}</p>
     {won && <StageCompletion className="cloud-clear" stars={stars} hasNext={hasNext} onNext={onNext} onBack={onBack} nextClassName="cloud-primary" />}
     <button className="cloud-gallery-button" aria-expanded={gallery} onClick={() => setGallery(v => !v)}>작품 모음 {collected.length} / 30 {gallery ? '접기' : '보기'}</button>

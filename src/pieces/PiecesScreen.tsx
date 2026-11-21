@@ -1,3 +1,4 @@
+import { BoardFirst, BoardMap, showBoard } from '../ui/BoardFirst';
 import { StageCompletion } from '../ui/StageCompletion';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import type { GameProps } from '../worlds';
@@ -113,6 +114,8 @@ export function PiecesScreen({ stage, bestStars, hasNext, clearNote, onBack, onN
     <div className="pieces-heading"><p>{chapter.title} · {stage.label.replace('STAGE ', '')}</p><h1 ref={title} tabIndex={-1}>{stage.title}</h1>{bestStars > 0 && <span className="pieces-best">최고 ★{bestStars}</span>}</div>
     <div className="pieces-goal"><span>{stage.number === 1 ? '● 조각을 점선에 쏙! 두 조각을 모아 봐요.' : stage.number === 11 ? '창문은 비워 둬요. 오목한 자리에 쏙!' : stage.number === 21 ? '돌려도 안 맞나요? 뒤집기를 눌러 봐요!' : '조각을 돌려서 틀을 빈틈없이 채워요.'}</span><button onClick={() => setHelp(!help)} aria-expanded={help}>규칙 {help ? '−' : '+'}</button></div>
     {help && <div className="pieces-rules"><p>조각을 끌거나, 조각을 고른 뒤 틀을 눌러요. 바구니에서 동그라미 친 표시 칸이 누른 칸에 놓여요. 회전은 조각을 고르고 「돌리기」를 눌러요.{stage.allowFlip ? ' 이제 「뒤집기」로 반대쪽 모양도 만들 수 있어요.' : ' 뒤집기는 3장에서 만나요.'}</p><p>틀 밖이나 겹친 자리는 놓이지 않아요. 놓은 조각도 언제든 다시 집거나 바구니로 가져올 수 있어요.</p><p>★★★ {stage.par}번 · ★★ {stage.par + 2}번 이하 · 그 밖에는 ★. 놓기·옮기기·꺼내기는 한 번이에요. 돌리기는 세지 않아요. 힌트를 쓰면 최대 ★★예요.</p></div>}
+    <BoardFirst status={<>{moves}번 놓기 · {layout.filter(Boolean).length} / {stage.pieces.length} 조각</>}>
+    <BoardMap>
     <div className={`pieces-canvas${won ? ' is-complete' : ''}`}>
       <div className="pieces-board-caption"><span>{won ? '그림이 나타났어요!' : '어떤 그림이 숨어 있을까?'}</span><b>{layout.filter(Boolean).length} / {stage.pieces.length} 조각</b></div>
       <svg ref={board} className="pieces-board" style={{ maxWidth: `${Math.min(360, 300 * stage.cols / stage.rows)}px` }} viewBox={`0 0 ${stage.cols * 40} ${stage.rows * 40}`} aria-label="조각을 놓는 틀" onPointerDown={onBoardDown}>
@@ -126,15 +129,17 @@ export function PiecesScreen({ stage, bestStars, hasNext, clearNote, onBack, onN
         }} />)}
       </svg>
     </div>
+    </BoardMap>
     <div className="pieces-tray" aria-label="조각 바구니">{stage.pieces.map((piece, i) => {
       const o = orient[i], cells = shape(piece, o.turn, o.flip), w = Math.max(...cells.map(c => c[0])) + 1, h = Math.max(...cells.map(c => c[1])) + 1;
       return <button key={i} aria-label={`${MARKS[i]} 조각 ${i + 1}${layout[i] ? ' 놓여 있음' : ''}`} aria-pressed={selected === i} className={`pieces-piece${layout[i] ? ' is-placed' : ''}`} style={{ borderColor: selected === i ? '#285f58' : COLORS[i] }} onPointerDown={e => begin(e, i)} onClick={e => { if (e.detail === 0) select(i); }}><svg viewBox={`-2 -2 ${w * 20 + 4} ${h * 20 + 4}`} aria-hidden="true"><Tiles cells={cells} index={i} unit={20} anchor /></svg><span>{MARKS[i]} {layout[i] ? '놓음' : `${piece.cells.length}칸`}</span></button>;
     })}</div>
     <div className="pieces-transform"><button disabled={selected === null} onClick={() => transform()}>↻ 돌리기</button>{stage.allowFlip && <button disabled={selected === null} onClick={() => transform(true)}>↔ 뒤집기</button>}<button disabled={selected === null || !layout[selected]} onClick={() => selected !== null && remove(selected)}>↓ 바구니로</button></div>
+    </BoardFirst>
     <div className="pieces-status" role="status" aria-live="polite">{note || '놓은 조각은 언제든 다시 집을 수 있어요.'}</div>
     {hint && <button className="pieces-hint-apply" onClick={() => { if (hint.remove) remove(hint.index); else put(hint.index, hint.pose); }}>{hint.remove ? '이 조각 꺼내기' : '힌트대로 놓기'}</button>}
     <div className="pieces-count"><span>놓기·꺼내기 {moves}번 · ★★★ {stage.par}번</span><span>{game.hinted ? '힌트 사용 · 최대 ★★' : '천천히 생각해도 좋아요'}</span></div>
-    <div className="pieces-tools"><button onClick={undo} disabled={moves === 0}>↶ 되돌리기</button><button onClick={() => { drag.current = null; setFloating(null); dispatch({ type: 'reset' }); setOrient(stage.pieces.map(() => ({ ...origin }))); setHint(null); setSelected(null); setHover(null); setNote('바구니에 모두 모았어요. 새로 시작해요.'); }}>처음부터</button><button onClick={requestHint} disabled={won}>한 조각 힌트</button></div>
+    <div className="pieces-tools"><button onClick={undo} disabled={moves === 0}>↶ 되돌리기</button><button onClick={() => { drag.current = null; setFloating(null); dispatch({ type: 'reset' }); showBoard(); setOrient(stage.pieces.map(() => ({ ...origin }))); setHint(null); setSelected(null); setHover(null); setNote('바구니에 모두 모았어요. 새로 시작해요.'); }}>처음부터</button><button onClick={requestHint} disabled={won}>한 조각 힌트</button></div>
     {won && <StageCompletion className="pieces-clear" stars={starsFor(moves, stage.par, game.hinted)} hasNext={hasNext} onNext={onNext} onBack={onBack} note={clearNote} />}
     {floating && selected !== null && <svg className="pieces-floating" style={{ left: floating.x + 12, top: floating.y - 65 }} width="100" height="100" viewBox="-2 -2 124 124" aria-hidden="true"><Tiles cells={shape(stage.pieces[selected], drag.current?.turn ?? orient[selected].turn, drag.current?.flip ?? orient[selected].flip)} index={selected} unit={24} /></svg>}
   </main>;

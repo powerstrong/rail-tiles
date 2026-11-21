@@ -13,16 +13,17 @@ export function useFitBoard<T extends HTMLElement>() {
     const game = ref.current;
     if (!game || typeof ResizeObserver === 'undefined') return;
 
+    const flattened = (parent: Element): HTMLElement[] => Array.from(parent.children).flatMap(child =>
+      getComputedStyle(child).display === 'contents' ? flattened(child) : [child as HTMLElement]);
+
     const fit = () => {
       const board = game.querySelector<SVGSVGElement>('.board-wrap .board');
       if (!board) return;
-      // Shared SVG boards use 100-unit cells. Short viewports scroll the interactive
-      // boards at 45px per cell instead of squeezing their hit areas below 44px.
-      game.style.setProperty('--cover-board-width', `${board.viewBox.baseVal.width * .45}px`);
+      if (window.matchMedia('(max-height: 480px)').matches) return;
       const cs = getComputedStyle(game);
       let used = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
       let shown = 0;
-      for (const child of Array.from(game.children) as HTMLElement[]) {
+      for (const child of flattened(game)) {
         const pos = getComputedStyle(child).position;
         if (pos === 'absolute' || pos === 'fixed' || child.offsetHeight === 0) continue;
         used += child.offsetHeight;
@@ -39,19 +40,24 @@ export function useFitBoard<T extends HTMLElement>() {
     const ro = new ResizeObserver(fit);
     const watch = () => {
       ro.observe(game);
-      for (const child of Array.from(game.children)) ro.observe(child);
+      for (const child of flattened(game)) ro.observe(child);
     };
     // Tips, banners and intros come and go: watch new children too.
     const mo = new MutationObserver(() => {
       watch();
       fit();
     });
-    mo.observe(game, { childList: true });
+    mo.observe(game, { childList: true, subtree: true });
+    // Folding changes which wrappers are display:contents. Observe the newly
+    // exposed children again so subsequent status/dock changes still fit.
+    const resize = () => { watch(); fit(); };
+    window.addEventListener('resize', resize);
     watch();
     fit();
     return () => {
       ro.disconnect();
       mo.disconnect();
+      window.removeEventListener('resize', resize);
     };
   }, []);
 
